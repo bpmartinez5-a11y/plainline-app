@@ -1,0 +1,851 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d6b71">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d6b71'/%3E%3Cpath d='M9 22V10h7a4 4 0 0 1 0 8h-7' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+<title>Plainline Text Concierge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a working demo console. Customer's phone on the left, the business's front desk on the right; tabs on phones. */
+:root{
+  --bg:#eaeff1; --surface:#ffffff; --sunk:#f3f6f7; --ink:#12222b; --muted:#5b6d76; --line:#d3dce0;
+  --accent:#0d6b71; --accent-ink:#ffffff; --accent-soft:#dcefef;
+  --me:#0d6b71; --me-ink:#ffffff; --them:#e4ebed; --them-ink:#12222b;
+  --warn:#a6520a; --warn-bg:#fcefd9; --ok:#2b7a4b; --ok-bg:#def1e5; --staff:#6247b3; --staff-bg:#ece6fa;
+  --phone:#0f1b20;
+  --f-display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --f-body:"Figtree", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0c1417; --surface:#132026; --sunk:#0f1a1f; --ink:#e2ebee; --muted:#8ea2aa; --line:#24353c;
+  --accent:#43b3b8; --accent-ink:#04201f; --accent-soft:#163437;
+  --me:#1d8086; --me-ink:#ffffff; --them:#1f2f35; --them-ink:#e2ebee;
+  --warn:#f1a64c; --warn-bg:#36260f; --ok:#6dc490; --ok-bg:#143021; --staff:#ab95f2; --staff-bg:#271f3f;
+  --phone:#05090b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c1417; --surface:#132026; --sunk:#0f1a1f; --ink:#e2ebee; --muted:#8ea2aa; --line:#24353c;
+  --accent:#43b3b8; --accent-ink:#04201f; --accent-soft:#163437;
+  --me:#1d8086; --me-ink:#ffffff; --them:#1f2f35; --them-ink:#e2ebee;
+  --warn:#f1a64c; --warn-bg:#36260f; --ok:#6dc490; --ok-bg:#143021; --staff:#ab95f2; --staff-bg:#271f3f;
+  --phone:#05090b; color-scheme:dark}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 40px}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+
+/* top bar */
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;justify-content:space-between}
+.brand{display:flex;align-items:baseline;gap:10px}
+.brand b{font-family:var(--f-display);font-size:24px;letter-spacing:-.02em}
+.brand span{color:var(--muted);font-size:13px}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{font-size:12px;padding:4px 10px;border-radius:99px;border:1px solid var(--line);color:var(--muted);background:var(--surface);white-space:nowrap}
+.pill i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--muted);margin-right:6px;vertical-align:1px;font-style:normal}
+.pill.on i{background:var(--ok)} .pill.off i{background:var(--warn)}
+.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px}
+.tabs button{border:0;background:none;padding:7px 14px;border-radius:9px;font-weight:600;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+
+/* main grid */
+.grid{display:grid;grid-template-columns:400px minmax(0,1fr);gap:22px;align-items:start}
+.pane{min-width:0}
+.mob-tabs{display:none}
+@media (max-width:980px){
+  .grid{grid-template-columns:minmax(0,1fr)}
+  .mob-tabs{display:flex}
+  .desk-tabs{display:none}
+  body[data-view="customer"] .right{display:none}
+  body:not([data-view="customer"]) .left{display:none}
+}
+
+/* phone */
+.left{display:flex;flex-direction:column;gap:10px;align-items:center}
+.phone{width:100%;max-width:380px;background:var(--phone);border-radius:44px;padding:12px;box-shadow:0 30px 60px -30px rgba(10,30,40,.45)}
+.screen{background:var(--surface);border-radius:34px;height:690px;display:flex;flex-direction:column;overflow:hidden}
+.ph-head{padding:22px 16px 10px;display:flex;flex-direction:column;align-items:center;gap:5px;border-bottom:1px solid var(--line);background:var(--sunk)}
+.logo{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;color:#fff;font-family:var(--f-display);font-weight:700;font-size:18px}
+.ph-name{font-weight:700;font-size:14px;display:flex;align-items:center;gap:5px}
+.ver{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-size:9px}
+.ph-sub{font-size:11px;color:var(--muted)}
+.thread{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:6px;scroll-behavior:smooth}
+.thread > *, .t-body > *{flex-shrink:0}
+.day-sep{text-align:center;font-size:11px;color:var(--muted);margin:4px 0}
+.b{max-width:82%;padding:8px 12px;border-radius:18px;white-space:pre-wrap;word-wrap:break-word;font-size:14px}
+.b.me{align-self:flex-end;background:var(--me);color:var(--me-ink);border-bottom-right-radius:6px}
+.b.them{align-self:flex-start;background:var(--them);color:var(--them-ink);border-bottom-left-radius:6px}
+.b.staff{background:var(--staff-bg)}
+.who{font-size:10.5px;color:var(--muted);margin:6px 0 -2px 6px;align-self:flex-start}
+.who.staff{color:var(--staff)}
+.sys{align-self:center;font-size:11.5px;color:var(--muted);background:var(--sunk);border:1px solid var(--line);padding:3px 10px;border-radius:99px;margin:4px 0;text-align:center}
+.sys.staff{color:var(--staff);border-color:transparent;background:var(--staff-bg)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-self:flex-start;max-width:92%;margin-top:2px}
+.chip{border:1px solid var(--accent);color:var(--accent);background:transparent;border-radius:99px;padding:5px 11px;font-size:13px;font-weight:500}
+.chip:hover{background:var(--accent-soft)}
+.typing{align-self:flex-start;background:var(--them);border-radius:18px;padding:10px 14px;display:flex;gap:4px}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:blink 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.typing i{animation:none}.thread{scroll-behavior:auto}}
+
+/* widgets inside the chat */
+.w{align-self:flex-start;width:88%;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;font-size:13px}
+.w-h{padding:9px 12px;font-weight:700;border-bottom:1px solid var(--line);background:var(--sunk);display:flex;justify-content:space-between;gap:8px}
+.w-h small{font-weight:500;color:var(--muted)}
+.w-row{display:flex;justify-content:space-between;gap:10px;align-items:center;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:10px 12px}
+.w-row:last-child{border-bottom:0}
+.w-row:hover:not(:disabled){background:var(--accent-soft)}
+.w-row:disabled{cursor:default;opacity:.55}
+.w-row .p{color:var(--muted);font-family:var(--f-mono);font-size:12px;white-space:nowrap}
+.days{display:flex;gap:6px;overflow-x:auto;padding:10px 12px 4px}
+.dchip{flex:0 0 auto;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:5px 9px;text-align:center;line-height:1.15;font-size:12px}
+.dchip b{display:block;font-size:14px}
+.dchip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.dchip:disabled{opacity:.4;cursor:default}
+.times{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px 12px 12px}
+.times button{border:1px solid var(--line);background:var(--sunk);border-radius:9px;padding:7px 4px;font-family:var(--f-mono);font-size:12px}
+.times button:hover{border-color:var(--accent);color:var(--accent)}
+.w-empty{padding:12px;color:var(--muted)}
+.w form{display:flex;flex-direction:column;gap:8px;padding:12px}
+.w label{display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:var(--muted);font-weight:600}
+.w input,.w textarea{border:1px solid var(--line);border-radius:9px;padding:7px 9px;background:var(--sunk);font-size:13px;font-weight:400}
+.w textarea{resize:vertical;min-height:44px}
+.btn{border:0;background:var(--accent);color:var(--accent-ink);font-weight:700;border-radius:10px;padding:9px 12px}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.warn{background:var(--warn);color:#fff}
+.w-pay{padding:12px;display:flex;flex-direction:column;gap:8px}
+.w-pay .amt{font-family:var(--f-display);font-size:26px;font-weight:700;letter-spacing:-.02em}
+.note{font-size:11.5px;color:var(--muted)}
+.w-done{padding:10px 12px;color:var(--muted)}
+.w.confirm{border-color:var(--ok)}
+.w.confirm .w-h{background:var(--ok-bg);color:var(--ok)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;padding:10px 12px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-weight:600}
+
+.composer{display:flex;gap:8px;padding:10px 12px 16px;border-top:1px solid var(--line);background:var(--sunk)}
+.composer input{flex:1;min-width:0;border:1px solid var(--line);border-radius:99px;padding:9px 14px;background:var(--surface)}
+.send{width:38px;height:38px;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);font-weight:700;flex:0 0 auto}
+.send:disabled{opacity:.4}
+.under{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.linkbtn{background:none;border:0;color:var(--accent);font-weight:600;padding:2px}
+.empty-chat{margin:auto 0;text-align:center;color:var(--muted);display:flex;flex-direction:column;gap:12px;align-items:center;padding:0 10px}
+.empty-chat .chips{align-self:center;justify-content:center}
+
+/* right side */
+.right{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.kpi{padding:12px 14px}
+.kpi small{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.kpi b{font-family:var(--f-display);font-size:28px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.kpi.alert b{color:var(--warn)}
+@media (max-width:560px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.desk{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:520px}
+@media (max-width:720px){.desk{grid-template-columns:minmax(0,1fr)}.convos{max-height:260px;border-right:0!important;border-bottom:1px solid var(--line)}}
+.convos{border-right:1px solid var(--line);overflow-y:auto;max-height:620px}
+.c-row{display:flex;flex-direction:column;gap:3px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:11px 14px}
+.c-row[aria-current="true"]{background:var(--accent-soft)}
+.c-top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.c-top b{font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.c-prev{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st{font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:99px;white-space:nowrap}
+.st.ai{background:var(--accent-soft);color:var(--accent)}
+.st.needs_human{background:var(--warn-bg);color:var(--warn)}
+.st.human{background:var(--staff-bg);color:var(--staff)}
+.st.booked{background:var(--ok-bg);color:var(--ok)}
+.st.ex{background:var(--sunk);color:var(--muted);border:1px solid var(--line)}
+.t-pane{display:flex;flex-direction:column;min-width:0}
+.t-head{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+.t-head h3{margin:0;font-size:15px}
+.t-head .reason{font-size:12px;color:var(--warn);margin-top:2px}
+.t-actions{display:flex;gap:8px;flex-wrap:wrap}
+.t-actions .btn{padding:7px 11px;font-size:13px}
+.t-body{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:6px;max-height:470px;min-height:300px}
+.t-body .b{max-width:78%}
+.t-body .b.me{align-self:flex-start;background:var(--them);color:var(--them-ink);border-radius:18px;border-bottom-left-radius:6px}
+.t-body .b.them{align-self:flex-end;background:var(--accent-soft);color:var(--ink);border-radius:18px;border-bottom-right-radius:6px}
+.t-body .b.staff{background:var(--staff-bg)}
+.t-body .who{align-self:flex-end;margin:6px 6px -2px 0}
+.t-body .who.cust{align-self:flex-start;margin-left:6px}
+.t-body .wsum{align-self:flex-end;font-size:12px;color:var(--muted);font-style:italic}
+.t-comp{display:flex;gap:8px;padding:10px 16px 14px;border-top:1px solid var(--line)}
+.t-comp input{flex:1;min-width:0;border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:var(--sunk)}
+.t-empty{margin:auto;color:var(--muted);text-align:center;padding:30px;max-width:340px}
+.sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:14px 16px 6px}
+.sec-h h2{margin:0;font-family:var(--f-display);font-size:18px;letter-spacing:-.01em}
+.sec-h span{font-size:12px;color:var(--muted)}
+.bk-list{display:flex;flex-direction:column;padding:4px 0 8px}
+.bk{display:grid;grid-template-columns:118px minmax(0,1fr) auto;gap:12px;align-items:center;padding:9px 16px;border-top:1px solid var(--line)}
+.bk time{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.bk .n{font-weight:600}
+.bk .s{font-size:12.5px;color:var(--muted)}
+.bk .d{font-family:var(--f-mono);font-size:12px;text-align:right}
+@media (max-width:520px){.bk{grid-template-columns:minmax(0,1fr) auto}.bk time{grid-column:1/-1}}
+
+/* setup */
+.setup{padding:4px 0 16px}
+.setup section{padding:12px 16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.setup section:first-of-type{border-top:0}
+.setup h4{margin:0;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.setup label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--muted)}
+.setup input,.setup select,.setup textarea{border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--sunk);font-weight:400;font-size:13.5px;color:var(--ink);min-width:0}
+.setup textarea{min-height:80px;resize:vertical}
+.svc-tbl{overflow-x:auto}
+.svc-tbl table{border-collapse:collapse;width:100%;min-width:520px}
+.svc-tbl th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:left;padding:4px 6px;font-weight:600}
+.svc-tbl td{padding:3px 4px}
+.svc-tbl input{width:100%}
+.svc-tbl .num{width:84px}
+.x{border:0;background:none;color:var(--muted);font-size:16px;padding:4px 8px}
+.hours{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.hrow{display:flex;flex-direction:column;gap:4px;border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--sunk)}
+.hrow b{font-size:12px}
+.hrow div{display:flex;gap:4px;align-items:center}
+.hrow select{padding:4px;font-size:12px;flex:1;background:var(--surface)}
+.save-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 16px 0}
+.saved{font-size:12.5px;color:var(--ok)}
+.golive ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.golive li span{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><a href="/" style="color:inherit;text-decoration:none"><b>Plainline</b></a><span>Text Concierge · live demo · <a href="/#contact" style="color:var(--accent)">Get one set up</a></span></div>
+    <div class="pills">
+      <span class="pill" id="aiPill"><i></i>Assistant: connecting</span>
+      <span class="pill" id="syncPill"><i></i>Sync: connecting</span>
+    </div>
+    <div class="tabs mob-tabs" role="tablist" aria-label="View">
+      <button data-view="customer" role="tab">Customer</button>
+      <button data-view="desk" role="tab">Front desk</button>
+      <button data-view="setup" role="tab">Setup</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- customer phone -->
+    <div class="pane left">
+      <div class="phone">
+        <div class="screen">
+          <div class="ph-head" id="phHead"></div>
+          <div class="thread" id="thread" aria-live="polite"></div>
+          <form class="composer" id="composer">
+            <input id="msgIn" autocomplete="off" placeholder="Text message" aria-label="Message to the business">
+            <button class="send" id="sendBtn" aria-label="Send">↑</button>
+          </form>
+        </div>
+      </div>
+      <div class="under">
+        <span>You're the customer here.</span>
+        <button class="linkbtn" id="newCust">Start as a new customer</button>
+      </div>
+    </div>
+
+    <!-- business side -->
+    <div class="pane right">
+      <div class="tabs desk-tabs" role="tablist" aria-label="Business view" style="align-self:flex-start">
+        <button data-view="desk" role="tab">Front desk</button>
+        <button data-view="setup" role="tab">Business setup</button>
+      </div>
+      <div id="deskView">
+        <div class="kpis" id="kpis"></div>
+        <div class="card desk" style="margin-top:16px">
+          <div class="convos" id="convos"></div>
+          <div class="t-pane" id="tpane"></div>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <div class="sec-h"><h2>Upcoming bookings</h2><span id="bkCount"></span></div>
+          <div class="bk-list" id="bookings"></div>
+        </div>
+      </div>
+      <div id="setupView" class="card" hidden></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+/* ---------- presets ---------- */
+const PRESETS = {
+  salon:{ preset:"salon", name:"Fern & Fade Studio", color:"#b0476b", staffName:"Maya",
+    tone:"Warm, upbeat and brief, like a stylist texting a regular.",
+    services:[
+      {id:"cut",name:"Women's cut & style",minutes:60,price:75,deposit:20},
+      {id:"mens",name:"Men's cut",minutes:30,price:40,deposit:0},
+      {id:"color",name:"Single-process color",minutes:120,price:140,deposit:40},
+      {id:"blow",name:"Blowout",minutes:45,price:50,deposit:0}],
+    hours:{0:null,1:null,2:[9,18],3:[9,18],4:[9,19],5:[9,18],6:[9,16]},
+    policies:"Cancel at least 24 hours ahead or the deposit is kept.\nFree parking behind the building.\nColor clients: come with dry, unwashed hair.\nWe take cards and Apple Pay in the salon."},
+  detail:{ preset:"detail", name:"Gloss Lab Detailing", color:"#2d5fa8", staffName:"Andre",
+    tone:"Friendly and straightforward, a little car-enthusiast energy.",
+    services:[
+      {id:"express",name:"Express wash & wax",minutes:60,price:79,deposit:0},
+      {id:"interior",name:"Interior deep clean",minutes:150,price:189,deposit:40},
+      {id:"full",name:"Full detail",minutes:240,price:299,deposit:60},
+      {id:"ceramic",name:"Ceramic coating consult",minutes:30,price:0,deposit:0}],
+    hours:{0:null,1:[8,17],2:[8,17],3:[8,17],4:[8,17],5:[8,17],6:[8,15]},
+    policies:"SUVs and trucks add $30 to detail services.\nPet hair removal is $25 extra.\nDrop-off is fine; we text when the car is ready.\nRain reschedules are free."},
+  hvac:{ preset:"hvac", name:"Northline Heating & Air", color:"#c0561b", staffName:"Dana",
+    tone:"Calm, professional and reassuring.",
+    services:[
+      {id:"diag",name:"Diagnostic visit",minutes:90,price:89,deposit:0},
+      {id:"tune",name:"Seasonal tune-up",minutes:60,price:129,deposit:0},
+      {id:"duct",name:"Duct cleaning estimate",minutes:45,price:0,deposit:0},
+      {id:"thermo",name:"Smart thermostat install",minutes:90,price:199,deposit:50}],
+    hours:{0:null,1:[7,18],2:[7,18],3:[7,18],4:[7,18],5:[7,18],6:[8,14]},
+    policies:"Diagnostic fee is credited toward any repair we do that day.\nGas smell or no heat with vulnerable people at home: hand off to staff right away.\nService area: within 25 miles of downtown.\nArrival window is 2 hours from the booked time."},
+  fitness:{ preset:"fitness", name:"Ironside Strength", color:"#3d7a3a", staffName:"Jordan",
+    tone:"Encouraging, direct, zero pressure.",
+    services:[
+      {id:"intro",name:"Free intro session",minutes:45,price:0,deposit:0},
+      {id:"pt",name:"Personal training",minutes:60,price:85,deposit:25},
+      {id:"class",name:"Group class drop-in",minutes:60,price:25,deposit:0},
+      {id:"scan",name:"Body composition scan",minutes:30,price:40,deposit:0}],
+    hours:{0:[8,14],1:[6,20],2:[6,20],3:[6,20],4:[6,20],5:[6,19],6:[8,14]},
+    policies:"Memberships start at $129/month; first intro session is free.\nBring water and training shoes.\nCancel personal training 12 hours ahead or the deposit is kept.\nShowers and lockers on site."}
+};
+const PRESET_LABEL = {salon:"Hair salon",detail:"Auto detailing",hvac:"Heating & air (home services)",fitness:"Gym / fitness studio",custom:"Custom"};
+const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid = () => Math.random().toString(36).slice(2,9) + Date.now().toString(36).slice(-5);
+const money = n => Number(n) ? "$" + (Number(n) % 1 ? Number(n).toFixed(2) : Number(n)) : "Free";
+const clone = o => JSON.parse(JSON.stringify(o));
+const ls = { get(k,d){ try{ const v = localStorage.getItem(k); return v==null ? d : JSON.parse(v); }catch{ return d; } },
+             set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch{} } };
+const fmtTime = d => new Date(d).toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+const fmtDay = d => new Date(d).toLocaleDateString([], {weekday:"short", month:"short", day:"numeric"});
+const fmtWhen = d => fmtDay(d) + " · " + fmtTime(d);
+const ymd = d => { const x = new Date(d); return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0"); };
+const fmtHour = h => { const d = new Date(2000,0,1,0,Math.round(h*60)); return d.toLocaleTimeString([], {hour:"numeric", minute: h%1 ? "2-digit" : undefined}); };
+const use = name => (window.claude && window.claude.use) ? window.claude.use(name).catch(() => null) : Promise.resolve(null);
+
+/* ---------- state ---------- */
+const S = {
+  config: null, convos: {}, bookings: {},
+  myConvoId: ls.get("pl_my", null),
+  selected: null, view: ls.get("pl_view", matchMedia("(max-width:980px)").matches ? "customer" : "desk"),
+  typing: new Set(), uiDay: {}, aiMode: "connecting", sync: "connecting",
+  setupDirty: false
+};
+const C = () => S.config || PRESETS.salon;
+const svcById = id => C().services.find(s => s.id === id);
+
+/* ---------- store: shared db when available, this browser otherwise ---------- */
+const SUPABASE_URL = "https://mtpaaizladkfjtpnkdao.supabase.co";
+const SUPABASE_KEY = "sb_publishable_JPkZK7XX94_KVaRBnFYpwQ_-1w3TY24";
+let db = null, sample = null;
+const queues = {};
+function writeDoc(path, data){
+  const [table, id] = path.split("/");
+  const q = (queues[path] || Promise.resolve()).then(async () => {
+    if (!db) return;
+    const r = data === null
+      ? await db.from(table).delete().eq("id", id)
+      : await db.from(table).upsert({id, doc: clone(data), updated_at: new Date().toISOString()});
+    if (r.error) console.warn("write failed", path, r.error);
+  });
+  queues[path] = q.catch(()=>{}); return q;
+}
+function saveLocal(){ if (!db) ls.set("pl_local", {config:S.config, convos:S.convos, bookings:S.bookings}); }
+function saveConvo(c){ c.updatedAt = Date.now(); S.convos[c.id] = c; saveLocal(); render(); writeDoc("convos/"+c.id, c); }
+function saveBooking(b){ S.bookings[b.id] = b; saveLocal(); render(); writeDoc("bookings/"+b.id, b); }
+function saveConfig(cfg){ S.config = cfg; saveLocal(); render(); writeDoc("config/main", cfg); }
+function getConvo(id){ return S.convos[id] ? clone(S.convos[id]) : null; }
+function sysToast(t){ const c = myConvo(); if (c){ c.msgs.push({id:uid(),from:"system",text:t,t:Date.now()}); saveConvo(c); } }
+
+async function initStore(){
+  const goLocal = () => {
+    db = null; S.sync = "local";
+    const saved = ls.get("pl_local", null);
+    if (saved){ S.config = saved.config; S.convos = saved.convos || {}; S.bookings = saved.bookings || {}; }
+    render();
+  };
+  if (!window.supabase){ goLocal(); return; }
+  db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const [cf, cv, bk] = await Promise.all([
+    db.from("config").select("id,doc").eq("id","main"),
+    db.from("convos").select("id,doc").order("updated_at", {ascending:false}).limit(200),
+    db.from("bookings").select("id,doc").limit(500)
+  ]);
+  if (cf.error || cv.error || bk.error){ console.warn(cf.error || cv.error || bk.error); goLocal(); return; }
+  S.config = cf.data[0]?.doc || null;
+  S.convos = Object.fromEntries(cv.data.map(r => [r.id, r.doc]));
+  S.bookings = Object.fromEntries(bk.data.map(r => [r.id, r.doc]));
+  S.sync = "shared"; render();
+  const onChange = table => p => {
+    if (p.eventType === "DELETE"){ const id = p.old?.id; if (table === "convos") delete S.convos[id]; if (table === "bookings") delete S.bookings[id]; render(); return; }
+    const row = p.new; if (!row) return;
+    if (table === "config"){ if (!S.setupDirty) S.config = row.doc; }
+    else if (table === "convos"){ const cur = S.convos[row.id]; if (!cur || (row.doc.updatedAt || 0) >= (cur.updatedAt || 0)) S.convos[row.id] = row.doc; }
+    else S.bookings[row.id] = row.doc;
+    render();
+  };
+  db.channel("concierge")
+    .on("postgres_changes", {event:"*", schema:"public", table:"config"}, onChange("config"))
+    .on("postgres_changes", {event:"*", schema:"public", table:"convos"}, onChange("convos"))
+    .on("postgres_changes", {event:"*", schema:"public", table:"bookings"}, onChange("bookings"))
+    .subscribe();
+}
+
+/* ---------- availability ---------- */
+function dayStart(d){ const x = new Date(d); x.setHours(0,0,0,0); return x; }
+function openDays(n=7){
+  const out = [], t = dayStart(new Date());
+  for (let i=0; i<21 && out.length<n; i++){ const d = new Date(t); d.setDate(t.getDate()+i); if (C().hours[d.getDay()]) out.push(d); }
+  return out;
+}
+function busy(){ return Object.values(S.bookings).filter(b => b.status !== "cancelled").map(b => { const s = new Date(b.start).getTime(); return [s, s + b.minutes*60000]; }); }
+function openSlots(svc, day){
+  const h = C().hours[day.getDay()]; if (!h || !svc) return [];
+  const out = [], earliest = Date.now() + 60*60000, taken = busy();
+  for (let m = h[0]*60; m + svc.minutes <= h[1]*60; m += 30){
+    const s = new Date(day); s.setHours(0, m, 0, 0);
+    const a = s.getTime(), b = a + svc.minutes*60000;
+    if (a < earliest || taken.some(([x,y]) => a < y && b > x)) continue;
+    out.push(s);
+  }
+  return out;
+}
+function slotFree(svc, start){ const a = new Date(start).getTime(), b = a + svc.minutes*60000; return a > Date.now() && !busy().some(([x,y]) => a < y && b > x); }
+
+/* ---------- conversations ---------- */
+function myConvo(){ return S.myConvoId ? getConvo(S.myConvoId) : null; }
+function newConvo(){
+  const c = {id:uid(), createdAt:Date.now(), updatedAt:Date.now(), name:"", phone:"", status:"ai", booked:false, handoffReason:"", msgs:[]};
+  S.myConvoId = c.id; ls.set("pl_my", c.id); return c;
+}
+function push(c, m){ m.id = uid(); m.t = Date.now(); c.msgs.push(m); return m; }
+const lastMsg = c => [...c.msgs].reverse().find(m => m.from !== "system");
+
+async function customerSend(text){
+  text = text.trim(); if (!text) return;
+  let c = myConvo() || newConvo();
+  c.msgs.forEach(m => { if (m.chips) m.chips = null; });
+  push(c, {from:"customer", text});
+  saveConvo(c);
+  if (c.status === "human" || c.status === "needs_human") return;
+  await aiTurn(c.id);
+}
+
+/* ---------- the assistant ---------- */
+function buildPrompt(c){
+  const cfg = C();
+  const shortest = [...cfg.services].sort((a,b) => a.minutes - b.minutes)[0];
+  const svc = cfg.services.map(s => `- id "${s.id}": ${s.name}, ${s.minutes} min, ${money(s.price)}${Number(s.deposit) ? `, ${money(s.deposit)} deposit to book` : ""}`).join("\n");
+  const hours = DAYS.map((d,i) => `${d} ${cfg.hours[i] ? fmtHour(cfg.hours[i][0])+"–"+fmtHour(cfg.hours[i][1]) : "closed"}`).join("; ");
+  const avail = openDays(7).map(d => { const sl = openSlots(shortest, d);
+    return `${fmtDay(d)} (${ymd(d)}): ${sl.length ? sl.slice(0,8).map(fmtTime).join(", ") + (sl.length > 8 ? ` and ${sl.length-8} more` : "") : "fully booked"}`; }).join("\n");
+  const convo = c.msgs.slice(-24).map(m => {
+    if (m.from === "customer") return "Customer: " + m.text;
+    if (m.from === "ai") return "You: " + (m.text || "") + (m.widget ? ` [showed ${m.widget.type} picker]` : "");
+    if (m.from === "staff") return `${cfg.staffName} (staff): ` + m.text;
+    return `(${m.text})`;
+  }).join("\n");
+  return `You are the text-message booking assistant for ${cfg.name}. You chat with customers by text and get them booked.
+Right now it is ${new Date().toLocaleString([], {weekday:"long", month:"long", day:"numeric", hour:"numeric", minute:"2-digit"})}.
+
+SERVICES
+${svc}
+
+HOURS: ${hours}
+
+OPEN START TIMES for a ${shortest.minutes}-min visit (longer services have fewer):
+${avail}
+
+POLICIES AND FAQ
+${cfg.policies}
+
+TONE: ${cfg.tone}
+
+RULES
+- Write like a real front desk texting: under 280 characters, plain text, no markdown, at most one emoji.
+- Use only the facts above. Never invent prices, services, staff or policies.
+- You cannot lock in a booking by text. When the customer wants to book, set "show" to "slots" with the serviceId (and "date" if they named a day). They pick a time from a picker that appears under your message. If the service is unclear, set "show" to "services" and ask what the visit is for.
+- If a day they ask about is closed or full, say so and suggest the nearest open day.
+- Set "handoff" to true when the customer is in pain, has an emergency or safety issue, is upset or complaining, asks about refunds or billing disputes, asks for a person, or asks something you can't answer from the facts. Then tell them ${cfg.staffName} from the team will jump in shortly.
+- "chips": 0 to 3 short replies the customer is likely to tap next (each under 28 characters). Leave empty when a picker is shown.
+
+CONVERSATION SO FAR
+${convo}
+
+Reply with only one JSON object for your next message:
+{"reply": string, "show": "services" | "slots" | "none", "serviceId": string | null, "date": "YYYY-MM-DD" | null, "chips": string[], "handoff": boolean, "handoffReason": string | null, "customerName": string | null}`;
+}
+
+function rulesAgent(c){
+  const cfg = C(), t = (lastMsg(c)?.text || "").toLowerCase();
+  const svc = cfg.services.find(s => t.includes(s.name.toLowerCase().split(/[ &-]/)[0]) || t.includes(s.id));
+  const nextDay = openDays(1)[0];
+  if (/hurt|pain|emergenc|urgent|gas|refund|complain|angry|manager|human|real person|someone/.test(t))
+    return {reply:`Got it. I'm bringing in ${cfg.staffName} from our team, they'll reply here shortly.`, show:"none", handoff:true, handoffReason:"Customer asked for help the assistant can't give"};
+  if (svc && /price|cost|how much/.test(t)) return {reply:`${svc.name} is ${money(svc.price)} and takes about ${svc.minutes} minutes. Want to grab a time?`, show:"none", chips:["Yes, book it","What else do you offer?"]};
+  if (svc) return {reply:`Great choice. Here's what's open for ${svc.name}:`, show:"slots", serviceId:svc.id};
+  if (/price|cost|how much|menu|offer/.test(t)) return {reply: cfg.services.map(s => `${s.name} ${money(s.price)}`).join(" · "), show:"services"};
+  if (/yes|book|appoint|opening|available|slot|today|tomorrow|mon|tue|wed|thu|fri|sat|sun|schedule/.test(t)) return {reply:"Yes, we have openings! What's the visit for?", show:"services"};
+  if (/hour|open|close/.test(t)) return {reply: "Our hours: " + DAYS.map((d,i) => cfg.hours[i] ? `${d} ${fmtHour(cfg.hours[i][0])}–${fmtHour(cfg.hours[i][1])}` : null).filter(Boolean).join(", ") + ".", show:"none", chips:["Book a visit"]};
+  if (/^(hi|hey|hello|yo)\b/.test(t)) return {reply:`Hi! This is ${cfg.name}. I can book you in, or answer questions about prices and hours.`, show:"none", chips:["Book a visit","Prices","Hours"]};
+  return {reply:`I can book you in, share prices, or check hours. ${nextDay ? `Next opening is ${fmtDay(nextDay)}.` : ""}`, show:"none", chips:["Book a visit","Prices","Talk to a person"]};
+}
+
+async function aiTurn(id){
+  let c = getConvo(id); if (!c) return;
+  S.typing.add(id); render();
+  let out = null;
+  if (S.aiMode === "claude"){
+    try {
+      const r = await fetch("/api/chat", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({prompt: buildPrompt(c)})});
+      if (r.status === 501) S.aiMode = "rules";
+      else if (r.ok) out = (await r.json()).result;
+    } catch(e){ console.warn("chat", e); }
+  }
+  if (!out || typeof out !== "object" || !out.reply) out = rulesAgent(c);
+  S.typing.delete(id);
+  c = getConvo(id); if (!c) return;
+  if (c.status === "human"){ render(); return; } // staff took over mid-reply
+  applyAi(c, out);
+  saveConvo(c);
+}
+
+function applyAi(c, out){
+  const msg = {from:"ai", text:String(out.reply).slice(0,600)};
+  const svc = out.serviceId && svcById(out.serviceId);
+  if (out.show === "slots" && svc) msg.widget = {type:"slots", serviceId:svc.id, date:out.date || null};
+  else if (out.show === "services" || (out.show === "slots" && !svc)) msg.widget = {type:"services"};
+  if (!msg.widget && Array.isArray(out.chips)) msg.chips = out.chips.filter(x => typeof x === "string").slice(0,3);
+  if (out.customerName && !c.name) c.name = String(out.customerName).slice(0,40);
+  push(c, msg);
+  if (out.handoff){
+    c.status = "needs_human"; c.handoffReason = out.handoffReason || "Customer needs a person";
+    push(c, {from:"system", text:"Front desk notified"});
+  }
+}
+
+/* ---------- widget actions (deterministic, no AI call) ---------- */
+function pickService(mid, sid){
+  const c = myConvo(), svc = svcById(sid); if (!c || !svc) return;
+  const m = c.msgs.find(x => x.id === mid); if (m) m.used = svc.name;
+  push(c, {from:"customer", text:svc.name});
+  push(c, {from:"ai", text:`Here's what's open for ${svc.name.toLowerCase()} (${svc.minutes} min, ${money(svc.price)}):`, widget:{type:"slots", serviceId:sid}});
+  saveConvo(c);
+}
+function pickSlot(mid, iso){
+  const c = myConvo(); if (!c) return;
+  const m = c.msgs.find(x => x.id === mid); if (!m) return;
+  const svc = svcById(m.widget.serviceId); if (!svc) return;
+  m.used = iso;
+  push(c, {from:"customer", text:fmtWhen(iso)});
+  push(c, {from:"ai", text:"Perfect. Just a few details to hold it:", widget:{type:"intake", serviceId:svc.id, slot:iso}});
+  saveConvo(c);
+}
+function submitIntake(mid, form){
+  const c = myConvo(); if (!c) return;
+  const m = c.msgs.find(x => x.id === mid); if (!m) return;
+  const svc = svcById(m.widget.serviceId);
+  const name = form.name.value.trim(), phone = form.phone.value.trim(), notes = form.notes.value.trim();
+  if (!name){ form.name.focus(); return; }
+  m.used = {name, phone, notes};
+  c.name = c.name || name; c.phone = phone || c.phone;
+  push(c, {from:"customer", text:`${name}${phone ? " · " + phone : ""}${notes ? "\n" + notes : ""}`});
+  if (Number(svc.deposit) > 0){
+    push(c, {from:"ai", text:`Thanks ${name.split(" ")[0]}! A ${money(svc.deposit)} deposit holds your spot and goes toward the visit.`, widget:{type:"deposit", serviceId:svc.id, slot:m.widget.slot, name, phone, notes}});
+    saveConvo(c);
+  } else finalize(c, svc, m.widget.slot, {name, phone, notes}, false);
+}
+function payDeposit(mid){
+  const c = myConvo(); if (!c) return;
+  const m = c.msgs.find(x => x.id === mid); if (!m) return;
+  const w = m.widget, svc = svcById(w.serviceId);
+  m.used = true;
+  push(c, {from:"customer", text:`Paid ${money(svc.deposit)} deposit`});
+  finalize(c, svc, w.slot, w, true);
+}
+function finalize(c, svc, slot, who, paid){
+  if (!slotFree(svc, slot)){
+    push(c, {from:"ai", text:"Ah, someone just grabbed that time. Here's what's still open:", widget:{type:"slots", serviceId:svc.id}});
+    saveConvo(c); return;
+  }
+  const b = {id:uid(), convoId:c.id, serviceId:svc.id, serviceName:svc.name, start:new Date(slot).toISOString(), minutes:svc.minutes,
+    price:Number(svc.price)||0, deposit:paid ? Number(svc.deposit) : 0, name:who.name, phone:who.phone || "", notes:who.notes || "", status:"booked", createdAt:Date.now()};
+  c.booked = true;
+  push(c, {from:"ai", text:`You're booked! See you ${fmtWhen(slot)}. Reply here anytime to change it.`, widget:{type:"confirm", bookingId:b.id, snapshot:{serviceName:b.serviceName, start:b.start, minutes:b.minutes, deposit:b.deposit, price:b.price}}});
+  saveBooking(b); saveConvo(c);
+}
+
+/* ---------- staff actions ---------- */
+function takeOver(id){
+  const c = getConvo(id); if (!c) return;
+  c.status = "human"; push(c, {from:"system", text:`${C().staffName} from the front desk joined`, staff:true}); saveConvo(c);
+  setTimeout(() => $("#staffIn")?.focus(), 50);
+}
+function handBack(id){
+  const c = getConvo(id); if (!c) return;
+  c.status = "ai"; c.handoffReason = ""; push(c, {from:"system", text:"The assistant is back on this chat"}); saveConvo(c);
+}
+function staffSend(id, text){
+  text = text.trim(); const c = getConvo(id); if (!c || !text) return;
+  if (c.status !== "human"){ c.status = "human"; push(c, {from:"system", text:`${C().staffName} from the front desk joined`, staff:true}); }
+  c.msgs.forEach(m => { if (m.chips) m.chips = null; });
+  push(c, {from:"staff", text}); saveConvo(c);
+}
+
+/* ---------- rendering: phone ---------- */
+function logoHTML(cfg, size){ const ini = cfg.name.split(/\s+/).filter(w => /[A-Za-z]/.test(w[0])).slice(0,2).map(w => w[0]).join("").toUpperCase();
+  return `<div class="logo" style="background:${esc(cfg.color||"#0d6b71")}${size?`;width:${size}px;height:${size}px;font-size:${size*.38}px;border-radius:${size*.28}px`:""}">${esc(ini)}</div>`; }
+
+function renderPhone(){
+  const cfg = C(), c = myConvo();
+  $("#phHead").innerHTML = `${logoHTML(cfg)}<div class="ph-name">${esc(cfg.name)} <span class="ver" title="Verified business">✓</span></div><div class="ph-sub">Usually replies instantly</div>`;
+  const th = $("#thread"), atBottom = th.scrollHeight - th.scrollTop - th.clientHeight < 80;
+  if (!c || !c.msgs.length){
+    const day = openDays(1)[0], first = cfg.services[0];
+    const starters = [day ? `Any openings ${DAYS[day.getDay()] === DAYS[new Date().getDay()] ? "today" : new Date(day).toLocaleDateString([], {weekday:"long"})}?` : "Any openings this week?",
+      first ? `How much is a ${first.name.toLowerCase()}?` : "What do you offer?", "What are your hours?"];
+    th.innerHTML = `<div class="empty-chat">${logoHTML(cfg,56)}<div><b style="color:var(--ink)">Text ${esc(cfg.name)}</b><br>Book a visit, ask about prices, or reach the team. Try one:</div>
+      <div class="chips">${starters.map(s => `<button class="chip" data-act="chip" data-text="${esc(s)}">${esc(s)}</button>`).join("")}</div></div>`;
+    return;
+  }
+  let html = `<div class="day-sep">Today ${fmtTime(c.createdAt)}</div>`;
+  const lastAi = [...c.msgs].reverse().find(m => m.from === "ai");
+  let prevFrom = null;
+  for (const m of c.msgs){
+    if (m.from === "system"){ html += `<div class="sys${m.staff?" staff":""}">${esc(m.text)}</div>`; prevFrom = null; continue; }
+    if (m.from === "staff" && prevFrom !== "staff") html += `<div class="who staff">${esc(cfg.staffName)} · Front desk</div>`;
+    if (m.text) html += `<div class="b ${m.from === "customer" ? "me" : "them"}${m.from === "staff" ? " staff" : ""}">${esc(m.text)}</div>`;
+    if (m.widget) html += widgetHTML(m);
+    if (m.chips && m.chips.length && m === lastAi && c.status === "ai") html += `<div class="chips">${m.chips.map(s => `<button class="chip" data-act="chip" data-text="${esc(s)}">${esc(s)}</button>`).join("")}</div>`;
+    prevFrom = m.from;
+  }
+  if (S.typing.has(c.id)) html += `<div class="typing" aria-label="Typing"><i></i><i></i><i></i></div>`;
+  const keep = {}; th.querySelectorAll("input[id],textarea[id]").forEach(el => keep[el.id] = el.value);
+  const focusId = th.contains(document.activeElement) ? document.activeElement.id : null;
+  th.innerHTML = html;
+  Object.entries(keep).forEach(([id,v]) => { const el = document.getElementById(id); if (el) el.value = v; });
+  if (focusId){ const el = document.getElementById(focusId); if (el) el.focus({preventScroll:true}); }
+  if (atBottom || th.dataset.cid !== c.id || th.dataset.n !== String(c.msgs.length)) th.scrollTop = th.scrollHeight;
+  th.dataset.cid = c.id; th.dataset.n = c.msgs.length;
+}
+
+function widgetHTML(m){
+  const w = m.widget, cfg = C();
+  if (w.type === "services"){
+    return `<div class="w"><div class="w-h">Choose a service</div>${cfg.services.map(s =>
+      `<button class="w-row" data-act="svc" data-mid="${m.id}" data-sid="${esc(s.id)}" ${m.used ? "disabled" : ""}><span>${esc(s.name)}${m.used === s.name ? " ✓" : ""}</span><span class="p">${money(s.price)} · ${s.minutes}m</span></button>`).join("")}</div>`;
+  }
+  if (w.type === "slots"){
+    const svc = svcById(w.serviceId); if (!svc) return "";
+    if (m.used) return `<div class="w"><div class="w-h">Pick a time <small>${esc(svc.name)}</small></div><div class="w-done">Picked ${esc(fmtWhen(m.used))}</div></div>`;
+    const days = openDays(7).map(d => ({d, n:openSlots(svc, d).length}));
+    let sel = S.uiDay[m.id] || (w.date && days.find(x => ymd(x.d) === w.date && x.n) ? w.date : null) || (days.find(x => x.n) ? ymd(days.find(x => x.n).d) : null);
+    const selDay = days.find(x => ymd(x.d) === sel);
+    const slots = selDay ? openSlots(svc, selDay.d) : [];
+    return `<div class="w"><div class="w-h">Pick a time <small>${esc(svc.name)} · ${svc.minutes} min</small></div>
+      <div class="days">${days.map(x => `<button class="dchip" data-act="day" data-mid="${m.id}" data-day="${ymd(x.d)}" aria-pressed="${ymd(x.d) === sel}" ${x.n ? "" : "disabled"}>${DAYS[x.d.getDay()]}<b>${x.d.getDate()}</b></button>`).join("")}</div>
+      ${slots.length ? `<div class="times">${slots.slice(0,15).map(s => `<button data-act="slot" data-mid="${m.id}" data-iso="${s.toISOString()}">${fmtTime(s)}</button>`).join("")}</div>` : `<div class="w-empty">No openings this week. Reply and we'll find you something.</div>`}</div>`;
+  }
+  if (w.type === "intake"){
+    const svc = svcById(w.serviceId);
+    if (m.used) return `<div class="w"><div class="w-h">Your details</div><div class="w-done">Sent ✓</div></div>`;
+    const c = myConvo();
+    return `<div class="w"><div class="w-h">Your details <small>${esc(svc?.name || "")} · ${esc(fmtWhen(w.slot))}</small></div>
+      <form data-act="intake" data-mid="${m.id}">
+        <label>Name<input name="name" id="in-name-${m.id}" required value="${esc(c?.name || "")}" autocomplete="name"></label>
+        <label>Mobile number<input name="phone" id="in-phone-${m.id}" inputmode="tel" value="${esc(c?.phone || "")}" autocomplete="tel"></label>
+        <label>Anything we should know? (optional)<textarea name="notes" id="in-notes-${m.id}"></textarea></label>
+        <button class="btn">Continue</button></form></div>`;
+  }
+  if (w.type === "deposit"){
+    const svc = svcById(w.serviceId);
+    return `<div class="w"><div class="w-h">Deposit <small>${esc(svc?.name || "")}</small></div><div class="w-pay">
+      <div class="amt">${money(svc?.deposit)}</div><div class="note">${esc(fmtWhen(w.slot))} · applied to your ${money(svc?.price)} visit</div>
+      ${m.used ? `<div class="w-done" style="padding:0">Paid ✓</div>` : `<button class="btn" data-act="pay" data-mid="${m.id}">Pay ${money(svc?.deposit)} deposit</button><div class="note">Demo payment. No card is charged.</div>`}</div></div>`;
+  }
+  if (w.type === "confirm"){
+    const b = S.bookings[w.bookingId] || w.snapshot;
+    return `<div class="w confirm"><div class="w-h">✓ Booked</div><dl class="kv"><dt>Service</dt><dd>${esc(b.serviceName)}</dd><dt>When</dt><dd>${esc(fmtWhen(b.start))}</dd><dt>Length</dt><dd>${b.minutes} min</dd>${b.deposit ? `<dt>Deposit</dt><dd>${money(b.deposit)} paid</dd>` : ""}<dt>Where</dt><dd>${esc(C().name)}</dd></dl></div>`;
+  }
+  return "";
+}
+
+/* ---------- rendering: front desk ---------- */
+const statusOf = c => c.status === "ai" && c.booked ? "booked" : c.status;
+const STATUS_LABEL = {ai:"Assistant", needs_human:"Needs you", human:"You're on", booked:"Booked"};
+
+function renderDesk(){
+  const convos = Object.values(S.convos).sort((a,b) => (b.status === "needs_human") - (a.status === "needs_human") || b.updatedAt - a.updatedAt);
+  const upcoming = Object.values(S.bookings).filter(b => b.status !== "cancelled" && new Date(b.start).getTime() > Date.now() - 3600e3).sort((a,b) => new Date(a.start) - new Date(b.start));
+  const needs = convos.filter(c => c.status === "needs_human").length;
+  const deposits = upcoming.reduce((s,b) => s + (Number(b.deposit)||0), 0);
+  $("#kpis").innerHTML = [
+    ["Conversations", convos.length, ""], ["Booked", upcoming.length, ""],
+    ["Need you", needs, needs ? "alert" : ""], ["Deposits held", "$" + deposits, ""]
+  ].map(([l,v,cl]) => `<div class="card kpi ${cl}"><small>${l}</small><b>${v}</b></div>`).join("");
+
+  $("#convos").innerHTML = convos.length ? convos.map(c => {
+    const st = statusOf(c), lm = lastMsg(c);
+    const prev = lm ? (lm.from === "customer" ? "" : lm.from === "staff" ? "You: " : "Assistant: ") + (lm.text || "[picker]") : "";
+    return `<button class="c-row" data-act="sel" data-id="${c.id}" aria-current="${S.selected === c.id}">
+      <span class="c-top"><b>${esc(c.name || "New customer")}${c.example ? ` <span class="st ex">Example</span>` : ""}</b><span class="st ${st}">${STATUS_LABEL[st]}</span></span>
+      <span class="c-prev">${esc(prev)}</span></button>`;
+  }).join("") : `<div class="t-empty">Conversations show up here the moment a customer texts. Send a message from the phone to try it.</div>`;
+
+  if (S.selected && !S.convos[S.selected]) S.selected = null;
+  if (!S.selected && convos.length) S.selected = convos[0].id;
+  renderThreadPane();
+
+  $("#bkCount").textContent = upcoming.length ? `${upcoming.length} upcoming` : "";
+  $("#bookings").innerHTML = upcoming.length ? upcoming.map(b => `<div class="bk"><time>${esc(fmtWhen(b.start))}</time>
+     <div style="min-width:0"><div class="n">${esc(b.name)}${b.example ? ` <span class="st ex">Example</span>` : ""}</div><div class="s">${esc(b.serviceName)} · ${b.minutes} min${b.phone ? " · " + esc(b.phone) : ""}${b.notes ? " · " + esc(b.notes) : ""}</div></div>
+     <div class="d">${b.deposit ? `<span class="st booked">${money(b.deposit)} paid</span>` : money(b.price)}</div></div>`).join("")
+    : `<div class="t-empty" style="padding:18px">No bookings yet. When a customer picks a time on the phone, it lands here.</div>`;
+}
+
+function renderThreadPane(){
+  const pane = $("#tpane"), c = S.selected ? S.convos[S.selected] : null, cfg = C();
+  const draft = $("#staffIn")?.value || "";
+  const hadFocus = document.activeElement?.id === "staffIn";
+  if (!c){ pane.innerHTML = `<div class="t-empty">Pick a conversation to read it, take it over, or reply as ${esc(cfg.staffName)}.</div>`; return; }
+  const st = statusOf(c);
+  let body = "", prev = null;
+  for (const m of c.msgs){
+    if (m.from === "system"){ body += `<div class="sys${m.staff?" staff":""}">${esc(m.text)}</div>`; prev = null; continue; }
+    if (m.from !== prev) body += `<div class="who ${m.from === "customer" ? "cust" : m.from === "staff" ? "staff" : ""}">${m.from === "customer" ? esc(c.name || "Customer") : m.from === "staff" ? esc(cfg.staffName) : "Assistant"}</div>`;
+    if (m.text) body += `<div class="b ${m.from === "customer" ? "me" : "them"}${m.from === "staff" ? " staff" : ""}">${esc(m.text)}</div>`;
+    if (m.widget){ const w = m.widget, s = w.serviceId && svcById(w.serviceId);
+      body += `<div class="wsum">${{services:"Showed service menu", slots:`Showed times for ${s?.name || "service"}`, intake:"Asked for contact details", deposit:`Requested ${money(s?.deposit)} deposit`, confirm:"Sent booking confirmation"}[w.type] || ""}${m.used && w.type === "slots" ? ` → picked ${fmtWhen(m.used)}` : ""}${m.used && w.type === "deposit" ? " → paid" : ""}</div>`; }
+    prev = m.from;
+  }
+  if (S.typing.has(c.id)) body += `<div class="wsum">Assistant is typing…</div>`;
+  pane.innerHTML = `<div class="t-head"><div><h3>${esc(c.name || "New customer")} <span class="st ${st}">${STATUS_LABEL[st]}</span></h3>
+      ${c.status === "needs_human" ? `<div class="reason">Flagged: ${esc(c.handoffReason)}</div>` : `<div class="note">${c.phone ? esc(c.phone) + " · " : ""}started ${fmtTime(c.createdAt)}</div>`}</div>
+      <div class="t-actions">${c.status === "human" ? `<button class="btn ghost" data-act="back" data-id="${c.id}">Hand back to assistant</button>` : `<button class="btn ${c.status === "needs_human" ? "warn" : ""}" data-act="take" data-id="${c.id}">Take over</button>`}</div></div>
+    <div class="t-body" id="tbody">${body}</div>
+    <form class="t-comp" id="staffForm" data-id="${c.id}"><input id="staffIn" autocomplete="off" placeholder="Reply as ${esc(cfg.staffName)}${c.status === "human" ? "" : " (takes over the chat)"}" aria-label="Staff reply"><button class="btn">Send</button></form>`;
+  const tb = $("#tbody"); tb.scrollTop = tb.scrollHeight;
+  const si = $("#staffIn"); si.value = draft; if (hadFocus) si.focus();
+}
+
+/* ---------- rendering: setup ---------- */
+function renderSetup(force){
+  if (S.setupDirty && !force) return;
+  const cfg = C(), v = $("#setupView");
+  const hourOpts = (sel, closed) => { let o = closed ? `<option value="">Closed</option>` : ""; for (let h=5; h<=23; h+=.5) o += `<option value="${h}" ${sel === h ? "selected" : ""}>${fmtHour(h)}</option>`; return o; };
+  v.innerHTML = `<div class="sec-h"><h2>Business setup</h2><span>Everything the assistant knows comes from here</span></div>
+  <div class="setup" id="setupForm">
+    <section><h4>Start from an industry</h4>
+      <div class="fgrid"><label>Template<select id="presetSel">${Object.keys(PRESET_LABEL).map(k => `<option value="${k}" ${(cfg.preset||"custom") === k ? "selected" : ""}>${PRESET_LABEL[k]}</option>`).join("")}</select></label>
+      <div class="note" style="align-self:end">Picking a template replaces the fields below. Save to put it live.</div></div></section>
+    <section><h4>Business</h4><div class="fgrid">
+      <label>Business name<input id="f-name" value="${esc(cfg.name)}"></label>
+      <label>Brand color<input id="f-color" type="color" value="${esc(cfg.color || "#0d6b71")}" style="height:38px;padding:3px"></label>
+      <label>Front desk name<input id="f-staff" value="${esc(cfg.staffName)}"></label>
+      <label style="grid-column:1/-1">Tone of voice<input id="f-tone" value="${esc(cfg.tone)}"></label></div></section>
+    <section><h4>Services</h4><div class="svc-tbl"><table><thead><tr><th>Service</th><th>Minutes</th><th>Price $</th><th>Deposit $</th><th></th></tr></thead>
+      <tbody id="svcRows">${cfg.services.map((s,i) => svcRow(s,i)).join("")}</tbody></table></div>
+      <div><button class="btn ghost" id="addSvc" type="button">Add service</button></div></section>
+    <section><h4>Hours</h4><div class="hours">${DAYS.map((d,i) => { const h = cfg.hours[i];
+      return `<div class="hrow"><b>${d}</b><div><select id="h-o-${i}" aria-label="${d} opens">${hourOpts(h ? h[0] : null, true)}</select><select id="h-c-${i}" aria-label="${d} closes" ${h ? "" : "disabled"}>${hourOpts(h ? h[1] : 17, false)}</select></div></div>`; }).join("")}</div></section>
+    <section><h4>Policies & FAQ</h4><label>One per line. The assistant answers from these and hands off anything else.<textarea id="f-pol">${esc(cfg.policies)}</textarea></label></section>
+    <div class="save-bar"><button class="btn" id="saveCfg" type="button">Save and put live</button><span class="saved" id="savedMsg"></span></div>
+    <section class="golive" style="margin-top:12px"><h4>Taking a client live</h4>
+      <ol><li><b>Channels.</b> <span>Website chat widget and SMS first. iMessage through a phone-number provider such as Blooio next. Apple Messages for Business (verified logo, Apple Pay) after Apple approves the brand.</span></li>
+      <li><b>Calendar.</b> <span>Swap the demo availability for the client's real calendar: Google Calendar, Square, Vagaro, Calendly or GoHighLevel.</span></li>
+      <li><b>Deposits.</b> <span>Replace the demo pay button with a Stripe payment link.</span></li>
+      <li><b>Alerts.</b> <span>Text or Slack the front desk when a chat is flagged "Needs you".</span></li></ol></section>
+    <section><h4>Demo data</h4><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><button class="btn ghost" id="clearBtn" type="button">Clear all conversations and bookings</button><span class="note" id="clearNote"></span></div></section>
+  </div>`;
+}
+function svcRow(s,i){ return `<tr data-sid="${esc(s.id)}"><td><input id="s-n-${i}" value="${esc(s.name)}" aria-label="Service name"></td><td><input class="num" id="s-m-${i}" type="number" min="15" step="15" value="${s.minutes}" aria-label="Minutes"></td><td><input class="num" id="s-p-${i}" type="number" min="0" value="${s.price}" aria-label="Price"></td><td><input class="num" id="s-d-${i}" type="number" min="0" value="${s.deposit}" aria-label="Deposit"></td><td><button class="x" type="button" data-act="rmsvc" aria-label="Remove service">×</button></td></tr>`; }
+
+function readSetup(){
+  const services = [...document.querySelectorAll("#svcRows tr")].map(tr => { const ins = tr.querySelectorAll("input");
+    return {id: tr.dataset.sid, name: ins[0].value.trim(), minutes: Math.max(15, Number(ins[1].value)||30), price: Math.max(0, Number(ins[2].value)||0), deposit: Math.max(0, Number(ins[3].value)||0)}; }).filter(s => s.name);
+  const hours = {}; DAYS.forEach((d,i) => { const o = $("#h-o-"+i).value, c = Number($("#h-c-"+i).value); hours[i] = o === "" ? null : [Number(o), Math.max(Number(o)+.5, c)]; });
+  return {preset: $("#presetSel").value === "custom" ? "custom" : $("#presetSel").value, name: $("#f-name").value.trim() || "My Business", color: $("#f-color").value,
+    staffName: $("#f-staff").value.trim() || "Team", tone: $("#f-tone").value.trim(), services: services.length ? services : C().services, hours, policies: $("#f-pol").value.trim()};
+}
+
+/* ---------- top-level render ---------- */
+function render(){
+  document.body.dataset.view = S.view;
+  document.querySelectorAll("[data-view]").forEach(b => { if (b.tagName === "BUTTON") b.setAttribute("aria-selected", b.dataset.view === S.view || (b.closest(".desk-tabs") && S.view === "customer" && b.dataset.view === "desk")); });
+  const showSetup = S.view === "setup";
+  $("#deskView").hidden = showSetup; $("#setupView").hidden = !showSetup;
+  const ai = $("#aiPill"), sy = $("#syncPill");
+  ai.className = "pill " + (S.aiMode === "claude" ? "on" : S.aiMode === "rules" ? "off" : "");
+  ai.lastChild.textContent = S.aiMode === "claude" ? "Assistant: Claude" : S.aiMode === "rules" ? "Assistant: built-in replies" : "Assistant: connecting";
+  sy.className = "pill " + (S.sync === "shared" ? "on" : S.sync === "local" ? "off" : "");
+  sy.lastChild.textContent = S.sync === "shared" ? "Sync: shared live" : S.sync === "local" ? "Sync: this browser only" : "Sync: connecting";
+  $("#sendBtn").disabled = false;
+  renderPhone(); renderDesk();
+  if (showSetup) renderSetup();
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-act],[data-view]"); if (!t) return;
+  if (t.dataset.view && t.tagName === "BUTTON"){ S.view = t.dataset.view; ls.set("pl_view", S.view); if (S.view === "setup"){ S.setupDirty = false; renderSetup(true); } render(); return; }
+  const a = t.dataset.act;
+  if (a === "chip") customerSend(t.dataset.text);
+  else if (a === "svc") pickService(t.dataset.mid, t.dataset.sid);
+  else if (a === "day"){ S.uiDay[t.dataset.mid] = t.dataset.day; renderPhone(); }
+  else if (a === "slot") pickSlot(t.dataset.mid, t.dataset.iso);
+  else if (a === "pay"){ t.disabled = true; t.textContent = "Processing…"; setTimeout(() => payDeposit(t.dataset.mid), 700); }
+  else if (a === "sel"){ S.selected = t.dataset.id; renderDesk(); }
+  else if (a === "take") takeOver(t.dataset.id);
+  else if (a === "back") handBack(t.dataset.id);
+  else if (a === "rmsvc"){ t.closest("tr").remove(); S.setupDirty = true; }
+});
+document.addEventListener("submit", e => {
+  const f = e.target; e.preventDefault();
+  if (f.id === "composer"){ const v = $("#msgIn").value; $("#msgIn").value = ""; customerSend(v); }
+  else if (f.dataset.act === "intake") submitIntake(f.dataset.mid, f);
+  else if (f.id === "staffForm"){ const v = $("#staffIn").value; $("#staffIn").value = ""; staffSend(f.dataset.id, v); }
+});
+$("#newCust").addEventListener("click", () => { S.myConvoId = null; ls.set("pl_my", null); renderPhone(); $("#msgIn").focus(); });
+document.addEventListener("input", e => { if (e.target.closest("#setupForm") && e.target.id !== "presetSel") { S.setupDirty = true; $("#savedMsg").textContent = ""; }
+  if (e.target.id && e.target.id.startsWith("h-o-")){ const i = e.target.id.slice(4); $("#h-c-"+i).disabled = e.target.value === ""; } });
+document.addEventListener("change", e => {
+  if (e.target.id === "presetSel" && PRESETS[e.target.value]){ const keep = S.config; S.config = clone(PRESETS[e.target.value]); renderSetup(true); S.config = keep; S.setupDirty = true; $("#savedMsg").textContent = "Template loaded. Save to put it live."; }
+});
+document.addEventListener("click", e => {
+  if (e.target.id === "addSvc"){ const tb = $("#svcRows"), i = tb.children.length + Date.now()%1000; tb.insertAdjacentHTML("beforeend", svcRow({id:"s"+uid().slice(0,5), name:"", minutes:60, price:0, deposit:0}, i)); S.setupDirty = true; tb.lastElementChild.querySelector("input").focus(); }
+  if (e.target.id === "saveCfg"){ const cfg = readSetup(); S.setupDirty = false; saveConfig(cfg); $("#savedMsg").textContent = "Saved. The assistant is using it now."; }
+  if (e.target.id === "clearBtn"){
+    const b = e.target;
+    if (b.dataset.armed !== "1"){ b.dataset.armed = "1"; b.textContent = "Yes, clear everything"; b.classList.add("warn"); $("#clearNote").textContent = "This removes every chat and booking for everyone viewing this demo."; return; }
+    Object.keys(S.convos).forEach(id => writeDoc("convos/"+id, null)); Object.keys(S.bookings).forEach(id => writeDoc("bookings/"+id, null));
+    S.convos = {}; S.bookings = {}; S.myConvoId = null; ls.set("pl_my", null); saveLocal();
+    b.dataset.armed = ""; b.textContent = "Clear all conversations and bookings"; b.classList.remove("warn"); $("#clearNote").textContent = "Cleared."; render();
+  }
+});
+
+/* ---------- boot ---------- */
+render();
+(async () => {
+  try { const r = await fetch("/api/chat"); S.aiMode = r.ok && (await r.json()).ai ? "claude" : "rules"; }
+  catch { S.aiMode = "rules"; }
+  render();
+})();
+initStore();
+setInterval(() => { if (!document.hidden) renderPhone(); }, 60000); // keep slot pickers current
+</script>
+</body>
+</html>
