@@ -669,6 +669,7 @@ function widgetHTML(m){
         <label>Name<input name="name" id="in-name-${m.id}" required value="${esc(c?.name || "")}" autocomplete="name"></label>
         <label>Mobile number<input name="phone" id="in-phone-${m.id}" inputmode="tel" value="${esc(c?.phone || "")}" autocomplete="tel"></label>
         <label>Anything we should know? (optional)<textarea name="notes" id="in-notes-${m.id}"></textarea></label>
+        <div class="note">Public demo: please use made-up details.</div>
         <button class="btn">Continue</button></form></div>`;
   }
   if (w.type === "deposit"){
