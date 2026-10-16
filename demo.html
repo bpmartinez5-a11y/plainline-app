@@ -379,7 +379,8 @@ function slotFree(svc, start){ const a = new Date(start).getTime(), b = a + svc.
 /* ---------- conversations ---------- */
 function myConvo(){ return S.myConvoId ? getConvo(S.myConvoId) : null; }
 function newConvo(){
-  const c = {id:uid(), createdAt:Date.now(), updatedAt:Date.now(), name:"", phone:"", status:"ai", booked:false, handoffReason:"", msgs:[]};
+  const c = {id:uid(), createdAt:Date.now(), updatedAt:Date.now(), name:"", phone:"", status:"ai", booked:false, handoffReason:"",
+    msgs:[{id:uid(), t:Date.now(), from:"system", text:`You're texting ${C().name}'s automated assistant. Ask for a person anytime.`}]}; // AI disclosure, first thing in every chat
   S.myConvoId = c.id; return c;
 }
 function push(c, m){ m.id = uid(); m.t = Date.now(); c.msgs.push(m); return m; }
@@ -432,6 +433,7 @@ TONE: ${cfg.tone}
 RULES
 - Write like a real front desk texting: under 280 characters, plain text, no markdown, at most one emoji.
 - Use only the facts above. Never invent prices, services, staff or policies.
+- You are an automated assistant. Never claim or imply you are a person. If asked, say so and offer ${cfg.staffName} from the team.
 - You cannot lock in a booking by text. When the customer wants to book, set "show" to "slots" with the serviceId (and "date" if they named a day). They pick a time from a picker that appears under your message. If the service is unclear, set "show" to "services" and ask what the visit is for.
 - If a day they ask about is closed or full, say so and suggest the nearest open day.
 - Set "handoff" to true when the customer is in pain, has an emergency or safety issue, is upset or complaining, asks about refunds or billing disputes, asks for a person, or asks something you can't answer from the facts. Then tell them ${cfg.staffName} from the team will jump in shortly.
@@ -566,13 +568,13 @@ function logoHTML(cfg, size){ const ini = cfg.name.split(/\s+/).filter(w => /[A-
 
 function renderPhone(){
   const cfg = C(), c = myConvo();
-  $("#phHead").innerHTML = `${logoHTML(cfg)}<div class="ph-name">${esc(cfg.name)} <span class="ver" title="Verified business">✓</span></div><div class="ph-sub">Usually replies instantly</div>`;
+  $("#phHead").innerHTML = `${logoHTML(cfg)}<div class="ph-name">${esc(cfg.name)} <span class="ver" title="Verified business">✓</span></div><div class="ph-sub">Automated assistant · a person can step in</div>`;
   const th = $("#thread"), atBottom = th.scrollHeight - th.scrollTop - th.clientHeight < 80;
   if (!c || !c.msgs.length){
     const day = openDays(1)[0], first = cfg.services[0];
     const starters = [day ? `Any openings ${DAYS[day.getDay()] === DAYS[new Date().getDay()] ? "today" : new Date(day).toLocaleDateString([], {weekday:"long"})}?` : "Any openings this week?",
       first ? `How much is a ${first.name.toLowerCase()}?` : "What do you offer?", "What are your hours?"];
-    th.innerHTML = `<div class="empty-chat">${logoHTML(cfg,56)}<div><b style="color:var(--ink)">Text ${esc(cfg.name)}</b><br>Book a visit, ask about prices, or reach the team. Try one:</div>
+    th.innerHTML = `<div class="empty-chat">${logoHTML(cfg,56)}<div><b style="color:var(--ink)">Text ${esc(cfg.name)}</b><br>You're texting an automated assistant. Book a visit, ask about prices, or ask for a person anytime. Try one:</div>
       <div class="chips">${starters.map(s => `<button class="chip" data-act="chip" data-text="${esc(s)}">${esc(s)}</button>`).join("")}</div></div>`;
     return;
   }
@@ -720,7 +722,9 @@ function renderSetup(force){
     <section><h4>Policies & FAQ</h4><label>One per line. The assistant answers from these and hands off anything else.<textarea id="f-pol">${esc(cfg.policies)}</textarea></label></section>
     <div class="save-bar"><button class="btn" id="saveCfg" type="button">Save and put live</button><span class="saved" id="savedMsg"></span></div>
     <section class="golive" style="margin-top:12px"><h4>Taking a client live</h4>
-      <ol><li><b>Channels.</b> <span>Website chat widget and SMS first. iMessage through a phone-number provider such as Blooio next. Apple Messages for Business (verified logo, Apple Pay) after Apple approves the brand.</span></li>
+      <ol><li><b>Agreement.</b> <span>The client signs the Plainline service agreement before setup starts.</span></li>
+      <li><b>AI disclosure.</b> <span>Keep it on: customers see "automated assistant" in the header and at the start of every chat, and the assistant never claims to be a person.</span></li>
+      <li><b>Channels.</b> <span>Website chat widget and SMS first. iMessage through a phone-number provider such as Blooio next. Apple Messages for Business (verified logo, Apple Pay) after Apple approves the brand.</span></li>
       <li><b>Calendar.</b> <span>Swap the demo availability for the client's real calendar: Google Calendar, Square, Vagaro, Calendly or GoHighLevel.</span></li>
       <li><b>Deposits.</b> <span>Replace the demo pay button with a Stripe payment link.</span></li>
       <li><b>Alerts.</b> <span>Text or Slack the front desk when a chat is flagged "Needs you".</span></li></ol></section>
