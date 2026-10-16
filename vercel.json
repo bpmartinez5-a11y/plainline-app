@@ -1,5 +1,18 @@
 {
   "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "book.plainlineops.com"
+        }
+      ],
+      "destination": "/demo",
+      "permanent": false
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
