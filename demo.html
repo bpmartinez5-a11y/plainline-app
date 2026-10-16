@@ -228,7 +228,7 @@ button{cursor:pointer}
     <div class="brand"><a href="/" style="color:inherit;text-decoration:none"><b>Plainline</b></a><span>Text Concierge · live demo · <a href="/#contact" style="color:var(--accent)">Get one set up</a></span></div>
     <div class="pills">
       <span class="pill" id="aiPill"><i></i>Assistant: connecting</span>
-      <span class="pill" id="syncPill"><i></i>Sync: connecting</span>
+      <span class="pill on"><i></i>Private: your chat stays in this tab</span>
     </div>
     <div class="tabs mob-tabs" role="tablist" aria-label="View">
       <button data-view="customer" role="tab">Customer</button>
@@ -253,6 +253,7 @@ button{cursor:pointer}
       <div class="under">
         <span>You're the customer here.</span>
         <button class="linkbtn" id="newCust">Start as a new customer</button>
+        <a href="/privacy" style="color:var(--muted)">Privacy</a>
       </div>
     </div>
 
@@ -278,7 +279,6 @@ button{cursor:pointer}
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
 /* ---------- presets ---------- */
 const PRESETS = {
@@ -335,75 +335,24 @@ const fmtDay = d => new Date(d).toLocaleDateString([], {weekday:"short", month:"
 const fmtWhen = d => fmtDay(d) + " · " + fmtTime(d);
 const ymd = d => { const x = new Date(d); return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0"); };
 const fmtHour = h => { const d = new Date(2000,0,1,0,Math.round(h*60)); return d.toLocaleTimeString([], {hour:"numeric", minute: h%1 ? "2-digit" : undefined}); };
-const use = name => (window.claude && window.claude.use) ? window.claude.use(name).catch(() => null) : Promise.resolve(null);
 
 /* ---------- state ---------- */
 const S = {
-  config: null, convos: {}, bookings: {},
-  myConvoId: ls.get("pl_my", null),
+  config: ls.get("pl_config", null), convos: {}, bookings: {},
+  myConvoId: null,
   selected: null, view: ls.get("pl_view", matchMedia("(max-width:980px)").matches ? "customer" : "desk"),
-  typing: new Set(), uiDay: {}, aiMode: "connecting", sync: "connecting",
+  typing: new Set(), uiDay: {}, aiMode: "connecting",
   setupDirty: false
 };
 const C = () => S.config || PRESETS.salon;
 const svcById = id => C().services.find(s => s.id === id);
 
-/* ---------- store: shared db when available, this browser otherwise ---------- */
-const SUPABASE_URL = "https://mtpaaizladkfjtpnkdao.supabase.co";
-const SUPABASE_KEY = "sb_publishable_JPkZK7XX94_KVaRBnFYpwQ_-1w3TY24";
-let db = null, sample = null;
-const queues = {};
-function writeDoc(path, data){
-  const [table, id] = path.split("/");
-  const q = (queues[path] || Promise.resolve()).then(async () => {
-    if (!db) return;
-    const r = data === null
-      ? await db.from(table).delete().eq("id", id)
-      : await db.from(table).upsert({id, doc: clone(data), updated_at: new Date().toISOString()});
-    if (r.error) console.warn("write failed", path, r.error);
-  });
-  queues[path] = q.catch(()=>{}); return q;
-}
-function saveLocal(){ if (!db) ls.set("pl_local", {config:S.config, convos:S.convos, bookings:S.bookings}); }
-function saveConvo(c){ c.updatedAt = Date.now(); S.convos[c.id] = c; saveLocal(); render(); writeDoc("convos/"+c.id, c); }
-function saveBooking(b){ S.bookings[b.id] = b; saveLocal(); render(); writeDoc("bookings/"+b.id, b); }
-function saveConfig(cfg){ S.config = cfg; saveLocal(); render(); writeDoc("config/main", cfg); }
+/* ---------- store: chats and bookings live only in this tab, so they stay private and a refresh starts over; the setup is remembered in this browser ---------- */
+const CHAT_LIMIT = 10; // customer messages per chat, to keep each demo chat (and its AI usage) small
+function saveConvo(c){ c.updatedAt = Date.now(); S.convos[c.id] = c; render(); }
+function saveBooking(b){ S.bookings[b.id] = b; render(); }
+function saveConfig(cfg){ S.config = cfg; ls.set("pl_config", cfg); render(); }
 function getConvo(id){ return S.convos[id] ? clone(S.convos[id]) : null; }
-function sysToast(t){ const c = myConvo(); if (c){ c.msgs.push({id:uid(),from:"system",text:t,t:Date.now()}); saveConvo(c); } }
-
-async function initStore(){
-  const goLocal = () => {
-    db = null; S.sync = "local";
-    const saved = ls.get("pl_local", null);
-    if (saved){ S.config = saved.config; S.convos = saved.convos || {}; S.bookings = saved.bookings || {}; }
-    render();
-  };
-  if (!window.supabase){ goLocal(); return; }
-  db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  const [cf, cv, bk] = await Promise.all([
-    db.from("config").select("id,doc").eq("id","main"),
-    db.from("convos").select("id,doc").order("updated_at", {ascending:false}).limit(200),
-    db.from("bookings").select("id,doc").limit(500)
-  ]);
-  if (cf.error || cv.error || bk.error){ console.warn(cf.error || cv.error || bk.error); goLocal(); return; }
-  S.config = cf.data[0]?.doc || null;
-  S.convos = Object.fromEntries(cv.data.map(r => [r.id, r.doc]));
-  S.bookings = Object.fromEntries(bk.data.map(r => [r.id, r.doc]));
-  S.sync = "shared"; render();
-  const onChange = table => p => {
-    if (p.eventType === "DELETE"){ const id = p.old?.id; if (table === "convos") delete S.convos[id]; if (table === "bookings") delete S.bookings[id]; render(); return; }
-    const row = p.new; if (!row) return;
-    if (table === "config"){ if (!S.setupDirty) S.config = row.doc; }
-    else if (table === "convos"){ const cur = S.convos[row.id]; if (!cur || (row.doc.updatedAt || 0) >= (cur.updatedAt || 0)) S.convos[row.id] = row.doc; }
-    else S.bookings[row.id] = row.doc;
-    render();
-  };
-  db.channel("concierge")
-    .on("postgres_changes", {event:"*", schema:"public", table:"config"}, onChange("config"))
-    .on("postgres_changes", {event:"*", schema:"public", table:"convos"}, onChange("convos"))
-    .on("postgres_changes", {event:"*", schema:"public", table:"bookings"}, onChange("bookings"))
-    .subscribe();
-}
 
 /* ---------- availability ---------- */
 function dayStart(d){ const x = new Date(d); x.setHours(0,0,0,0); return x; }
@@ -430,7 +379,7 @@ function slotFree(svc, start){ const a = new Date(start).getTime(), b = a + svc.
 function myConvo(){ return S.myConvoId ? getConvo(S.myConvoId) : null; }
 function newConvo(){
   const c = {id:uid(), createdAt:Date.now(), updatedAt:Date.now(), name:"", phone:"", status:"ai", booked:false, handoffReason:"", msgs:[]};
-  S.myConvoId = c.id; ls.set("pl_my", c.id); return c;
+  S.myConvoId = c.id; return c;
 }
 function push(c, m){ m.id = uid(); m.t = Date.now(); c.msgs.push(m); return m; }
 const lastMsg = c => [...c.msgs].reverse().find(m => m.from !== "system");
@@ -439,6 +388,10 @@ async function customerSend(text){
   text = text.trim(); if (!text) return;
   let c = myConvo() || newConvo();
   c.msgs.forEach(m => { if (m.chips) m.chips = null; });
+  if (c.msgs.filter(m => m.from === "customer").length >= CHAT_LIMIT){
+    if (!c.limited){ c.limited = true; push(c, {from:"system", text:"This demo chat has reached its limit. Refresh the page to start a new one."}); saveConvo(c); }
+    return;
+  }
   push(c, {from:"customer", text});
   saveConvo(c);
   if (c.status === "human" || c.status === "needs_human") return;
@@ -453,7 +406,7 @@ function buildPrompt(c){
   const hours = DAYS.map((d,i) => `${d} ${cfg.hours[i] ? fmtHour(cfg.hours[i][0])+"–"+fmtHour(cfg.hours[i][1]) : "closed"}`).join("; ");
   const avail = openDays(7).map(d => { const sl = openSlots(shortest, d);
     return `${fmtDay(d)} (${ymd(d)}): ${sl.length ? sl.slice(0,8).map(fmtTime).join(", ") + (sl.length > 8 ? ` and ${sl.length-8} more` : "") : "fully booked"}`; }).join("\n");
-  const convo = c.msgs.slice(-24).map(m => {
+  const convo = c.msgs.slice(-12).map(m => {
     if (m.from === "customer") return "Customer: " + m.text;
     if (m.from === "ai") return "You: " + (m.text || "") + (m.widget ? ` [showed ${m.widget.type} picker]` : "");
     if (m.from === "staff") return `${cfg.staffName} (staff): ` + m.text;
@@ -512,7 +465,7 @@ async function aiTurn(id){
   if (S.aiMode === "claude"){
     try {
       const r = await fetch("/api/chat", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({prompt: buildPrompt(c)})});
-      if (r.status === 501) S.aiMode = "rules";
+      if (r.status === 501 || r.status === 429) S.aiMode = "rules"; // no key, or this visitor hit the limit: built-in replies
       else if (r.ok) out = (await r.json()).result;
     } catch(e){ console.warn("chat", e); }
   }
@@ -669,7 +622,7 @@ function widgetHTML(m){
         <label>Name<input name="name" id="in-name-${m.id}" required value="${esc(c?.name || "")}" autocomplete="name"></label>
         <label>Mobile number<input name="phone" id="in-phone-${m.id}" inputmode="tel" value="${esc(c?.phone || "")}" autocomplete="tel"></label>
         <label>Anything we should know? (optional)<textarea name="notes" id="in-notes-${m.id}"></textarea></label>
-        <div class="note">Public demo: please use made-up details.</div>
+        <div class="note">Demo only: please use made-up details.</div>
         <button class="btn">Continue</button></form></div>`;
   }
   if (w.type === "deposit"){
@@ -770,7 +723,6 @@ function renderSetup(force){
       <li><b>Calendar.</b> <span>Swap the demo availability for the client's real calendar: Google Calendar, Square, Vagaro, Calendly or GoHighLevel.</span></li>
       <li><b>Deposits.</b> <span>Replace the demo pay button with a Stripe payment link.</span></li>
       <li><b>Alerts.</b> <span>Text or Slack the front desk when a chat is flagged "Needs you".</span></li></ol></section>
-    <section><h4>Demo data</h4><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><button class="btn ghost" id="clearBtn" type="button">Clear all conversations and bookings</button><span class="note" id="clearNote"></span></div></section>
   </div>`;
 }
 function svcRow(s,i){ return `<tr data-sid="${esc(s.id)}"><td><input id="s-n-${i}" value="${esc(s.name)}" aria-label="Service name"></td><td><input class="num" id="s-m-${i}" type="number" min="15" step="15" value="${s.minutes}" aria-label="Minutes"></td><td><input class="num" id="s-p-${i}" type="number" min="0" value="${s.price}" aria-label="Price"></td><td><input class="num" id="s-d-${i}" type="number" min="0" value="${s.deposit}" aria-label="Deposit"></td><td><button class="x" type="button" data-act="rmsvc" aria-label="Remove service">×</button></td></tr>`; }
@@ -789,11 +741,9 @@ function render(){
   document.querySelectorAll("[data-view]").forEach(b => { if (b.tagName === "BUTTON") b.setAttribute("aria-selected", b.dataset.view === S.view || (b.closest(".desk-tabs") && S.view === "customer" && b.dataset.view === "desk")); });
   const showSetup = S.view === "setup";
   $("#deskView").hidden = showSetup; $("#setupView").hidden = !showSetup;
-  const ai = $("#aiPill"), sy = $("#syncPill");
+  const ai = $("#aiPill");
   ai.className = "pill " + (S.aiMode === "claude" ? "on" : S.aiMode === "rules" ? "off" : "");
   ai.lastChild.textContent = S.aiMode === "claude" ? "Assistant: Claude" : S.aiMode === "rules" ? "Assistant: built-in replies" : "Assistant: connecting";
-  sy.className = "pill " + (S.sync === "shared" ? "on" : S.sync === "local" ? "off" : "");
-  sy.lastChild.textContent = S.sync === "shared" ? "Sync: shared live" : S.sync === "local" ? "Sync: this browser only" : "Sync: connecting";
   $("#sendBtn").disabled = false;
   renderPhone(); renderDesk();
   if (showSetup) renderSetup();
@@ -820,7 +770,7 @@ document.addEventListener("submit", e => {
   else if (f.dataset.act === "intake") submitIntake(f.dataset.mid, f);
   else if (f.id === "staffForm"){ const v = $("#staffIn").value; $("#staffIn").value = ""; staffSend(f.dataset.id, v); }
 });
-$("#newCust").addEventListener("click", () => { S.myConvoId = null; ls.set("pl_my", null); renderPhone(); $("#msgIn").focus(); });
+$("#newCust").addEventListener("click", () => { S.myConvoId = null; renderPhone(); $("#msgIn").focus(); });
 document.addEventListener("input", e => { if (e.target.closest("#setupForm") && e.target.id !== "presetSel") { S.setupDirty = true; $("#savedMsg").textContent = ""; }
   if (e.target.id && e.target.id.startsWith("h-o-")){ const i = e.target.id.slice(4); $("#h-c-"+i).disabled = e.target.value === ""; } });
 document.addEventListener("change", e => {
@@ -829,13 +779,6 @@ document.addEventListener("change", e => {
 document.addEventListener("click", e => {
   if (e.target.id === "addSvc"){ const tb = $("#svcRows"), i = tb.children.length + Date.now()%1000; tb.insertAdjacentHTML("beforeend", svcRow({id:"s"+uid().slice(0,5), name:"", minutes:60, price:0, deposit:0}, i)); S.setupDirty = true; tb.lastElementChild.querySelector("input").focus(); }
   if (e.target.id === "saveCfg"){ const cfg = readSetup(); S.setupDirty = false; saveConfig(cfg); $("#savedMsg").textContent = "Saved. The assistant is using it now."; }
-  if (e.target.id === "clearBtn"){
-    const b = e.target;
-    if (b.dataset.armed !== "1"){ b.dataset.armed = "1"; b.textContent = "Yes, clear everything"; b.classList.add("warn"); $("#clearNote").textContent = "This removes every chat and booking for everyone viewing this demo."; return; }
-    Object.keys(S.convos).forEach(id => writeDoc("convos/"+id, null)); Object.keys(S.bookings).forEach(id => writeDoc("bookings/"+id, null));
-    S.convos = {}; S.bookings = {}; S.myConvoId = null; ls.set("pl_my", null); saveLocal();
-    b.dataset.armed = ""; b.textContent = "Clear all conversations and bookings"; b.classList.remove("warn"); $("#clearNote").textContent = "Cleared."; render();
-  }
 });
 
 /* ---------- boot ---------- */
@@ -845,7 +788,6 @@ render();
   catch { S.aiMode = "rules"; }
   render();
 })();
-initStore();
 setInterval(() => { if (!document.hidden) renderPhone(); }, 60000); // keep slot pickers current
 </script>
 </body>
