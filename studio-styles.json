@@ -1,0 +1,22 @@
+[
+  {"id": "particles", "name": "Particles", "look": "thousands of small dots drifting into a shape (the logo or a product)", "fits": "tech, events, night venues"},
+  {"id": "liquid", "name": "Liquid morph", "look": "soft blobs that melt between shapes, gentle gradients", "fits": "spas, skincare, smoothie and juice bars"},
+  {"id": "neon", "name": "Neon glow", "look": "glowing tube lettering on a dark wall", "fits": "bars, barbers, tattoo, late-night food"},
+  {"id": "y2k", "name": "Y2K chrome", "look": "shiny chrome lettering, early-2000s energy", "fits": "streetwear, nail salons, music"},
+  {"id": "kinetic", "name": "Kinetic type", "look": "huge bold condensed words that stack and slide", "fits": "gyms, coaches, events"},
+  {"id": "paper", "name": "Paper cutout", "look": "layered paper scenes with soft shadows and depth", "fits": "kids' services, bakeries, florists, tutors"},
+  {"id": "holo", "name": "Holographic", "look": "rainbow foil shimmer on cards", "fits": "collectibles, card shops, beauty"},
+  {"id": "isometric", "name": "Isometric", "look": "3D blocks at an angle, like a scale model", "fits": "contractors, builders, logistics"},
+  {"id": "ascii", "name": "ASCII art", "look": "pictures made of monospace text characters", "fits": "developers, IT services, game shops"},
+  {"id": "clay", "name": "Clay 3D", "look": "soft squishy clay-like shapes and icons", "fits": "daycares, pet groomers, toy shops"},
+  {"id": "vhs", "name": "Retro VHS", "look": "80s sunset grid, scan lines, tape labels", "fits": "arcades, vintage shops, music venues"},
+  {"id": "comic", "name": "Comic book", "look": "halftone dots, bold outlines, burst callouts", "fits": "game stores, kids' parties, food trucks"},
+  {"id": "splitflap", "name": "Split-flap", "look": "airport departure-board letters flipping into place", "fits": "travel, transport, auto shops, restaurants"},
+  {"id": "handdrawn", "name": "Hand-drawn", "look": "pencil and marker sketches on paper", "fits": "cafes, teachers, small makers, therapists"},
+  {"id": "blueprint", "name": "Blueprint", "look": "white line drawings on blueprint blue with dimension marks", "fits": "HVAC, plumbing, electricians, engineers"},
+  {"id": "physics", "name": "Physics", "look": "objects that fall, bounce and stack", "fits": "candy, toys, gyms, playful brands"},
+  {"id": "pixel", "name": "Pixel art", "look": "8-bit game graphics", "fits": "game stores, esports, youth programs"},
+  {"id": "bauhaus", "name": "Bauhaus", "look": "primary colors, circles and squares on a strong grid", "fits": "architects, galleries, design studios"},
+  {"id": "deco", "name": "Art deco", "look": "gold lines, arches, 1920s symmetry", "fits": "salons, cocktail bars, jewelers, event venues"},
+  {"id": "brutal", "name": "Neo-brutalism", "look": "thick black borders, flat bright blocks, hard offset shadows", "fits": "startups, agencies, bold local brands"}
+]
