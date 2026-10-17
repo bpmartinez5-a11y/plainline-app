@@ -1,0 +1,17 @@
+# Plainline
+
+> Plainline is an AI text receptionist for local service businesses. It answers customer questions by text and website chat, books customers into the business's open times, and hands anything tricky to the owner. Plainline does the setup.
+
+- Who it's for: appointment-based local businesses such as hair salons, auto detailing, heating and air, gyms and studios.
+- What it does: answers only from the business's own services, prices, hours and policies; books real open times inside the chat (with an optional deposit); flags upset customers, emergencies and refund questions to the owner, who can take over any chat.
+- How setup works: a short call, then Plainline builds and tests the assistant, the owner tries it, then it goes live on the website chat and text messages.
+- Pricing: quoted per business.
+- Capacity: three new setups a month, each built and tested by hand.
+- Run by Plainlineops LLC.
+
+## Pages
+
+- [Home](https://plainlineops.com/): what Plainline does, how setup works, common questions, contact form
+- [Live demo](https://plainlineops.com/demo): text as a customer and watch the front desk side
+- [Privacy policy](https://plainlineops.com/privacy)
+- [Terms of use](https://plainlineops.com/terms)
