@@ -5,7 +5,16 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0d6b71">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d6b71'/%3E%3Cpath d='M9 22V10h7a4 4 0 0 1 0 8h-7' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
-<title>Plainline Text Concierge</title>
+<meta name="description" content="Text a sample business as a customer and watch the front desk side live: answers, bookings and hand-offs to a person. No sign-up.">
+<title>Live demo · Plainline AI text assistant</title>
+<link rel="canonical" href="https://plainlineops.com/demo">
+<meta property="og:site_name" content="Plainline">
+<meta property="og:url" content="https://plainlineops.com/demo">
+<meta property="og:title" content="Live demo · Plainline AI text assistant">
+<meta property="og:description" content="Text a sample business as a customer and watch the front desk side live: answers, bookings and hand-offs to a person. No sign-up.">
+<meta property="og:image" content="https://plainlineops.com/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<script defer src="/_vercel/insights/script.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -48,7 +57,7 @@ button{cursor:pointer}
 
 /* top bar */
 .top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;justify-content:space-between}
-.brand{display:flex;align-items:baseline;gap:10px}
+.brand{display:flex;align-items:baseline;gap:10px;margin:0;font:inherit}
 .brand b{font-family:var(--f-display);font-size:24px;letter-spacing:-.02em}
 .brand span{color:var(--muted);font-size:13px}
 .pills{display:flex;gap:8px;flex-wrap:wrap}
@@ -225,7 +234,7 @@ button{cursor:pointer}
 <body>
 <div class="wrap">
   <header class="top">
-    <div class="brand"><a href="/" style="color:inherit;text-decoration:none"><b>Plainline</b></a><span>Text Concierge · live demo · <a href="/#contact" style="color:var(--accent)">Get one set up</a></span></div>
+    <h1 class="brand"><a href="/" style="color:inherit;text-decoration:none"><b>Plainline</b></a><span>Text Concierge · live demo · <a href="/#contact" style="color:var(--accent)">Get one set up</a></span></h1>
     <div class="pills">
       <span class="pill" id="aiPill"><i></i>Assistant: connecting</span>
       <span class="pill on"><i></i>Private: your chat stays in this tab</span>
