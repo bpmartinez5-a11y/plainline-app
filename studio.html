@@ -98,13 +98,13 @@ iframe{border:0;background:#fff;border-radius:10px;height:760px;width:390px;max-
 
   <section class="card">
     <h2>4. Quote</h2>
-    <p class="hint">They keep their domain. No website or domain? You register one for them: the domain cost plus monthly upkeep at your rate. Your numbers are remembered on this device.</p>
+    <p class="hint">They keep their domain. No website or domain? You register one for them for its yearly cost. Monthly care follows the billable-hours plans; the hours each plan buys come from your rate. Your numbers are remembered on this device.</p>
     <div class="grid">
       <label>Domain<input id="q-domain" placeholder="theirbusiness.com"></label>
       <label>Domain is<select id="q-own"><option value="keep">Theirs, keep it</option><option value="new">New, we register it</option></select></label>
       <label>Setup fee ($)<input id="q-setup" type="number" min="0" inputmode="decimal"></label>
       <label>Your hourly rate ($)<input id="q-rate" type="number" min="0" inputmode="decimal"></label>
-      <label>Upkeep hours a month<input id="q-hours" type="number" min="0" step="0.5" inputmode="decimal"></label>
+      <label>Monthly plan<select id="q-plan"></select></label>
       <label>New domain cost ($/yr)<input id="q-dcost" type="number" min="0" inputmode="decimal"></label>
     </div>
     <div class="quote" id="quote"></div>
@@ -196,19 +196,23 @@ $("#openBtn").onclick = () => window.open(URL.createObjectURL(file()), "_blank",
 $("#dlBtn").onclick = () => { const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(file()), download: (($("#q-domain").value || $("#f-name").value || "site").replace(/[^a-z0-9.]+/gi, "-").toLowerCase()) + ".html" }); a.click(); };
 
 /* quote */
-["setup", "rate", "hours", "dcost"].forEach(k => { $("#q-" + k).value = store.get("q." + k); });
+// Billable-hours plans (Ben, Oct 17). Change the names or prices here.
+const PLANS = [["Starter", 250], ["Growth", 500], ["Pro", 1000], ["Dedicated (full time)", 4500]];
+$("#q-plan").innerHTML = PLANS.map(([n, p], i) => `<option value="${i}">${n} · $${p.toLocaleString("en-US")}/month</option>`).join("");
+["setup", "rate", "plan", "dcost"].forEach(k => { const v = store.get("q." + k); if (v) $("#q-" + k).value = v; });
 const money = n => "$" + (Math.round(n * 100) / 100).toLocaleString("en-US", { minimumFractionDigits: n % 1 ? 2 : 0 });
 function quote() {
-  ["setup", "rate", "hours", "dcost"].forEach(k => store.set("q." + k, $("#q-" + k).value));
+  ["setup", "rate", "plan", "dcost"].forEach(k => store.set("q." + k, $("#q-" + k).value));
   const name = $("#f-name").value.trim() || "your business", dom = $("#q-domain").value.trim(), isNew = $("#q-own").value === "new" || !dom;
-  const setup = +$("#q-setup").value || 0, rate = +$("#q-rate").value || 0, hrs = +$("#q-hours").value || 0, dcost = +$("#q-dcost").value || 0;
+  const setup = +$("#q-setup").value || 0, rate = +$("#q-rate").value || 0, dcost = +$("#q-dcost").value || 0;
+  const [plan, price] = PLANS[+$("#q-plan").value || 0], hrs = rate ? Math.round(price / rate * 2) / 2 : 0;
   const lines = [`New website for ${name}`, "",
     isNew ? `• New domain${dom ? " (" + dom + ")" : ""}, registered and set up for you: ${dcost ? money(dcost) + " a year" : "[add domain cost]"}` : `• Built to go live on your own domain, ${dom}. You keep it.`,
     `• Design and build, mobile-ready, set up to be found on Google and AI search: ${setup ? money(setup) + " one time" : "[add setup fee]"}`,
-    `• Monthly upkeep: ${hrs && rate ? `${hrs} hour${hrs === 1 ? "" : "s"} a month at ${money(rate)}/hour = ${money(hrs * rate)} a month` : "[add hours and rate]"}`];
+    `• ${plan} care plan: ${money(price)} a month${hrs ? `, up to ${hrs} hour${hrs === 1 ? "" : "s"} of updates, fixes and changes at ${money(rate)}/hour` : " [add your rate to show the hours]"}`];
   $("#quote").textContent = lines.join("\n");
 }
-document.querySelectorAll("#q-domain,#q-own,#q-setup,#q-rate,#q-hours,#q-dcost,#f-name").forEach(i => i.addEventListener("input", quote));
+document.querySelectorAll("#q-domain,#q-own,#q-setup,#q-rate,#q-plan,#q-dcost,#f-name").forEach(i => i.addEventListener("input", quote));
 $("#copyQuote").onclick = () => navigator.clipboard.writeText($("#quote").textContent).then(() => say($("#quoteMsg"), "Copied.", "ok"), () => say($("#quoteMsg"), "Couldn't copy. Select the text instead.", "err"));
 quote();
 </script>
