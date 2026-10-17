@@ -102,7 +102,8 @@ iframe{border:0;background:#fff;border-radius:10px;height:760px;width:390px;max-
     <div class="grid">
       <label>Domain<input id="q-domain" placeholder="theirbusiness.com"></label>
       <label>Domain is<select id="q-own"><option value="keep">Theirs, keep it</option><option value="new">New, we register it</option></select></label>
-      <label>Setup fee ($)<input id="q-setup" type="number" min="0" inputmode="decimal"></label>
+      <label>Standard design fee ($)<input id="q-setup" type="number" min="0" inputmode="decimal"></label>
+      <label>This client's price ($, if negotiated)<input id="q-deal" type="number" min="0" inputmode="decimal" placeholder="Same as standard"></label>
       <label>Your hourly rate ($)<input id="q-rate" type="number" min="0" inputmode="decimal"></label>
       <label>Monthly plan<select id="q-plan"></select></label>
       <label>New domain cost ($/yr)<input id="q-dcost" type="number" min="0" inputmode="decimal"></label>
@@ -204,15 +205,15 @@ const money = n => "$" + (Math.round(n * 100) / 100).toLocaleString("en-US", { m
 function quote() {
   ["setup", "rate", "plan", "dcost"].forEach(k => store.set("q." + k, $("#q-" + k).value));
   const name = $("#f-name").value.trim() || "your business", dom = $("#q-domain").value.trim(), isNew = $("#q-own").value === "new" || !dom;
-  const setup = +$("#q-setup").value || 0, rate = +$("#q-rate").value || 0, dcost = +$("#q-dcost").value || 0;
+  const setup = +$("#q-setup").value || 0, deal = $("#q-deal").value === "" ? setup : +$("#q-deal").value, rate = +$("#q-rate").value || 0, dcost = +$("#q-dcost").value || 0;
   const [plan, price] = PLANS[+$("#q-plan").value || 0], hrs = rate ? Math.round(price / rate * 2) / 2 : 0;
   const lines = [`New website for ${name}`, "",
     isNew ? `• New domain${dom ? " (" + dom + ")" : ""}, registered and set up for you: ${dcost ? money(dcost) + " a year" : "[add domain cost]"}` : `• Built to go live on your own domain, ${dom}. You keep it.`,
-    `• Design and build, mobile-ready, set up to be found on Google and AI search: ${setup ? money(setup) + " one time" : "[add setup fee]"}`,
+    `• Design and build, mobile-ready, set up to be found on Google and AI search: ${setup ? money(deal) + " one time" + (deal < setup ? ` (standard ${money(setup)}, ${money(setup - deal)} off)` : "") : "[add your design fee]"}`,
     `• ${plan} care plan: ${money(price)} a month${hrs ? `, up to ${hrs} hour${hrs === 1 ? "" : "s"} of updates, fixes and changes at ${money(rate)}/hour` : " [add your rate to show the hours]"}`];
   $("#quote").textContent = lines.join("\n");
 }
-document.querySelectorAll("#q-domain,#q-own,#q-setup,#q-rate,#q-plan,#q-dcost,#f-name").forEach(i => i.addEventListener("input", quote));
+document.querySelectorAll("#q-domain,#q-own,#q-setup,#q-deal,#q-rate,#q-plan,#q-dcost,#f-name").forEach(i => i.addEventListener("input", quote));
 $("#copyQuote").onclick = () => navigator.clipboard.writeText($("#quote").textContent).then(() => say($("#quoteMsg"), "Copied.", "ok"), () => say($("#quoteMsg"), "Couldn't copy. Select the text instead.", "err"));
 quote();
 </script>
