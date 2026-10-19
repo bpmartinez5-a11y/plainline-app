@@ -17,3 +17,6 @@ Plainline sells finished jobs to local businesses (answering every customer, boo
 - Plan mode before multi-file edits. Edit with small diffs; never rewrite a whole file to change part of it.
 - Find things with Grep or Glob first, then Read only the line range you need. `demo.html` is ~58 KB; don't read it whole.
 - Hand searches, reviews and research to the Sonnet subagents in `.claude/agents/`.
+
+## Compact instructions
+When compacting, keep: the current task, decisions made, file paths and line numbers touched, and open questions. Drop: full file contents, command output, and dead ends.
