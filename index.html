@@ -99,7 +99,8 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
 .hero h1,.hero > p,.hero .cta{animation:rise .8s var(--ease-out) both}
 .hero > p{animation-delay:.08s}.hero .cta{animation-delay:.16s}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}}
-.thread{background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:16px 14px 14px;box-shadow:0 24px 60px -28px color-mix(in srgb,var(--ink) 45%,transparent);display:flex;flex-direction:column;gap:8px;min-height:380px;margin-bottom:40px}
+.thread{background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:16px 14px 14px;box-shadow:0 24px 60px -28px color-mix(in srgb,var(--ink) 45%,transparent);display:flex;flex-direction:column;gap:8px;min-height:380px;margin:0 0 40px}
+#msgs{display:contents}
 .thread-top{display:flex;align-items:center;gap:10px;padding:0 4px 10px;border-bottom:1px solid var(--line);margin-bottom:4px}
 .thread-top i{width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font:700 15px var(--f-display);font-style:normal}
 .thread-top b{display:block;font-size:15px;line-height:1.2}
@@ -113,12 +114,12 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
 .msg.typing span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:dot 1s infinite}
 .msg.typing span:nth-child(2){animation-delay:.15s}.msg.typing span:nth-child(3){animation-delay:.3s}
 @keyframes dot{0%,60%,100%{opacity:.3;transform:none}30%{opacity:1;transform:translateY(-3px)}}
-.booked{align-self:flex-end;display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,transparent);border-radius:99px;padding:6px 12px 6px 8px;--o:100% 50%}
+.booked{align-self:flex-end;display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,transparent);border-radius:99px;padding:6px 12px 6px 8px}
 .booked svg{width:18px;height:18px}
 .pop{animation:pop .55s var(--spring) both}
 @keyframes pop{from{opacity:0;transform:scale(.6) translateY(8px)}}
 .thread-note{margin:auto 4px 0;font-size:12.5px;color:var(--muted)}
-/* How it works is a real sequence: the rail fills as you scroll, where the browser supports it */
+/* How it works is a real sequence: each number lights up as you scroll, where the browser supports it */
 .steps li::after{content:"";position:absolute;left:15px;top:36px;bottom:4px;width:2px;background:var(--line);border-radius:2px}
 .steps li:last-child::after{display:none}
 @supports (animation-timeline:view()){
@@ -128,10 +129,10 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
 /* Phone: a small sticky bar keeps the two actions in reach */
 .dock{display:none}
 @media (max-width:640px){
-  .dock{display:flex;gap:8px;position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:10;padding:8px;border-radius:18px;background:color-mix(in srgb,var(--surface) 88%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--line);box-shadow:0 10px 30px -12px color-mix(in srgb,var(--ink) 40%,transparent);transition:transform .45s var(--spring),opacity .3s}
+  .dock{display:flex;gap:8px;position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:10;padding:8px;border-radius:18px;background:color-mix(in srgb,var(--surface) 88%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--line);box-shadow:0 10px 30px -12px color-mix(in srgb,var(--ink) 40%,transparent);transition:transform .45s var(--spring),opacity .3s,visibility 0s}
   .dock .btn{flex:1;padding:10px 12px}
-  .dock.away{transform:translateY(140%);opacity:0;pointer-events:none}
-  body{padding-bottom:96px}
+  .dock.away{transform:translateY(140%);opacity:0;visibility:hidden;transition-delay:0s,0s,.45s}
+  body{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
   .hero p{font-size:17px}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
@@ -148,9 +149,9 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
     <div class="cta"><a class="btn" href="#contact">Ask about a setup slot</a><a class="btn ghost" href="/demo">Try the live demo</a></div>
     <p class="slots"><b>Three new setups a month.</b> Each one is built and tested by hand, so we keep the number small.</p>
   </header>
-  <figure class="thread" id="thread" aria-label="Example text conversation between a customer and a salon's Plainline assistant" style="margin-inline:0">
+  <figure class="thread" id="thread" aria-label="Example text conversation between a customer and a salon's Plainline assistant">
     <div class="thread-top"><i aria-hidden="true">C</i><div><b>Corner Cuts</b><small>Text assistant</small></div><button type="button" id="replay" hidden>Replay</button></div>
-    <div id="msgs" style="display:contents"></div>
+    <div id="msgs"></div>
     <figcaption class="thread-note">Example conversation</figcaption>
   </figure>
   </div>
@@ -207,7 +208,7 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
     </form>
   </section>
 
-  <div class="dock" id="dock"><a class="btn ghost" href="/demo">Live demo</a><a class="btn" href="#contact">Ask about a slot</a></div>
+  <div class="dock away" id="dock"><a class="btn ghost" href="/demo">Live demo</a><a class="btn" href="#contact">Ask about a slot</a></div>
 
   <footer><span>© 2026 Plainlineops LLC</span><span><a href="/demo">Live demo</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></span></footer>
 </div>
