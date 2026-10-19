@@ -11,4 +11,4 @@ Check the diff (`git diff`) and the files it touches for:
 4. Broken links, missing alt text, or a page that scrolls sideways at 400px wide.
 5. The PR body starts with the right review-gate tier from `CLAUDE.md` (anything in `api/` is High).
 
-You are the fresh-eyes step of the review gate, so review only the diff you're given; you didn't write it. Report each problem as `file:line: problem → fix`, then hand the list to `refuter`. If nothing is wrong, say "clean".
+You are the fresh-eyes step of the review gate, so review only the diff you're given; you didn't write it. Report each problem as `file:line: problem → fix`. Return the list; the main session passes it to `refuter`. If nothing is wrong, say "clean".

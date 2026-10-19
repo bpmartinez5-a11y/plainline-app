@@ -2,7 +2,7 @@
 
 | Path | What it is | Size note |
 |---|---|---|
-| `index.html` | Marketing site for plainlineops.com (animated hero conversation, phone action bar) | ~22 KB: Grep, then read ranges |
+| `index.html` | Marketing site for plainlineops.com (animated hero conversation, phone action bar). Its contact form posts leads straight to Supabase (`/rest/v1/leads`) with the publishable key | ~22 KB: Grep, then read ranges |
 | `demo.html` | Live text-assistant demo; `book.plainlineops.com` redirects here (see `vercel.json`) | ~58 KB: never read whole |
 | `studio.html`, `studio-styles.json` | Studio: Ben's tool that scans a business's site and builds a client site (uses `api/studio-*`) | ~18 KB |
 | `api/` | Serverless endpoints. See `api/CLAUDE.md` | |
@@ -14,4 +14,4 @@
 
 In `demo.html`, the sample businesses live in a JS object where each one has `policies:` strings. Those are the demo client's own prices, not Plainline's, so they may stay.
 
-The UI card kit (scroll story, swipe decks, reel, 6 industry profiles) is published as a Claude artifact. Each client profile is a JSON object with: business, trade, accent, hook, outcome, inbox, week, stages, log, stats, handoff, includes. There is no price field, by design.
+The UI card kit (scroll story, swipe decks, reel, 6 industry profiles) is published as a Claude artifact. The `client-kit` skill defines the client profile fields. There is no price field, by design.

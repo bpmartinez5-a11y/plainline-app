@@ -8,7 +8,7 @@ Plainline runs on Vercel: static pages plus serverless functions in `api/`. Verc
 
 **How deploys work**
 - Every pull request gets a Vercel Preview deployment. Test there.
-- Recent work merges to `main` (PR #8 did). The repo's GitHub default branch is an older `claude/...` branch, so always open PRs against `main` unless Ben says otherwise. Confirm the production branch in Vercel → Project → Settings → Git before the first merge.
+- Open PRs against `main`, not the GitHub default branch (check with `git ls-remote --symref origin HEAD`; if it isn't `main`, still target `main` unless Ben says otherwise). Confirm the production branch in Vercel → Project → Settings → Git before the first merge.
 - Rollback: Vercel → Deployments → pick the last good one → Promote (or `vercel rollback`). It's instant, so prefer it to a hotfix under pressure.
 
 **Review gate (from `CLAUDE.md`)**
@@ -27,7 +27,7 @@ Plainline runs on Vercel: static pages plus serverless functions in `api/`. Verc
    - The demo replies, and fallback works (replies still come with AI off).
    - Studio rejects a wrong key with 401.
 3. `vercel.json` is valid JSON. The `book.plainlineops.com` redirect and the security headers are unchanged unless intended.
-4. Env vars exist in Vercel Production, never in code: `ANTHROPIC_API_KEY`, `STUDIO_KEY`, and optionally `ANTHROPIC_MODEL`.
+4. Env vars exist in Vercel Production, never in code: `ANTHROPIC_API_KEY`, `STUDIO_KEY`, and optionally `ANTHROPIC_MODEL` and `STUDIO_MODEL`. (The Supabase publishable key in `index.html` is public by design; its safety is the `leads` table's row-level security.)
 5. The Anthropic API key has a spend limit set in the Console.
 6. No Plainline price appears on any client-facing page.
 

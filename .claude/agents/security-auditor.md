@@ -14,8 +14,9 @@ Check:
   - Is the rate limit per instance only, and what's the cost exposure?
   - Input size limits, error messages leaking internals, logging of secrets or visitor messages.
 - **Studio (`api/studio-*.js`, `api/_studio.js`)**: is every route behind `authorized()`? Is the key compared in constant time and never logged? Can `studio-scan` be pointed at internal or private addresses (localhost, 169.254.x, 10.x, redirects to them), and are response size and time capped?
+- **Supabase leads (`index.html` contact form)**: the publishable key is meant to be public, so safety depends on row-level security. Confirm the `leads` table allows insert only (no select, update or delete) for the anon role, and that inputs are length-capped.
 - **Injection and XSS**: Grep `innerHTML`, `insertAdjacentHTML`, `document.write`, `eval`, `new Function`. Does model output or user text reach them without escaping?
-- **Secrets**: Grep for keys or tokens in tracked files (`sk-`, `api_key`, `Bearer`, `.env`). Check `git log -p -S "sk-" --all -n 20` for history.
+- **Secrets**: Grep for keys or tokens in tracked files (`sk-`, `api_key`, `Bearer`, `.env`). Check history with `git log -S "sk-" --all --oneline -n 20` (commit list only); inspect a hit with `git show <commit> --stat` and report the file, never the value.
 - **Headers (`vercel.json`)**: present (nosniff, frame DENY, referrer) and missing (Content-Security-Policy, Permissions-Policy, Strict-Transport-Security).
 - **Data exposure**: what visitor data is sent, stored or logged, and whether `privacy.html` matches it.
 - **Supply chain**: third-party scripts and CDNs loaded without pinned versions.
