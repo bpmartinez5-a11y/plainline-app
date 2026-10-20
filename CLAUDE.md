@@ -25,7 +25,7 @@ Put the tier at the top of the PR body. A fresh agent that didn't write the chan
 - `/tech-lead` before anything hard to undo · `/architect-mvp` design, then build → `architect`
 - `/audit-codebase` report only → `auditor` · `/refactor-clean` same behavior, cleaner structure → `auditor`
 - `/debug-prod` → `debugger` · `/perf-pass` → `perf-engineer` · `/security-audit` → `security-auditor`
-- `/build-ui` card-kit style components · `/ship-it` review gate and Vercel deploy · `/client-kit` → `intake`
+- `/build-ui` card-kit style components · `/ship-it` review gate and Vercel deploy · `/client-kit` → `intake` · `/client-docs` the 10 client documents
 - Every change ends with the review gate: `reviewer`, then `refuter`.
 
 ## Working style
