@@ -42,7 +42,7 @@ ul{padding-left:22px}
   <ul>
     <li><b>Contact form.</b> Your name, email, business name and message, only when you send the form. We use them to reply to you and to talk with you about a setup.</li>
     <li><b>Live demo.</b> Messages and details you type into the demo stay in your browser tab and are gone when you refresh or close it. If the demo's AI replies are turned on, the messages in that chat are sent through our server to our AI provider to write the next reply. We don't save them. Anthropic handles those messages under its own API terms and may keep them for a limited time for safety and abuse monitoring; we don't control that, which is one more reason to use made-up details in the demo. Settings you change on the demo's setup screen are saved only in your own browser.</li>
-    <li><b>Technical data.</b> Like any website, our host receives your IP address and basic browser information when you visit. Our demo server also holds your IP address in memory, never on disk, for about an hour, only to limit how many AI replies one visitor can request. We count page visits with Vercel's cookieless analytics, which shows us totals like visits per page and where visitors came from, never who you are.</li>
+    <li><b>Technical data.</b> Like any website, our host receives your IP address and basic browser information when you visit. Our demo server also holds your IP address in memory, never on disk, for about an hour (a little longer if the server stays running), only to limit how many AI replies one visitor can request. We count page visits with Vercel's cookieless analytics, which shows us totals like visits per page and where visitors came from, never who you are.</li>
   </ul>
 
   <h2>What we don't do</h2>
@@ -50,11 +50,12 @@ ul{padding-left:22px}
     <li>We don't sell or rent your information.</li>
     <li>We don't use advertising or tracking cookies, or analytics that follow you across sites.</li>
     <li>We don't knowingly collect information from children. This site is for businesses and adults.</li>
+    <li>Browsers can send a "Do Not Track" signal. We don't track visitors across sites, so we treat every visit the same whether or not the signal is on.</li>
     <li>When we make data de-identified so it can't be tied to a person or business, we keep it that way: we don't try to re-identify it, and we require anyone we share it with to make the same promise.</li>
   </ul>
 
   <h2>Who helps us run the site</h2>
-  <p>These companies process data for us, only to provide their service:</p>
+  <p>These companies help us run the site. Each handles data under its own terms, as described below:</p>
   <ul>
     <li><b>Vercel</b> hosts the website and the demo server, and counts page visits.</li>
     <li><b>Supabase</b> stores contact form messages.</li>
