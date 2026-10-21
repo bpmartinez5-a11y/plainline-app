@@ -8,7 +8,7 @@ Plainline sells finished jobs to local businesses (every customer answered, the 
 - Never show a Plainline price, plan price or dollar amount on anything client-facing. Ben prices each client after a walkthrough. Calls to action say "Book a walkthrough".
 - No AI-looking imagery: no generated faces, robots or glowing-brain art. Visuals are real-looking UI cards built from the client's own data, over documentary photos from Higgsfield.
 - Example businesses and numbers are labeled "values illustrative" until real client data replaces them.
-- Client builds keep the promises in the client agreement (client-docs skill): the assistant says it is automated; hand-offs reach the designated contact in under 5 minutes, failed sends are resent by the Fact Sheet backup method, and every send is logged (§§2.3, 3.3, 7.12); outbound texts go only to opted-in numbers, STOP is honored automatically, a consent record is kept per number, and sends stay inside quiet hours (§3.4).
+- Client builds keep the promises in the client agreement (client-docs skill): the assistant says it is automated; hand-offs reach the designated contact in under 5 minutes, failed sends are resent by the Fact Sheet backup method, and every send is logged (§§2.3, 3.3, 7.12); outbound message types in the Order Form go only to numbers with a consent record and never during quiet hours; STOP is honored automatically; replies to a customer's own message and hand-off notices to the client are not blocked (§3.4).
 
 ## Review gate (Ben turned it on 2026-10-18)
 Every PR here and to client sites gets a risk tier and a fresh-eyes review before it merges. The change sets the tier:

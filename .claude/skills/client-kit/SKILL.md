@@ -4,7 +4,7 @@ description: "Build a Plainline client profile and card kit from a business's we
 ---
 # Client kit
 
-1. Hand the URL to the `intake` subagent. It fetches the home, services and contact pages (skipping blogs and PDFs), fills the profile below and writes it to `clients/<slug>.json`.
+1. Hand the URL to the `intake` subagent. It fetches the home, services and contact pages (skipping blogs and PDFs), fills the profile below and writes it to `clients/<slug>.json`. `clients/` holds prospects only: at signing, the profile moves to the Client Docs artifact and is deleted from the repo.
 2. The profile fields (the card kit reads exactly these):
    - `business`, `initials`, `trade` (one line), `accent` (pulled from their logo or brand color)
    - `hook` (4 short caption parts, the third gets highlighted) and `outcome` (3 parts, the second highlighted). Both say the job done, e.g. "answers every stranded driver".

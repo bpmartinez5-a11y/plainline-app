@@ -12,6 +12,6 @@ Check the diff (`git diff`) and the files it touches for:
 5. The PR body starts with the right review-gate tier from `CLAUDE.md` (anything in `api/` is High).
 6. The "automated assistant" disclosure is unchanged everywhere it appears (demo.html, any assistant prompt), and no assistant uses a name or persona that implies a person. Any change to it makes the PR High tier.
 7. Check the diff against the incident eval cases the main session passes you. If none were passed, say "evals not checked".
-8. For any diff that sends messages or hand-offs: STOP and opt-outs stop sends, hand-offs are logged and resent by the backup method on failure, and nothing sends outside quiet hours or without a consent record (`CLAUDE.md` hard rules).
+8. For any diff that sends messages or hand-offs: STOP and opt-outs stop sends; hand-offs are logged and resent by the backup method on failure; outbound message types never go during quiet hours or without a consent record, while replies to a customer's own message and hand-off notices are not blocked (`CLAUDE.md` hard rules).
 
 You are the fresh-eyes step of the review gate, so review only the diff you're given; you didn't write it. Report each problem as `file:line: problem → fix`. Return the list; the main session passes it to `refuter`. If nothing is wrong, say "clean".
