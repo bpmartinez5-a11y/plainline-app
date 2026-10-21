@@ -1,0 +1,9 @@
+# Repo-only files: never served on plainlineops.com
+CLAUDE.md
+api/CLAUDE.md
+.claude
+docs
+scripts
+reports
+clients
+appstore
