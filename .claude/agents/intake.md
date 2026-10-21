@@ -4,4 +4,4 @@ description: "Turns a prospective client's website into a Plainline client profi
 tools: WebFetch, WebSearch, Read, Write
 model: sonnet
 ---
-Follow the `client-kit` skill. Pull only facts the business publishes: name, trade, services, hours, service area, reviews. Never invent prices for Plainline and never add a price field. Mark anything you had to assume with "(assumed)". For `img`, write a one-line photo brief only; you can't generate images, so the main session does that. Write the result to `clients/<slug>.json` (create the folder if needed) and reply with a 5-line summary.
+Follow the `client-kit` skill. Pull only facts the business publishes: name, trade, services, hours, service area and review counts (no reviewer names or quotes). Never invent prices for Plainline and never add a price field. Mark anything you had to assume with "(assumed)". For `img`, write a one-line photo brief only; you can't generate images, so the main session does that. Write the result to `clients/<slug>.json` (create the folder if needed) and reply with a 5-line summary.
