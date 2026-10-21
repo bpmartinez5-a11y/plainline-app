@@ -103,3 +103,10 @@ test("planner questions are kept but never printed on the pages", () => {
   assert.strictEqual(out.profile.questions[0].options.length, 2);
   assert.ok(!/Do they show prices publicly\?<\/|>Do they show prices/.test(out.site.replace(/<script>window\.__PROFILE__[\s\S]*?<\/script>/, "")));
 });
+
+test("live and downloaded pages don't carry the planner's questions or Ben's todos", () => {
+  const p = Object.assign({}, photographer, { questions: [{ question: "Internal question?" }] });
+  const live = E.render(p).site, preview = E.render(p, { preview: true }).site;
+  assert.ok(!live.includes("Internal question?") && !live.includes("Starting prices for each lane"));
+  assert.ok(preview.includes("Internal question?"));
+});

@@ -68,8 +68,9 @@ function brief(b) {
     colors: site.colors, structured: site.structured, images: site.images, text: site.text,
     pages: (scan.pages || []).map(p => ({ url: p.url, title: p.title, headings: p.headings, images: p.images, text: p.text, structured: p.structured }))
   };
-  const answers = (Array.isArray(b.answers) ? b.answers : []).slice(0, 4)
-    .map(a => a && typeof a === "object" ? `- ${String(a.question || "").slice(0, 200)} → ${String(a.answer || "").slice(0, 300)}` : "").filter(x => x.length > 4);
+  const answers = (Array.isArray(b.answers) ? b.answers : []).slice(0, 8)
+    .filter(a => a && typeof a === "object" && String(a.answer || "").trim() && String(a.question || "").trim())
+    .map(a => `- ${String(a.question).slice(0, 200)} → ${String(a.answer).trim().slice(0, 300)}`);
   return [
     b.notes ? `Ben's notes (follow these): ${String(b.notes).slice(0, 2000)}` : "",
     answers.length ? `Ben's answers to your earlier questions (follow these):\n${answers.join("\n")}` : "",

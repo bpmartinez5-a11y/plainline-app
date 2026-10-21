@@ -387,10 +387,10 @@ ${visit()}`;
         const tabs = `<div class="subtabs">${items.map(x => `<a href="${route(x.path)}" aria-current="${!!(it && it.id === x.id)}">${esc(x.title)}</a>`).join("")}</div>`;
         if (!it) return `<section class="sec"><div class="sec-head"><h2>${esc(c.title)}</h2>${c.blurb ? `<p>${esc(c.blurb)}</p>` : ""}</div>${tabs}
 <div class="roster">${items.map(x => `<a class="tile tilt" href="${route(x.path)}">${img("cover:" + x.path, x.photos[0] || { src: extra(x.path)[0] }, 800, x.title) || art(x.title.slice(0, 1))}<span class="cap"><small>${esc(x.kicker)}</small><b>${esc(x.title)}</b></span></a>`).join("")}</div></section>`;
-        const link = B.domain ? `https://${B.domain}/#${it.path}` : location.origin + location.pathname + "#" + it.path;
+        const link = B.domain ? `https://${B.domain}/#${it.path}` : /^https?:$/.test(location.protocol) ? location.origin + location.pathname + "#" + it.path : "";
         const pics = it.photos.map((p, i) => i === 0 ? img("cover:" + it.path, p, 1600, p.alt || it.title) : img("photo:" + it.path + ":" + i, p, 1600, p.alt || it.title)).filter(Boolean).concat(extra(it.path).map(s => `<img src="${esc(s)}" alt="${esc(it.title)}" loading="lazy">`));
         return `<section class="sec">${tabs}<div class="gal-hero"><h3>${esc(it.title)}</h3><div class="meta">${it.line ? `<div class="mono">${esc(it.line)}</div>` : ""}
-<div class="share"><code>${esc(link)}</code><button class="iconbtn" data-copy="${esc(link)}" type="button">Copy link</button></div>
+${link ? `<div class="share"><code>${esc(link)}</code><button class="iconbtn" data-copy="${esc(link)}" type="button">Copy link</button></div>` : ""}
 <a class="btn solid" href="#book">${esc(P.hero.cta)}</a></div></div>
 ${pics.length ? `<div class="masonry">${pics.map(h => `<figure>${h}</figure>`).join("")}</div>` : `<p class="note">New ${esc(it.title.toLowerCase())} photos are coming soon.</p>`}</section>`;
       },
@@ -455,8 +455,8 @@ ${K.minors ? `<div class="check"><input type="checkbox" id="f-guardian" name="gu
     // Routes live in a variable, not only in the address bar: inside the Studio's srcdoc preview a "#x" link
     // resolves against the Studio's own URL and would load the Studio into the frame.
     let here = location.hash.slice(1);
-    function go(h) { here = String(h || "").slice(0, 200); try { history.pushState(null, "", "#" + here); } catch (e) {} render(); }
-    document.addEventListener("click", e => { const a = e.target.closest && e.target.closest('a[href^="#"]'); if (!a || e.defaultPrevented) return; e.preventDefault(); go(a.getAttribute("href").slice(1)); });
+    function go(h) { h = String(h || "").slice(0, 200); if (h === here) return render(); here = h; try { history.pushState(null, "", "#" + here); } catch (e) {} render(); }
+    document.addEventListener("click", e => { const a = e.target.closest && e.target.closest('a[href^="#"]'); if (!a || e.defaultPrevented || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return; e.preventDefault(); go(a.getAttribute("href").slice(1)); });
     function render() {
       let raw = here || "home";
       if (/^owner(?:$|[/?])/.test(raw)) { if (OPT.preview) { try { parent.postMessage({ plStudio: "open", page: "dashboard" }, "*"); } catch (e) {} } here = "home"; try { history.replaceState(null, "", "#home"); } catch (e) {} raw = "home"; }
@@ -537,8 +537,7 @@ ${K.minors ? `<div class="check"><input type="checkbox" id="f-guardian" name="gu
     applyTheme();
     addEventListener("scroll", () => { mbook.hidden = /^book/.test(here) || scrollY < 520; }, { passive: true });
     addEventListener("storage", e => { if (e.key === KEY) { edits = store.get(); render(); } });
-    addEventListener("hashchange", () => { here = location.hash.slice(1); render(); });
-    addEventListener("popstate", () => { here = location.hash.slice(1); render(); });
+    addEventListener("hashchange", () => { const h = location.hash.slice(1); if (h !== here) { here = h; render(); } });
     // In the Studio preview the parent page can jump to a section (only the Studio, nothing else).
     if (OPT.preview) addEventListener("message", e => { if (e.source === parent && e.data && e.data.plStudio === "go" && typeof e.data.hash === "string") go(e.data.hash.replace(/[^a-z0-9\-/?=]/gi, "")); });
     render();
@@ -852,7 +851,7 @@ ${isSite ? SITE_CSS : DASH_CSS}
 </head>
 <body>
 <noscript>${escHtml(B.name)}${B.kind ? " · " + escHtml(B.kind) : ""}. Turn on JavaScript to see this site.</noscript>
-<script>window.__PROFILE__=${embed(p)};window.__OPTIONS__=${embed(o)};</script>
+<script>window.__PROFILE__=${embed(o.preview ? p : Object.assign({}, p, { questions: [], todos: [] }))};window.__OPTIONS__=${embed(o)};</script>
 <script>(${runtime.toString()})();</script>
 </body>
 </html>

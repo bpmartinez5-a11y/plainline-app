@@ -66,7 +66,7 @@ details.card[open]>summary::after{content:" ▴"}
 .dec>section,.dec>details{border-top:1px solid var(--line);padding-top:14px;margin-top:10px}
 .dec h3{font:700 17px var(--f-display);margin:0 0 4px}.dec h3 small{font:400 13px var(--f-body);margin-left:6px}
 .pick{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.pick button{border:1px solid var(--line);background:var(--sunk);color:var(--ink);border-radius:999px;padding:8px 13px;font:600 14px var(--f-body);cursor:pointer;min-height:40px}
+.pick button{border:1px solid var(--line);background:var(--sunk);color:var(--ink);border-radius:999px;padding:8px 13px;font:600 14px var(--f-body);cursor:pointer;min-height:44px}
 .pick button[aria-pressed="true"],.pick button[aria-checked="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
 .q{display:grid;gap:6px;margin:0 0 14px}.q b{font-size:15px}
 .q input{max-width:420px}
@@ -326,25 +326,40 @@ const answers = {};
 const clone = o => JSON.parse(JSON.stringify(o));
 const h = t => String(t == null ? "" : t).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const LOOK_NAMES = { studio: "Studio", grid: "Grid Light", backstage: "Backstage" }, VOICE_NAMES = { bold: "Bold type", clean: "Clean type", warm: "Warm type" };
-const SEC = { business: "Business", hero: "Top of page", collections: "Sections", recent: "Recent work", proof: "Proof", about: "About", pricing: "Pricing", contact: "Contact", booking: "Booking" };
+const SEC = { business: "Business", hero: "Top of page", collections: "Sections", recent: "Recent work", proof: "Proof", about: "About", pricing: "Pricing", contact: "Contact", booking: "Booking", owner: "Dashboard" };
+const FIELD = { startingAt: "starting price", line: "short line", kicker: "small label", title: "name", name: "name", label: "label", blurb: "intro", lede: "intro", paragraphs: "paragraph", hours: "hours", items: "item", steps: "step", intro: "intro", note: "note", text: "text", when: "date", address: "address", phone: "phone", serviceArea: "service area", tagline: "tagline", eyebrow: "small heading", lines: "headline", cta: "button", who: "who it's for", stages: "stage" };
+// Each blank is keyed by a stable path: array entries that have an id are named "#id", so a fill
+// stays on the same fact even if a rebuild reorders sections.
 function blanks(p) {
   const out = [];
-  (function walk(v, path, ctx) {
-    if (typeof v === "string") { if (/^ADD:/i.test(v)) out.push({ key: JSON.stringify(path), what: v.replace(/^ADD:\s*/i, ""), where: ctx }); return; }
-    if (Array.isArray(v)) return v.forEach((x, i) => walk(x, path.concat(i), ctx));
+  (function walk(v, path, ctx, field) {
+    if (typeof v === "string") { if (/^ADD:/i.test(v)) out.push({ key: JSON.stringify(path), what: v.replace(/^ADD:\s*/i, ""), where: ctx + (FIELD[field] ? " · " + FIELD[field] : "") }); return; }
+    if (Array.isArray(v)) return v.forEach((x, i) => walk(x, path.concat(x && typeof x === "object" && x.id ? "#" + x.id : i), ctx, field));
     if (v && typeof v === "object") {
+      if (v.hidden === true) return; // sections Ben switched off
       const name = v.name || v.title || v.label;
       for (const [k, x] of Object.entries(v)) {
         if (!path.length && (k === "todos" || k === "questions")) continue;
         const c = !path.length ? (SEC[k] || k) : name && typeof name === "string" && !/^ADD:/i.test(name) && !ctx.endsWith(name) ? ctx + " · " + name : ctx;
-        walk(x, path.concat(k), c);
+        walk(x, path.concat(k), c, k);
       }
     }
-  })(p, [], "");
+  })(p, [], "", "");
   return out;
 }
-function setAt(o, path, v) { const last = path[path.length - 1], parent = path.slice(0, -1).reduce((x, k) => x && x[k], o); if (parent && typeof parent === "object") parent[last] = v; }
-function getAt(o, path) { return path.reduce((x, k) => x == null ? x : x[k], o); }
+const BAD = new Set(["__proto__", "constructor", "prototype"]);
+function step(x, k) {
+  if (x == null || BAD.has(String(k))) return undefined;
+  if (Array.isArray(x) && typeof k === "string" && k[0] === "#") return x.find(e => e && e.id === k.slice(1));
+  return x[k];
+}
+function getAt(o, path) { return path.reduce(step, o); }
+function setAt(o, path, v) {
+  const last = path[path.length - 1], parent = path.slice(0, -1).reduce(step, o);
+  if (!parent || typeof parent !== "object" || BAD.has(String(last))) return;
+  if (Array.isArray(parent) && typeof last === "string" && last[0] === "#") { const i = parent.findIndex(e => e && e.id === last.slice(1)); if (i >= 0) parent[i] = v; return; }
+  parent[last] = v;
+}
 function freshChoice(p, keep) {
   const c = { look: p.look, voice: p.voice, accent: p.accent, hide: new Set(), show: Object.assign({}, p.show), fills: {}, touched: {} };
   if (keep) { // a rebuild keeps what Ben already chose
@@ -380,7 +395,7 @@ function drawDecisions() {
   const p = base;
   // questions
   $("#qBox").hidden = !p.questions.length;
-  $("#qs").innerHTML = p.questions.map(q => `<div class="q"><b>${h(q.question)}</b>${q.options.length ? `<div class="pick" role="radiogroup" aria-label="${h(q.question)}">${q.options.map(o => `<button type="button" role="radio" data-q="${h(q.id)}" data-a="${h(o)}" aria-checked="${answers[q.id] === o}">${h(o)}</button>`).join("")}</div>` : ""}<input data-qi="${h(q.id)}" placeholder="${q.options.length ? "Or type an answer" : "Your answer"}" value="${h(q.options.includes(answers[q.id]) ? "" : answers[q.id] || "")}" aria-label="Answer: ${h(q.question)}"></div>`).join("");
+  $("#qs").innerHTML = p.questions.map((q, n) => { const a = answers[q.question] || ""; return `<div class="q"><b>${h(q.question)}</b>${q.options.length ? `<div class="pick" role="radiogroup" aria-label="${h(q.question)}">${q.options.map((o, k) => `<button type="button" role="radio" data-q="${n}" data-a="${k}" aria-checked="${a === o}">${h(o)}</button>`).join("")}</div>` : ""}<input data-qi="${n}" placeholder="${q.options.length ? "Or type an answer" : "Your answer"}" value="${h(q.options.includes(a) ? "" : a)}" aria-label="Answer: ${h(q.question)}"></div>`; }).join("");
   // blanks
   const list = blanks(p);
   $("#fillBox").hidden = !list.length && !p.todos.length;
@@ -399,18 +414,25 @@ function drawDecisions() {
 document.addEventListener("click", e => {
   const t = e.target.closest("button"); if (!t || !base) return;
   const d = t.dataset;
-  if (d.q !== undefined) { answers[d.q] = answers[d.q] === d.a ? "" : d.a; drawDecisions(); return; }
-  if (d.look) { choice.look = d.look; choice.touched.look = 1; drawDecisions(); rerender(); return; }
-  if (d.voice) { choice.voice = d.voice; choice.touched.voice = 1; drawDecisions(); rerender(); return; }
+  if (d.q !== undefined) { const q = base.questions[+d.q], o = q && q.options[+d.a]; if (!q) return; answers[q.question] = answers[q.question] === o ? "" : o; redraw(t); return; }
+  if (d.look) { choice.look = d.look; choice.touched.look = 1; redraw(t); rerender(); return; }
+  if (d.voice) { choice.voice = d.voice; choice.touched.voice = 1; redraw(t); rerender(); return; }
   if (d.sec) { const [kind, id] = d.sec.split(/:(.*)/s);
     if (kind === "col") { if (choice.hide.has(id)) choice.hide.delete(id); else if (base.collections.length - choice.hide.size > 1) choice.hide.add(id); else return say($("#goMsg"), "Keep at least one section.", "err"); }
     else choice.show[id] = !choice.show[id];
-    drawDecisions(); rerender(); }
+    redraw(t); rerender(); }
 });
+// Redraw the panel but keep keyboard focus on the button that was pressed.
+function redraw(btn) {
+  const keys = ["look", "voice", "sec", "q", "a"].filter(k => btn.dataset[k] !== undefined);
+  const sel = keys.map(k => `[data-${k}="${CSS.escape(btn.dataset[k])}"]`).join("");
+  drawDecisions();
+  const again = sel && document.querySelector(".dec " + sel); if (again) again.focus();
+}
 document.addEventListener("input", e => {
   const t = e.target; if (!base) return;
   if (t.dataset.fill !== undefined) { choice.fills[t.dataset.fill] = t.value.slice(0, 300); soon(); }
-  else if (t.dataset.qi !== undefined) { answers[t.dataset.qi] = t.value.slice(0, 300); }
+  else if (t.dataset.qi !== undefined) { const q = base.questions[+t.dataset.qi]; if (q) answers[q.question] = t.value.slice(0, 300); }
   else if (t.id === "accentPick") { choice.accent = t.value.toUpperCase(); choice.touched.accent = 1; soon(); }
 });
 $("#lookReset").onclick = () => { if (!base) return; const keepFills = choice.fills; choice = freshChoice(base); choice.fills = keepFills; drawDecisions(); rerender(); };
@@ -423,7 +445,7 @@ async function build(notes, withAnswers) {
     STEP("scan"); say($("#goMsg"), "Reading their site…");
     if (!scan || $("#url").value.trim() !== url) { scan = await (await call("/api/studio-scan", { url })).json(); $("#url").value = url; fillFromScan(scan); }
     STEP("plan"); say($("#goMsg"), `Read ${1 + scan.pages.length} page${scan.pages.length ? "s" : ""} from ${scan.domain}. Planning their pages… about a minute.`);
-    const ans = withAnswers && base ? base.questions.map(q => ({ question: q.question, answer: (answers[q.id] || "").trim() })).filter(a => a.answer) : [];
+    const ans = withAnswers ? Object.entries(answers).map(([question, answer]) => ({ question, answer: String(answer || "").trim() })).filter(a => a.answer).slice(-8) : [];
     const profile = await readProfile(await call("/api/studio-profile", { scan, notes: notes || "", answers: ans }));
     STEP("render");
     const keep = choice; base = profile; choice = freshChoice(profile, keep);
@@ -436,7 +458,7 @@ async function build(notes, withAnswers) {
 }
 $("#goForm").onsubmit = e => { e.preventDefault(); scan = null; base = null; choice = null; build(); };
 $("#goAgain").onclick = () => build($("#goNotes").value.trim(), true);
-$("#qGo").onclick = () => { if (!base || !base.questions.some(q => (answers[q.id] || "").trim())) return say($("#goMsg"), "Answer at least one question first.", "err"); build($("#goNotes").value.trim(), true); };
+$("#qGo").onclick = () => { if (!base || !base.questions.some(q => (answers[q.question] || "").trim())) return say($("#goMsg"), "Answer at least one question first.", "err"); build($("#goNotes").value.trim(), true); };
 </script>
 </body>
 </html>

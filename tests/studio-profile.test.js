@@ -81,3 +81,14 @@ test("Ben's answers reach Claude and questions come back", async () => {
   assert.match(srv.lastBody.messages[0].content, /Lead service\? → Water heaters/);
   assert.strictEqual(JSON.parse(out.trim().split("\n").pop()).profile.questions[0].question, "Show prices?");
 });
+
+test("blank answers are dropped and up to 8 answers are kept", async () => {
+  const srv = await fakeClaude({ business: { name: "Q" }, look: "grid", voice: "clean", hero: {}, collections: [], booking: {}, owner: {} });
+  process.env.STUDIO_KEY = "k"; process.env.ANTHROPIC_BASE_URL = "http://127.0.0.1:" + srv.address().port;
+  delete require.cache[require.resolve("../api/studio-profile.js")];
+  const answers = Array.from({ length: 9 }, (_, i) => ({ question: "Q" + i + "?", answer: i === 1 ? "  " : "A" + i }));
+  await call(require("../api/studio-profile.js"), { scan, answers });
+  srv.close();
+  const brief = srv.lastBody.messages[0].content;
+  assert.ok(!brief.includes("Q1?")); assert.ok(brief.includes("Q7? → A7")); assert.ok(!brief.includes("Q8?"));
+});
