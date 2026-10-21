@@ -7,6 +7,7 @@ Every change in `api/` is **High** tier: Ben approves and the-enforcer passes.
 | `chat.js` | Demo text assistant: POST builds a prompt, calls Claude and returns one JSON reply; GET reports whether AI is on | Public; same-origin check and per-IP limit |
 | `studio-scan.js` | Studio: fetches a business's website server-side and returns its pages | `x-studio-key` header (Ben only) |
 | `studio-build.js` | Studio: asks Claude to build a client site from a scan | `x-studio-key` header (Ben only) |
+| `studio-profile.js` | Studio engine path: asks Claude for a site profile (one forced tool call), then sanitizes it and keeps only photos and links from the scan; streams a heartbeat, last line is the JSON | `x-studio-key` header (Ben only) |
 | `_studio.js` | Shared Studio helpers (`authorized`, `body`). Files starting with `_` aren't routes on Vercel. | — |
 
 Conventions every endpoint keeps:

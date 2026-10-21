@@ -22,6 +22,16 @@ Put the tier at the top of the PR body. A fresh agent that didn't write the chan
 - Files and what they do: `docs/claude/site.md` · API conventions: `api/CLAUDE.md` (loads when you work in `api/`)
 - How to work cheaply in this repo: `docs/claude/token-habits.md`
 
+## Studio engine (URL in, website + owner dashboard out)
+- Flow: `studio.html` search bar → `api/studio-scan` (reads their site) → `api/studio-profile` (Claude fills a site profile through one tool call) → `studio-engine.js` renders the website and the owner dashboard in the browser. The old freeform builder (`api/studio-build`) stays under "Classic builder".
+- Claude never writes page code on this path. Change the look or behavior of every client site in `studio-engine.js` only, and add or change fields in the profile schema in both `studio-engine.js` (`sanitize`) and `api/studio-profile.js` (`TOOL`).
+- Profile rules: facts from the scan only; unknowns are `"ADD: …"` placeholders (yellow on the site, listed in the Studio); no email addresses anywhere; a phone number only if the business publishes it; photos only from URLs in the scan.
+- `sanitize` runs on the server and again in the browser. Keep it idempotent; there's a test for it.
+- Ben's decisions sit on top of the planner's profile in the Studio, never inside the API: look, type, accent and section switches (`show`, `collections[].hidden`) re-render instantly; filled-in blanks replace `ADD:` values by path; planner `questions` go back to `api/studio-profile` as `answers` on a rebuild, which keeps his earlier choices.
+- Site links route through the engine's in-page router (`go()`), not the address bar: inside the Studio's srcdoc preview a plain `#x` link would load the Studio into the frame.
+- The owner dashboard saves to the viewer's browser only and has no login. It must not go on a client's live domain until it's backed by Supabase with MFA (Plainline security baseline).
+- Fixtures: `studio-examples/photographer-sample.json` (made-up photographer, the baseline layout) and `studio-examples/ridgeline-sample.json` (made-up plumber, no photos). Tests: `node --test tests/*.test.js`.
+
 ## Skills (run with /name) → the subagent each one uses
 - `/tech-lead` before anything hard to undo · `/architect-mvp` design, then build → `architect`
 - `/audit-codebase` report only → `auditor` · `/refactor-clean` same behavior, cleaner structure → `auditor`

@@ -48,7 +48,30 @@ iframe{border:0;background:#fff;border-radius:10px;height:760px;width:390px;max-
 .stage.desk iframe{width:100%}
 .quote{white-space:pre-wrap;background:var(--sunk);border:1px solid var(--line);border-radius:12px;padding:14px;font-size:14.5px;margin:10px 0 0}
 [hidden]{display:none!important}
+.go{display:flex;gap:10px;flex-wrap:wrap}
+.go input{flex:1 1 280px;font-size:18px;padding:14px 16px;min-height:52px}
+.go .btn{min-height:52px;padding:12px 22px;font-size:16px}
+.steps{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 0;padding:0;list-style:none}
+.steps li{font-size:13px;padding:6px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.steps li.on{border-color:var(--accent);color:var(--ink)}.steps li.done{background:var(--accent-soft);border-color:transparent;color:var(--ink)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 10px}
+.tabs .btn[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.todos{margin:10px 0 0;padding-left:20px;font-size:14px}.todos li{margin:2px 0}
+details.card>summary{cursor:pointer;font:700 18px var(--f-display);list-style:none}
+details.card>summary::-webkit-details-marker{display:none}
+details.card>summary::after{content:" ▾";color:var(--muted)}details.card[open]>summary{margin-bottom:12px}
+details.card[open]>summary::after{content:" ▴"}
+.sub{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+.dec{display:grid;gap:4px;margin-top:6px}
+.dec>section,.dec>details{border-top:1px solid var(--line);padding-top:14px;margin-top:10px}
+.dec h3{font:700 17px var(--f-display);margin:0 0 4px}.dec h3 small{font:400 13px var(--f-body);margin-left:6px}
+.pick{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.pick button{border:1px solid var(--line);background:var(--sunk);color:var(--ink);border-radius:999px;padding:8px 13px;font:600 14px var(--f-body);cursor:pointer;min-height:44px}
+.pick button[aria-pressed="true"],.pick button[aria-checked="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.q{display:grid;gap:6px;margin:0 0 14px}.q b{font-size:15px}
+.q input{max-width:420px}
 </style>
+<script src="/studio-engine.js" defer></script>
 </head>
 <body>
 <div class="wrap">
@@ -60,7 +83,52 @@ iframe{border:0;background:#fff;border-radius:10px;height:760px;width:390px;max-
     <div class="row"><input class="grow" id="keyIn" type="password" autocomplete="current-password" aria-label="Studio key"><button class="btn" id="keySave" type="button">Save</button></div>
   </section>
 
-  <section class="card">
+  <section class="card" aria-labelledby="go-h">
+    <h2 id="go-h">Rebuild a website</h2>
+    <p class="hint">Paste the business's website. You get their new site and their owner dashboard back, built from what's on their site now.</p>
+    <form class="go" id="goForm"><input id="goUrl" type="text" inputmode="url" autocomplete="url" placeholder="theirbusiness.com" aria-label="Their website" required><button class="btn" id="goBtn" type="submit">Build</button></form>
+    <ol class="steps" id="steps" hidden><li data-s="scan">Reading their site</li><li data-s="plan">Planning pages</li><li data-s="render">Building site + dashboard</li></ol>
+    <p class="msg" id="goMsg" role="status"></p>
+    <div id="out" hidden>
+      <div class="tabs" role="group" aria-label="Preview">
+        <button class="btn ghost" type="button" data-show="site" aria-pressed="true">Website</button>
+        <button class="btn ghost" type="button" data-show="dashboard" aria-pressed="false">Owner dashboard</button>
+        <span style="flex:1"></span>
+        <button class="btn ghost" id="gPhone" type="button" aria-pressed="true">Phone</button>
+        <button class="btn ghost" id="gDesk" type="button" aria-pressed="false">Desktop</button>
+      </div>
+      <div class="stage" id="gStage"><iframe id="gFrame" title="Preview" sandbox="allow-scripts allow-popups"></iframe></div>
+      <div class="row" style="margin-top:12px"><button class="btn ghost" id="gOpen" type="button">Open full screen</button><button class="btn ghost" id="gDlSite" type="button">Download website</button><button class="btn ghost" id="gDlOwner" type="button">Download dashboard</button><button class="btn ghost" id="gCopy" type="button">Copy profile</button></div>
+      <p class="hint" style="margin:8px 0 0">Downloads are <code>index.html</code> and <code>owner.html</code>. The website isn't connected yet (its form doesn't send), and the dashboard has no login, so neither goes on a live domain yet.</p>
+      <div class="dec">
+        <section id="qBox" hidden aria-labelledby="q-h">
+          <h3 id="q-h">Questions from the planner</h3>
+          <p class="hint">It couldn't tell these from their site. Answer what you know and skip the rest; answers rebuild the plan.</p>
+          <div id="qs"></div>
+          <button class="btn" id="qGo" type="button">Rebuild with answers</button>
+        </section>
+        <section id="fillBox" hidden aria-labelledby="f-h">
+          <h3 id="f-h">Fill in the blanks</h3>
+          <p class="hint" id="fillMsg"></p>
+          <div class="grid" id="fills"></div>
+          <ul class="todos" id="todos"></ul>
+        </section>
+        <section aria-labelledby="l-h">
+          <h3 id="l-h">Look <small class="hint">optional · picked for you, change anything</small></h3>
+          <div class="pick" role="radiogroup" aria-label="Look" id="lookPick"></div>
+          <div class="pick" role="radiogroup" aria-label="Type" id="voicePick"></div>
+          <div class="row" style="margin-top:10px"><label style="flex-direction:row;align-items:center;gap:8px">Accent color <input type="color" id="accentPick" style="padding:2px;width:52px;height:40px"></label><button class="btn ghost" id="lookReset" type="button">Back to the picks</button></div>
+          <p class="hint" style="margin:12px 0 6px">Sections on the site</p>
+          <div class="pick" id="secPick"></div>
+        </section>
+        <details><summary class="hint" style="cursor:pointer;margin:0">Notes for a rebuild (optional)</summary><textarea id="goNotes" style="width:100%;margin-top:8px" placeholder="e.g. split sports and portraits, push the booking button"></textarea><button class="btn ghost" id="goAgain" type="button" style="margin-top:8px">Rebuild with notes</button></details>
+      </div>
+    </div>
+  </section>
+
+  <details class="card" id="classic">
+  <summary>Classic builder (one freeform page, pick a style)</summary>
+  <section>
     <h2>1. The business</h2>
     <p class="hint">Paste their website and Scan, or fill in the details by hand if they don't have one.</p>
     <div class="row"><input class="grow" id="url" type="url" inputmode="url" placeholder="https://theirbusiness.com" aria-label="Their website"><button class="btn" id="scanBtn" type="button">Scan</button></div>
@@ -82,19 +150,20 @@ iframe{border:0;background:#fff;border-radius:10px;height:760px;width:390px;max-
     <div id="imgWrap" hidden style="margin-top:12px"><p class="hint" style="margin-bottom:6px">Photos from their site to use (untick any that aren't theirs):</p><div class="imgs" id="imgs"></div></div>
   </section>
 
-  <section class="card">
+  <section class="sub">
     <h2>2. Style <small>from the content team's style library</small></h2>
     <p class="hint">One style per site, built from the business's real things. Green outlines are the two that fit this kind of business.</p>
     <div class="styles" id="styles"></div>
   </section>
 
-  <section class="card">
+  <section class="sub">
     <h2>3. Build</h2>
     <div class="row"><button class="btn" id="buildBtn" type="button">Build the site</button><button class="btn ghost" id="phoneBtn" type="button" aria-pressed="true">Phone</button><button class="btn ghost" id="deskBtn" type="button" aria-pressed="false">Desktop</button>
       <button class="btn ghost" id="openBtn" type="button" disabled>Open full screen</button><button class="btn ghost" id="dlBtn" type="button" disabled>Download</button></div>
     <p class="msg" id="buildMsg" role="status"></p>
     <div class="stage" id="stage" hidden><iframe id="frame" title="Site preview" sandbox="allow-scripts allow-popups"></iframe></div>
   </section>
+  </details>
 
   <section class="card">
     <h2>4. Quote</h2>
@@ -193,7 +262,16 @@ $("#buildBtn").onclick = async () => {
 const view = desk => { $("#stage").classList.toggle("desk", desk); $("#deskBtn").setAttribute("aria-pressed", desk); $("#phoneBtn").setAttribute("aria-pressed", !desk); };
 $("#phoneBtn").onclick = () => view(false); $("#deskBtn").onclick = () => view(true);
 const file = () => new Blob([html], { type: "text/html" });
-$("#openBtn").onclick = () => window.open(URL.createObjectURL(file()), "_blank", "noopener");
+$("#openBtn").onclick = () => openSandboxed(html);
+// Generated pages never run with the Studio's origin (that would expose the Studio key in localStorage):
+// full screen is a blank tab holding the page in a sandboxed frame without same-origin.
+function openSandboxed(page) {
+  const w = window.open("", "_blank"); if (!w) return;
+  w.opener = null;
+  w.document.write('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Preview</title><style>html,body{margin:0;height:100%}iframe{border:0;width:100%;height:100%;display:block}</style><iframe sandbox="allow-scripts allow-popups" title="Preview"></iframe>');
+  w.document.close();
+  w.document.querySelector("iframe").srcdoc = page;
+}
 $("#dlBtn").onclick = () => { const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(file()), download: (($("#q-domain").value || $("#f-name").value || "site").replace(/[^a-z0-9.]+/gi, "-").toLowerCase()) + ".html" }); a.click(); };
 
 /* quote */
@@ -216,6 +294,171 @@ function quote() {
 document.querySelectorAll("#q-domain,#q-own,#q-setup,#q-deal,#q-rate,#q-plan,#q-dcost,#f-name").forEach(i => i.addEventListener("input", quote));
 $("#copyQuote").onclick = () => navigator.clipboard.writeText($("#quote").textContent).then(() => say($("#quoteMsg"), "Copied.", "ok"), () => say($("#quoteMsg"), "Couldn't copy. Select the text instead.", "err"));
 quote();
+
+/* one-bar flow: URL -> scan -> profile -> engine renders the website and the owner dashboard */
+let built = null, showing = "site";
+const STEP = s => document.querySelectorAll("#steps li").forEach(li => { const order = ["scan", "plan", "render", "done"], i = order.indexOf(li.dataset.s), j = order.indexOf(s); li.className = i < j ? "done" : i === j ? "on" : ""; });
+function showPreview(which, hash) {
+  if (!built) return; showing = which;
+  document.querySelectorAll("[data-show]").forEach(b => b.setAttribute("aria-pressed", b.dataset.show === which));
+  const f = $("#gFrame"); f.srcdoc = which === "site" ? built.preview.site : built.preview.dashboard;
+  if (hash) f.onload = () => { f.onload = null; f.contentWindow.postMessage({ plStudio: "go", hash }, "*"); };
+}
+window.addEventListener("message", e => { if (!built || e.source !== $("#gFrame").contentWindow || !e.data || e.data.plStudio !== "open") return; showPreview(e.data.page === "dashboard" ? "dashboard" : "site", typeof e.data.hash === "string" ? e.data.hash : ""); });
+document.querySelectorAll("[data-show]").forEach(b => b.onclick = () => showPreview(b.dataset.show));
+const gView = desk => { $("#gStage").classList.toggle("desk", desk); $("#gDesk").setAttribute("aria-pressed", desk); $("#gPhone").setAttribute("aria-pressed", !desk); };
+$("#gPhone").onclick = () => gView(false); $("#gDesk").onclick = () => gView(true);
+const save = (text, name) => { const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(new Blob([text], { type: "text/html" })), download: name }); a.click(); };
+$("#gDlSite").onclick = () => built && save(built.files.site, "index.html");
+$("#gDlOwner").onclick = () => built && save(built.files.dashboard, "owner.html");
+$("#gOpen").onclick = () => built && openSandboxed(showing === "site" ? built.live.site : built.live.dashboard);
+$("#gCopy").onclick = () => built && navigator.clipboard.writeText(JSON.stringify(built.profile, null, 1)).then(() => say($("#goMsg"), "Profile copied.", "ok"), () => say($("#goMsg"), "Couldn't copy.", "err"));
+
+async function readProfile(r) {
+  const text = await r.text(), last = text.trim().split("\n").pop();
+  let d; try { d = JSON.parse(last); } catch { throw new Error("The planner stopped before it finished. Try again"); }
+  if (d.error) throw new Error(d.error);
+  return d.profile;
+}
+/* Ben's optional decisions on top of the planner's profile. The planner's profile stays untouched in `base`. */
+let base = null, choice = null;
+const answers = {};
+const clone = o => JSON.parse(JSON.stringify(o));
+const h = t => String(t == null ? "" : t).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const LOOK_NAMES = { studio: "Studio", grid: "Grid Light", backstage: "Backstage" }, VOICE_NAMES = { bold: "Bold type", clean: "Clean type", warm: "Warm type" };
+const SEC = { business: "Business", hero: "Top of page", collections: "Sections", recent: "Recent work", proof: "Proof", about: "About", pricing: "Pricing", contact: "Contact", booking: "Booking", owner: "Dashboard" };
+const FIELD = { startingAt: "starting price", line: "short line", kicker: "small label", title: "name", name: "name", label: "label", blurb: "intro", lede: "intro", paragraphs: "paragraph", hours: "hours", items: "item", steps: "step", intro: "intro", note: "note", text: "text", when: "date", address: "address", phone: "phone", serviceArea: "service area", tagline: "tagline", eyebrow: "small heading", lines: "headline", cta: "button", who: "who it's for", stages: "stage" };
+// Each blank is keyed by a stable path: array entries that have an id are named "#id", so a fill
+// stays on the same fact even if a rebuild reorders sections.
+function blanks(p) {
+  const out = [];
+  (function walk(v, path, ctx, field) {
+    if (typeof v === "string") { if (/^ADD:/i.test(v)) out.push({ key: JSON.stringify(path), what: v.replace(/^ADD:\s*/i, ""), where: ctx + (FIELD[field] ? " · " + FIELD[field] : "") }); return; }
+    if (Array.isArray(v)) return v.forEach((x, i) => walk(x, path.concat(x && typeof x === "object" && x.id ? "#" + x.id : i), ctx, field));
+    if (v && typeof v === "object") {
+      if (v.hidden === true) return; // sections Ben switched off
+      const name = v.name || v.title || v.label;
+      for (const [k, x] of Object.entries(v)) {
+        if (!path.length && (k === "todos" || k === "questions")) continue;
+        const c = !path.length ? (SEC[k] || k) : name && typeof name === "string" && !/^ADD:/i.test(name) && !ctx.endsWith(name) ? ctx + " · " + name : ctx;
+        walk(x, path.concat(k), c, k);
+      }
+    }
+  })(p, [], "", "");
+  return out;
+}
+const BAD = new Set(["__proto__", "constructor", "prototype"]);
+function step(x, k) {
+  if (x == null || BAD.has(String(k))) return undefined;
+  if (Array.isArray(x) && typeof k === "string" && k[0] === "#") return x.find(e => e && e.id === k.slice(1));
+  return x[k];
+}
+function getAt(o, path) { return path.reduce(step, o); }
+function setAt(o, path, v) {
+  const last = path[path.length - 1], parent = path.slice(0, -1).reduce(step, o);
+  if (!parent || typeof parent !== "object" || BAD.has(String(last))) return;
+  if (Array.isArray(parent) && typeof last === "string" && last[0] === "#") { const i = parent.findIndex(e => e && e.id === last.slice(1)); if (i >= 0) parent[i] = v; return; }
+  parent[last] = v;
+}
+function freshChoice(p, keep) {
+  const c = { look: p.look, voice: p.voice, accent: p.accent, hide: new Set(), show: Object.assign({}, p.show), fills: {}, touched: {} };
+  if (keep) { // a rebuild keeps what Ben already chose
+    if (keep.touched.look) { c.look = keep.look; c.touched.look = 1; }
+    if (keep.touched.voice) { c.voice = keep.voice; c.touched.voice = 1; }
+    if (keep.touched.accent) { c.accent = keep.accent; c.touched.accent = 1; }
+    keep.hide.forEach(id => { if (p.collections.some(x => x.id === id)) c.hide.add(id); });
+    Object.assign(c.show, keep.show);
+    for (const [k, v] of Object.entries(keep.fills)) if (/^ADD:/i.test(String(getAt(p, JSON.parse(k)) || ""))) c.fills[k] = v;
+  }
+  return c;
+}
+function derive() {
+  const p = clone(base);
+  p.look = choice.look; p.voice = choice.voice; p.accent = choice.accent;
+  p.collections.forEach(c => { c.hidden = choice.hide.has(c.id); });
+  p.show = Object.assign({}, choice.show);
+  for (const [k, v] of Object.entries(choice.fills)) if (v.trim()) setAt(p, JSON.parse(k), v.trim());
+  return p;
+}
+function rerender() {
+  const E = window.StudioEngine, p = derive();
+  built = { profile: E.sanitize(p), preview: E.render(p, { preview: true }), live: E.render(p, {}) };
+  const f = E.render(p, { dashboardHref: "owner.html", siteHref: "index.html" }); built.files = { site: f.site, dashboard: f.dashboard };
+  delete built.profile._tokens; delete built.profile._slug;
+  showPreview(showing);
+  const left = blanks(p).length + base.todos.length;
+  $("#fillMsg").textContent = left ? `${left} thing${left > 1 ? "s" : ""} to fill before the owner sees it. They show yellow on the site; type the real fact and the preview updates.` : "Nothing left to fill.";
+}
+let rerenderTimer = 0;
+const soon = () => { clearTimeout(rerenderTimer); rerenderTimer = setTimeout(rerender, 300); };
+function drawDecisions() {
+  const p = base;
+  // questions
+  $("#qBox").hidden = !p.questions.length;
+  $("#qs").innerHTML = p.questions.map((q, n) => { const a = answers[q.question] || ""; return `<div class="q"><b>${h(q.question)}</b>${q.options.length ? `<div class="pick" role="radiogroup" aria-label="${h(q.question)}">${q.options.map((o, k) => `<button type="button" role="radio" data-q="${n}" data-a="${k}" aria-checked="${a === o}">${h(o)}</button>`).join("")}</div>` : ""}<input data-qi="${n}" placeholder="${q.options.length ? "Or type an answer" : "Your answer"}" value="${h(q.options.includes(a) ? "" : a)}" aria-label="Answer: ${h(q.question)}"></div>`; }).join("");
+  // blanks
+  const list = blanks(p);
+  $("#fillBox").hidden = !list.length && !p.todos.length;
+  $("#fills").innerHTML = list.map((b, i) => `<label>${h(b.where)}<input data-fill="${h(b.key)}" placeholder="${h(b.what)}" value="${h(choice.fills[b.key] || "")}"></label>`).join("");
+  $("#todos").innerHTML = p.todos.map(t => `<li>${h(t)}</li>`).join("");
+  // look
+  const pill = (attr, val, label, on) => `<button type="button" role="radio" ${attr}="${h(val)}" aria-checked="${on}">${h(label)}</button>`;
+  $("#lookPick").innerHTML = window.StudioEngine.LOOKS.map(k => pill("data-look", k, (LOOK_NAMES[k] || k) + (k === p.look ? " · pick" : ""), choice.look === k)).join("");
+  $("#voicePick").innerHTML = window.StudioEngine.VOICES.map(k => pill("data-voice", k, (VOICE_NAMES[k] || k) + (k === p.voice ? " · pick" : ""), choice.voice === k)).join("");
+  $("#accentPick").value = /^#[0-9a-f]{6}$/i.test(choice.accent) ? choice.accent : "#c8202b";
+  const secs = [...p.collections.map(c => ["col:" + c.id, c.title, !choice.hide.has(c.id)]),
+    ...(p.recent.photos.length ? [["show:recent", p.recent.title, choice.show.recent]] : []), ...(p.proof.items.length ? [["show:proof", p.proof.title, choice.show.proof]] : []),
+    ...(p.about.paragraphs.length ? [["show:about", "About", choice.show.about]] : []), ...(p.pricing.lanes.length ? [["show:pricing", "Pricing", choice.show.pricing]] : []), ["show:visit", "Hours & location", choice.show.visit]];
+  $("#secPick").innerHTML = secs.map(([k, l, on]) => `<button type="button" data-sec="${h(k)}" aria-pressed="${!!on}">${h(l)}</button>`).join("");
+}
+document.addEventListener("click", e => {
+  const t = e.target.closest("button"); if (!t || !base) return;
+  const d = t.dataset;
+  if (d.q !== undefined) { const q = base.questions[+d.q], o = q && q.options[+d.a]; if (!q) return; answers[q.question] = answers[q.question] === o ? "" : o; redraw(t); return; }
+  if (d.look) { choice.look = d.look; choice.touched.look = 1; redraw(t); rerender(); return; }
+  if (d.voice) { choice.voice = d.voice; choice.touched.voice = 1; redraw(t); rerender(); return; }
+  if (d.sec) { const [kind, id] = d.sec.split(/:(.*)/s);
+    if (kind === "col") { if (choice.hide.has(id)) choice.hide.delete(id); else if (base.collections.length - choice.hide.size > 1) choice.hide.add(id); else return say($("#goMsg"), "Keep at least one section.", "err"); }
+    else choice.show[id] = !choice.show[id];
+    redraw(t); rerender(); }
+});
+// Redraw the panel but keep keyboard focus on the button that was pressed.
+function redraw(btn) {
+  const keys = ["look", "voice", "sec", "q", "a"].filter(k => btn.dataset[k] !== undefined);
+  const sel = keys.map(k => `[data-${k}="${CSS.escape(btn.dataset[k])}"]`).join("");
+  drawDecisions();
+  const again = sel && document.querySelector(".dec " + sel); if (again) again.focus();
+}
+document.addEventListener("input", e => {
+  const t = e.target; if (!base) return;
+  if (t.dataset.fill !== undefined) { choice.fills[t.dataset.fill] = t.value.slice(0, 300); soon(); }
+  else if (t.dataset.qi !== undefined) { const q = base.questions[+t.dataset.qi]; if (q) answers[q.question] = t.value.slice(0, 300); }
+  else if (t.id === "accentPick") { choice.accent = t.value.toUpperCase(); choice.touched.accent = 1; soon(); }
+});
+$("#lookReset").onclick = () => { if (!base) return; const keepFills = choice.fills; choice = freshChoice(base); choice.fills = keepFills; drawDecisions(); rerender(); };
+
+async function build(notes, withAnswers) {
+  const url = $("#goUrl").value.trim(); if (!url) { $("#goUrl").focus(); return; }
+  if (!window.StudioEngine) return say($("#goMsg"), "The builder didn't load. Reload the page.", "err");
+  [$("#goBtn"), $("#goAgain"), $("#qGo")].forEach(b => b.disabled = true); $("#steps").hidden = false;
+  try {
+    STEP("scan"); say($("#goMsg"), "Reading their site…");
+    if (!scan || $("#url").value.trim() !== url) { scan = await (await call("/api/studio-scan", { url })).json(); $("#url").value = url; fillFromScan(scan); }
+    STEP("plan"); say($("#goMsg"), `Read ${1 + scan.pages.length} page${scan.pages.length ? "s" : ""} from ${scan.domain}. Planning their pages… about a minute.`);
+    const ans = withAnswers ? Object.entries(answers).map(([question, answer]) => ({ question, answer: String(answer || "").trim() })).filter(a => a.answer).slice(-8) : [];
+    const profile = await readProfile(await call("/api/studio-profile", { scan, notes: notes || "", answers: ans }));
+    STEP("render");
+    const keep = choice; base = profile; choice = freshChoice(profile, keep);
+    if (!withAnswers) Object.keys(answers).forEach(k => delete answers[k]);
+    drawDecisions(); rerender();
+    $("#out").hidden = false; showPreview("site"); STEP("done");
+    say($("#goMsg"), `Done: ${profile.business.name}. Built from ${scan.domain}.` + (profile.questions.length ? ` The planner has ${profile.questions.length} question${profile.questions.length > 1 ? "s" : ""} for you below.` : ""), "ok");
+  } catch (e) { say($("#goMsg"), e.message, "err"); }
+  finally { [$("#goBtn"), $("#goAgain"), $("#qGo")].forEach(b => b.disabled = false); }
+}
+$("#goForm").onsubmit = e => { e.preventDefault(); scan = null; base = null; choice = null; build(); };
+$("#goAgain").onclick = () => build($("#goNotes").value.trim(), true);
+$("#qGo").onclick = () => { if (!base || !base.questions.some(q => (answers[q.question] || "").trim())) return say($("#goMsg"), "Answer at least one question first.", "err"); build($("#goNotes").value.trim(), true); };
 </script>
 </body>
 </html>

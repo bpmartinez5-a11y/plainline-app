@@ -4,7 +4,8 @@
 |---|---|---|
 | `index.html` | Marketing site for plainlineops.com (animated hero conversation, phone action bar). Its contact form posts leads straight to Supabase (`/rest/v1/leads`) with the publishable key | ~22 KB: Grep, then read ranges |
 | `demo.html` | Live text-assistant demo; `book.plainlineops.com` redirects here (see `vercel.json`) | ~58 KB: never read whole |
-| `studio.html`, `studio-styles.json` | Studio: Ben's tool that scans a business's site and builds a client site (uses `api/studio-*`) | ~18 KB |
+| `studio.html`, `studio-styles.json` | Studio: Ben's tool that scans a business's site and builds a client site; the search bar builds a website + owner dashboard through the engine (uses `api/studio-*`) | ~18 KB |
+| `studio-engine.js` | The engine: renders a site profile into the client website and owner dashboard (browser and Node). Fixtures in `studio-examples/`, tests in `tests/` | ~86 KB |
 | `api/` | Serverless endpoints. See `api/CLAUDE.md` | |
 | `appstore/` | App Store listing (`listing.md`), screenshot generator (`make_screenshots.js`, `seed.js`) and screenshots | Don't read the PNGs |
 | `icons/`, `manifest.webmanifest` | Installable web app icons and manifest | |
