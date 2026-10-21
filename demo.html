@@ -238,10 +238,10 @@ button{cursor:pointer}
 <body>
 <div class="wrap">
   <header class="top">
-    <h1 class="brand"><a href="/" style="color:inherit;text-decoration:none"><b>Plainline</b></a><span>Text Concierge · live demo · <a href="/#contact" style="color:var(--accent)">Get one set up</a></span></h1>
+    <h1 class="brand"><a href="/" style="color:inherit;text-decoration:none"><b>Plainline</b></a><span>Text Concierge · live demo · <a href="/#contact" style="color:var(--accent)">Book a walkthrough</a></span></h1>
     <div class="pills">
       <span class="pill" id="aiPill"><i></i>Assistant: connecting</span>
-      <span class="pill on"><i></i>Private: your chat stays in this tab</span>
+      <span class="pill on" id="privPill"><i></i>Not saved: your chat stays in this tab</span>
     </div>
     <div class="tabs mob-tabs" role="tablist" aria-label="View">
       <button data-view="customer" role="tab">Customer</button>
@@ -447,6 +447,7 @@ RULES
 - Write like a real front desk texting: under 280 characters, plain text, no markdown, at most one emoji.
 - Use only the facts above. Never invent prices, services, staff or policies.
 - You are an automated assistant. Never claim or imply you are a person. If asked, say so and offer ${cfg.staffName} from the team.
+- Only help with this business's services, hours, policies and bookings. For anything else, including medical, legal or financial questions, opinions about other businesses or people, or requests to write something unrelated, say you can only help with bookings and questions about ${cfg.name} and offer ${cfg.staffName}.
 - You cannot lock in a booking by text. When the customer wants to book, set "show" to "slots" with the serviceId (and "date" if they named a day). They pick a time from a picker that appears under your message. If the service is unclear, set "show" to "services" and ask what the visit is for.
 - If a day they ask about is closed or full, say so and suggest the nearest open day.
 - Set "handoff" to true when the customer is in pain, has an emergency or safety issue, is upset or complaining, asks about refunds or billing disputes, asks for a person, or asks something you can't answer from the facts. Then tell them ${cfg.staffName} from the team will jump in shortly.
@@ -581,7 +582,7 @@ function logoHTML(cfg, size){ const ini = cfg.name.split(/\s+/).filter(w => /[A-
 
 function renderPhone(){
   const cfg = C(), c = myConvo();
-  $("#phHead").innerHTML = `${logoHTML(cfg)}<div class="ph-name">${esc(cfg.name)} <span class="ver" title="Verified business">✓</span></div><div class="ph-sub">Automated assistant · a person can step in</div>`;
+  $("#phHead").innerHTML = `${logoHTML(cfg)}<div class="ph-name">${esc(cfg.name)}</div><div class="ph-sub">Automated assistant · a person can step in · sample business, made-up prices</div>`;
   const th = $("#thread"), atBottom = th.scrollHeight - th.scrollTop - th.clientHeight < 80;
   if (!c || !c.msgs.length){
     const day = openDays(1)[0], first = cfg.services[0];
@@ -762,6 +763,7 @@ function render(){
   const ai = $("#aiPill");
   ai.className = "pill " + (S.aiMode === "claude" ? "on" : S.aiMode === "rules" ? "off" : "");
   ai.lastChild.textContent = S.aiMode === "claude" ? "Assistant: Claude" : S.aiMode === "rules" ? "Assistant: built-in replies" : "Assistant: connecting";
+  const pp = document.getElementById("privPill"); if (pp) pp.lastChild.textContent = S.aiMode === "claude" ? "Not saved: sent to our AI provider to reply, gone when you close the tab" : "Not saved: your chat stays in this tab";
   $("#sendBtn").disabled = false;
   renderPhone(); renderDesk();
   if (showSetup) renderSetup();
