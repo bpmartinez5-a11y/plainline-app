@@ -1,0 +1,120 @@
+{
+ "business": {
+  "name": "Ridgeline Plumbing",
+  "kind": "Plumber",
+  "city": "Austin",
+  "region": "TX",
+  "domain": "ridgelineplumbing.example",
+  "tagline": "Sample business \u00b7 values illustrative",
+  "socials": []
+ },
+ "look": "grid",
+ "voice": "clean",
+ "accent": "#0D8A72",
+ "hero": {
+  "eyebrow": "Licensed plumbing \u00b7 Austin, TX \u00b7 sample",
+  "lines": [
+   "Leaks fixed",
+   "today."
+  ],
+  "highlight": "today.",
+  "lede": "Repairs, water heaters and drain cleaning across Austin. Text a photo of the problem and get a time window back.",
+  "cta": "Book a visit",
+  "photos": []
+ },
+ "collections": [
+  {
+   "id": "services",
+   "title": "Services",
+   "blurb": "What we fix most often.",
+   "items": [
+    {
+     "id": "water-heaters",
+     "title": "Water heaters",
+     "kicker": "Repair & replace",
+     "line": "Tank and tankless, same-week installs.",
+     "photos": []
+    },
+    {
+     "id": "drains",
+     "title": "Drains",
+     "kicker": "Clogs & backups",
+     "line": "Kitchen, bath and main lines.",
+     "photos": []
+    },
+    {
+     "id": "leaks",
+     "title": "Leaks",
+     "kicker": "Repairs",
+     "line": "Under sinks, behind walls, under slabs.",
+     "photos": []
+    }
+   ]
+  }
+ ],
+ "recent": {
+  "photos": []
+ },
+ "proof": {
+  "items": []
+ },
+ "about": {
+  "title": "About us",
+  "paragraphs": [
+   "ADD: how long they've been in business and who runs it"
+  ],
+  "why": [],
+  "timeline": []
+ },
+ "pricing": {
+  "lanes": []
+ },
+ "contact": {
+  "phone": "(512) 555-0148",
+  "hours": [
+   "ADD: opening hours"
+  ],
+  "serviceArea": "Austin and nearby"
+ },
+ "booking": {
+  "title": "Book a visit",
+  "intro": "Tell us what's going on. We'll text back a time window.",
+  "types": [
+   {
+    "id": "repair",
+    "label": "Repair",
+    "fields": [
+     {
+      "id": "issue",
+      "label": "What's wrong?"
+     }
+    ]
+   },
+   {
+    "id": "install",
+    "label": "New install",
+    "fields": [
+     {
+      "id": "what",
+      "label": "What are we installing?"
+     }
+    ]
+   },
+   {
+    "id": "emergency",
+    "label": "It's urgent",
+    "fields": []
+   }
+  ]
+ },
+ "owner": {
+  "jobWord": "job",
+  "stages": [
+   "New",
+   "Quoted",
+   "Booked",
+   "Done",
+   "Paid"
+  ]
+ }
+}

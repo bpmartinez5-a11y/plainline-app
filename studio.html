@@ -48,7 +48,22 @@ iframe{border:0;background:#fff;border-radius:10px;height:760px;width:390px;max-
 .stage.desk iframe{width:100%}
 .quote{white-space:pre-wrap;background:var(--sunk);border:1px solid var(--line);border-radius:12px;padding:14px;font-size:14.5px;margin:10px 0 0}
 [hidden]{display:none!important}
+.go{display:flex;gap:10px;flex-wrap:wrap}
+.go input{flex:1 1 280px;font-size:18px;padding:14px 16px;min-height:52px}
+.go .btn{min-height:52px;padding:12px 22px;font-size:16px}
+.steps{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 0;padding:0;list-style:none}
+.steps li{font-size:13px;padding:6px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.steps li.on{border-color:var(--accent);color:var(--ink)}.steps li.done{background:var(--accent-soft);border-color:transparent;color:var(--ink)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 10px}
+.tabs .btn[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.todos{margin:10px 0 0;padding-left:20px;font-size:14px}.todos li{margin:2px 0}
+details.card>summary{cursor:pointer;font:700 18px var(--f-display);list-style:none}
+details.card>summary::-webkit-details-marker{display:none}
+details.card>summary::after{content:" ▾";color:var(--muted)}details.card[open]>summary{margin-bottom:12px}
+details.card[open]>summary::after{content:" ▴"}
+.sub{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
 </style>
+<script src="/studio-engine.js" defer></script>
 </head>
 <body>
 <div class="wrap">
@@ -60,7 +75,31 @@ iframe{border:0;background:#fff;border-radius:10px;height:760px;width:390px;max-
     <div class="row"><input class="grow" id="keyIn" type="password" autocomplete="current-password" aria-label="Studio key"><button class="btn" id="keySave" type="button">Save</button></div>
   </section>
 
-  <section class="card">
+  <section class="card" aria-labelledby="go-h">
+    <h2 id="go-h">Rebuild a website</h2>
+    <p class="hint">Paste the business's website. You get their new site and their owner dashboard back, built from what's on their site now.</p>
+    <form class="go" id="goForm"><input id="goUrl" type="text" inputmode="url" autocomplete="url" placeholder="theirbusiness.com" aria-label="Their website" required><button class="btn" id="goBtn" type="submit">Build</button></form>
+    <ol class="steps" id="steps" hidden><li data-s="scan">Reading their site</li><li data-s="plan">Planning pages</li><li data-s="render">Building site + dashboard</li></ol>
+    <p class="msg" id="goMsg" role="status"></p>
+    <div id="out" hidden>
+      <div class="tabs" role="group" aria-label="Preview">
+        <button class="btn ghost" type="button" data-show="site" aria-pressed="true">Website</button>
+        <button class="btn ghost" type="button" data-show="dashboard" aria-pressed="false">Owner dashboard</button>
+        <span style="flex:1"></span>
+        <button class="btn ghost" id="gPhone" type="button" aria-pressed="true">Phone</button>
+        <button class="btn ghost" id="gDesk" type="button" aria-pressed="false">Desktop</button>
+      </div>
+      <div class="stage" id="gStage"><iframe id="gFrame" title="Preview" sandbox="allow-scripts allow-popups"></iframe></div>
+      <div class="row" style="margin-top:12px"><button class="btn ghost" id="gOpen" type="button">Open full screen</button><button class="btn ghost" id="gDlSite" type="button">Download website</button><button class="btn ghost" id="gDlOwner" type="button">Download dashboard</button><button class="btn ghost" id="gCopy" type="button">Copy profile</button></div>
+      <p class="hint" style="margin:8px 0 0">Downloads are <code>index.html</code> and <code>owner.html</code>. The website isn't connected yet (its form doesn't send), and the dashboard has no login, so neither goes on a live domain yet.</p>
+      <div id="todoWrap" hidden><p class="msg err" style="margin-top:12px" id="todoMsg"></p><ul class="todos" id="todos"></ul></div>
+      <details style="margin-top:12px"><summary class="hint" style="cursor:pointer;margin:0">Notes for a rebuild (optional)</summary><textarea id="goNotes" style="width:100%;margin-top:8px" placeholder="e.g. split sports and portraits, push the booking button"></textarea><button class="btn ghost" id="goAgain" type="button" style="margin-top:8px">Rebuild with notes</button></details>
+    </div>
+  </section>
+
+  <details class="card" id="classic">
+  <summary>Classic builder (one freeform page, pick a style)</summary>
+  <section>
     <h2>1. The business</h2>
     <p class="hint">Paste their website and Scan, or fill in the details by hand if they don't have one.</p>
     <div class="row"><input class="grow" id="url" type="url" inputmode="url" placeholder="https://theirbusiness.com" aria-label="Their website"><button class="btn" id="scanBtn" type="button">Scan</button></div>
@@ -82,19 +121,20 @@ iframe{border:0;background:#fff;border-radius:10px;height:760px;width:390px;max-
     <div id="imgWrap" hidden style="margin-top:12px"><p class="hint" style="margin-bottom:6px">Photos from their site to use (untick any that aren't theirs):</p><div class="imgs" id="imgs"></div></div>
   </section>
 
-  <section class="card">
+  <section class="sub">
     <h2>2. Style <small>from the content team's style library</small></h2>
     <p class="hint">One style per site, built from the business's real things. Green outlines are the two that fit this kind of business.</p>
     <div class="styles" id="styles"></div>
   </section>
 
-  <section class="card">
+  <section class="sub">
     <h2>3. Build</h2>
     <div class="row"><button class="btn" id="buildBtn" type="button">Build the site</button><button class="btn ghost" id="phoneBtn" type="button" aria-pressed="true">Phone</button><button class="btn ghost" id="deskBtn" type="button" aria-pressed="false">Desktop</button>
       <button class="btn ghost" id="openBtn" type="button" disabled>Open full screen</button><button class="btn ghost" id="dlBtn" type="button" disabled>Download</button></div>
     <p class="msg" id="buildMsg" role="status"></p>
     <div class="stage" id="stage" hidden><iframe id="frame" title="Site preview" sandbox="allow-scripts allow-popups"></iframe></div>
   </section>
+  </details>
 
   <section class="card">
     <h2>4. Quote</h2>
@@ -193,7 +233,16 @@ $("#buildBtn").onclick = async () => {
 const view = desk => { $("#stage").classList.toggle("desk", desk); $("#deskBtn").setAttribute("aria-pressed", desk); $("#phoneBtn").setAttribute("aria-pressed", !desk); };
 $("#phoneBtn").onclick = () => view(false); $("#deskBtn").onclick = () => view(true);
 const file = () => new Blob([html], { type: "text/html" });
-$("#openBtn").onclick = () => window.open(URL.createObjectURL(file()), "_blank", "noopener");
+$("#openBtn").onclick = () => openSandboxed(html);
+// Generated pages never run with the Studio's origin (that would expose the Studio key in localStorage):
+// full screen is a blank tab holding the page in a sandboxed frame without same-origin.
+function openSandboxed(page) {
+  const w = window.open("", "_blank"); if (!w) return;
+  w.opener = null;
+  w.document.write('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Preview</title><style>html,body{margin:0;height:100%}iframe{border:0;width:100%;height:100%;display:block}</style><iframe sandbox="allow-scripts allow-popups" title="Preview"></iframe>');
+  w.document.close();
+  w.document.querySelector("iframe").srcdoc = page;
+}
 $("#dlBtn").onclick = () => { const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(file()), download: (($("#q-domain").value || $("#f-name").value || "site").replace(/[^a-z0-9.]+/gi, "-").toLowerCase()) + ".html" }); a.click(); };
 
 /* quote */
@@ -216,6 +265,61 @@ function quote() {
 document.querySelectorAll("#q-domain,#q-own,#q-setup,#q-deal,#q-rate,#q-plan,#q-dcost,#f-name").forEach(i => i.addEventListener("input", quote));
 $("#copyQuote").onclick = () => navigator.clipboard.writeText($("#quote").textContent).then(() => say($("#quoteMsg"), "Copied.", "ok"), () => say($("#quoteMsg"), "Couldn't copy. Select the text instead.", "err"));
 quote();
+
+/* one-bar flow: URL -> scan -> profile -> engine renders the website and the owner dashboard */
+let built = null, showing = "site";
+const STEP = s => document.querySelectorAll("#steps li").forEach(li => { const order = ["scan", "plan", "render", "done"], i = order.indexOf(li.dataset.s), j = order.indexOf(s); li.className = i < j ? "done" : i === j ? "on" : ""; });
+function showPreview(which, hash) {
+  if (!built) return; showing = which;
+  document.querySelectorAll("[data-show]").forEach(b => b.setAttribute("aria-pressed", b.dataset.show === which));
+  const f = $("#gFrame"); f.srcdoc = which === "site" ? built.preview.site : built.preview.dashboard;
+  if (hash) f.onload = () => { f.onload = null; f.contentWindow.postMessage({ plStudio: "go", hash }, "*"); };
+}
+window.addEventListener("message", e => { if (!built || e.source !== $("#gFrame").contentWindow || !e.data || e.data.plStudio !== "open") return; showPreview(e.data.page === "dashboard" ? "dashboard" : "site", typeof e.data.hash === "string" ? e.data.hash : ""); });
+document.querySelectorAll("[data-show]").forEach(b => b.onclick = () => showPreview(b.dataset.show));
+const gView = desk => { $("#gStage").classList.toggle("desk", desk); $("#gDesk").setAttribute("aria-pressed", desk); $("#gPhone").setAttribute("aria-pressed", !desk); };
+$("#gPhone").onclick = () => gView(false); $("#gDesk").onclick = () => gView(true);
+const save = (text, name) => { const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(new Blob([text], { type: "text/html" })), download: name }); a.click(); };
+$("#gDlSite").onclick = () => built && save(built.files.site, "index.html");
+$("#gDlOwner").onclick = () => built && save(built.files.dashboard, "owner.html");
+$("#gOpen").onclick = () => built && openSandboxed(showing === "site" ? built.live.site : built.live.dashboard);
+$("#gCopy").onclick = () => built && navigator.clipboard.writeText(JSON.stringify(built.profile, null, 1)).then(() => say($("#goMsg"), "Profile copied.", "ok"), () => say($("#goMsg"), "Couldn't copy.", "err"));
+
+async function readProfile(r) {
+  const text = await r.text(), last = text.trim().split("\n").pop();
+  let d; try { d = JSON.parse(last); } catch { throw new Error("The planner stopped before it finished. Try again"); }
+  if (d.error) throw new Error(d.error);
+  return d.profile;
+}
+async function build(notes) {
+  const url = $("#goUrl").value.trim(); if (!url) { $("#goUrl").focus(); return; }
+  if (!window.StudioEngine) return say($("#goMsg"), "The builder didn't load. Reload the page.", "err");
+  $("#goBtn").disabled = $("#goAgain").disabled = true; $("#steps").hidden = false;
+  try {
+    STEP("scan"); say($("#goMsg"), "Reading their site…");
+    if (!scan || notes === undefined || $("#url").value.trim() !== url) { scan = await (await call("/api/studio-scan", { url })).json(); $("#url").value = url; fillFromScan(scan); }
+    STEP("plan"); say($("#goMsg"), `Read ${1 + scan.pages.length} page${scan.pages.length ? "s" : ""} from ${scan.domain}. Planning their pages… about a minute.`);
+    const profile = await readProfile(await call("/api/studio-profile", { scan, notes: notes || "" }));
+    STEP("render");
+    const E = window.StudioEngine;
+    built = {
+      profile,
+      preview: E.render(profile, { preview: true }),
+      files: E.render(profile, { dashboardHref: "owner.html", siteHref: "index.html" }),
+      live: E.render(profile, {})
+    };
+    built.files = { site: built.files.site, dashboard: built.files.dashboard };
+    $("#out").hidden = false; showPreview("site"); STEP("done");
+    const todos = [...new Set([...built.preview.profile.todos, ...JSON.stringify(built.preview.profile).match(/ADD:[^"]*/g) || []])];
+    $("#todoWrap").hidden = !todos.length;
+    $("#todoMsg").textContent = todos.length ? `${todos.length} thing${todos.length > 1 ? "s" : ""} to fill in before the owner sees it (highlighted yellow on the site):` : "";
+    $("#todos").innerHTML = todos.map(t => `<li>${t.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]))}</li>`).join("");
+    say($("#goMsg"), `Done: ${profile.business.name}. Built from ${scan.domain}.`, "ok");
+  } catch (e) { say($("#goMsg"), e.message, "err"); }
+  finally { $("#goBtn").disabled = $("#goAgain").disabled = false; }
+}
+$("#goForm").onsubmit = e => { e.preventDefault(); scan = null; build(); };
+$("#goAgain").onclick = () => build($("#goNotes").value.trim());
 </script>
 </body>
 </html>
