@@ -8,7 +8,7 @@ description: "Design the system first, then build the smallest version that work
 2. **Design.** Hand the feature to the `architect` subagent. It returns architecture, file structure, data model, endpoints, UI states, caching, tradeoffs and build order.
 3. **Check the design.**
    - Does it break a hard rule (no Plainline prices, no AI-looking imagery)?
-   - Does it add a service, dependency or monthly cost? List each one for Ben.
+   - Does it add a service, dependency or monthly cost? List each one for Ben. If a new service will receive client or customer data, add it to `docs/subprocessors.md` and get Ben's 15-day client notice out before it goes live (agreement §7.7).
    - Is anything there "for scale" that this month's traffic doesn't need? Cut it.
 4. **Show Ben the plan** (in plan mode) and wait for a yes before editing.
 5. **Build in the architect's order**, one small step at a time:
