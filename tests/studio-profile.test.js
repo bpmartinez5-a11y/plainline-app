@@ -71,3 +71,13 @@ test("photos not on their site and email addresses are dropped", async () => {
   assert.ok(!JSON.stringify(profile).includes("owner@example.com"));
   assert.ok(profile.todos.some(t => /privacy page/.test(t)));
 });
+
+test("Ben's answers reach Claude and questions come back", async () => {
+  const srv = await fakeClaude({ business: { name: "Q Co" }, look: "grid", voice: "clean", hero: {}, collections: [], booking: {}, owner: {}, questions: [{ question: "Show prices?", options: ["Yes", "No"] }] });
+  process.env.STUDIO_KEY = "k"; process.env.ANTHROPIC_BASE_URL = "http://127.0.0.1:" + srv.address().port;
+  delete require.cache[require.resolve("../api/studio-profile.js")];
+  const { out } = await call(require("../api/studio-profile.js"), { scan, answers: [{ question: "Lead service?", answer: "Water heaters" }] });
+  srv.close();
+  assert.match(srv.lastBody.messages[0].content, /Lead service\? → Water heaters/);
+  assert.strictEqual(JSON.parse(out.trim().split("\n").pop()).profile.questions[0].question, "Show prices?");
+});

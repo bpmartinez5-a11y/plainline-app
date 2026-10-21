@@ -88,3 +88,18 @@ test("unconnected builds say so and stay out of search", () => {
   assert.ok(live.includes('"connected":false'));
   assert.ok(!E.render(photographer, { connected: true }).site.includes('content="noindex"'));
 });
+
+test("section switches and hidden collections drop out of the site", () => {
+  const p = JSON.parse(JSON.stringify(photographer));
+  p.show = { pricing: false, recent: false }; p.collections[1].hidden = true;
+  const s = E.sanitize(p);
+  assert.strictEqual(s.show.pricing, false); assert.strictEqual(s.show.about, true);
+  assert.strictEqual(s.collections[1].hidden, true);
+  assert.deepStrictEqual(E.sanitize(JSON.parse(JSON.stringify(s))), s);
+});
+
+test("planner questions are kept but never printed on the pages", () => {
+  const out = E.render({ business: { name: "Q Co" }, questions: [{ question: "Do they show prices publicly?", options: ["Yes", "No"] }] });
+  assert.strictEqual(out.profile.questions[0].options.length, 2);
+  assert.ok(!/Do they show prices publicly\?<\/|>Do they show prices/.test(out.site.replace(/<script>window\.__PROFILE__[\s\S]*?<\/script>/, "")));
+});

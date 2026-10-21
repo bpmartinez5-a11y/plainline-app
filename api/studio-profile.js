@@ -27,6 +27,10 @@ Structure:
 - look: "studio" for photo-led or premium businesses, "grid" for trades and services, "backstage" for night, emergency or nightlife businesses. voice: "bold" (sports, trades, energy), "clean" (most services, health, tech), "warm" (food, family, hospitality, weddings). accent: their main brand color from the scan's colors if one fits, else a color that suits the trade, as #RRGGBB.
 - hero.lines: 2 or 3 short lines (max 4 words each) that say what they do; highlight: one word or phrase from those lines.
 
+Questions for Ben:
+- questions: up to 4 short questions, only where the scan can't settle something that changes the build (for example whether they want prices public, which services to lead with, or what to call a section). Give 2 to 4 short answer options when you can. Never ask for something the scan already answers, and don't ask about colors or style.
+- If Ben's answers are given, follow them, don't ask those again, and use them to fill any matching "ADD:" placeholder.
+
 Return the profile by calling the save_profile tool once.`;
 
 const S = { type: "string" };
@@ -48,6 +52,7 @@ const TOOL = {
       contact: { type: "object", properties: { phone: S, address: S, hours: { type: "array", items: S }, serviceArea: S } },
       booking: { type: "object", properties: { title: S, intro: S, steps: { type: "array", items: S }, minors: { type: "boolean" }, types: { type: "array", items: { type: "object", properties: { id: S, label: S, fields: { type: "array", items: { type: "object", properties: { id: S, label: S, kind: { type: "string", enum: ["text", "number", "date", "select"] }, options: { type: "array", items: S } } } } } } } } },
       owner: { type: "object", properties: { jobWord: S, stages: { type: "array", items: S } } },
+      questions: { type: "array", items: { type: "object", properties: { id: S, question: S, options: { type: "array", items: S } }, required: ["question"] } },
       todos: { type: "array", items: S }
     },
     required: ["business", "look", "voice", "hero", "collections", "booking", "owner"]
@@ -63,8 +68,11 @@ function brief(b) {
     colors: site.colors, structured: site.structured, images: site.images, text: site.text,
     pages: (scan.pages || []).map(p => ({ url: p.url, title: p.title, headings: p.headings, images: p.images, text: p.text, structured: p.structured }))
   };
+  const answers = (Array.isArray(b.answers) ? b.answers : []).slice(0, 4)
+    .map(a => a && typeof a === "object" ? `- ${String(a.question || "").slice(0, 200)} → ${String(a.answer || "").slice(0, 300)}` : "").filter(x => x.length > 4);
   return [
     b.notes ? `Ben's notes (follow these): ${String(b.notes).slice(0, 2000)}` : "",
+    answers.length ? `Ben's answers to your earlier questions (follow these):\n${answers.join("\n")}` : "",
     `Scan of ${scan.domain || "their site"}:\n${JSON.stringify(slim)}`
   ].filter(Boolean).join("\n\n").slice(0, MAX_INPUT);
 }

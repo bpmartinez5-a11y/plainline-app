@@ -67,7 +67,7 @@
       },
       collections: uniqIds(arr(p.collections, 3).map((c, ci) => ({
         id: slug(c && (c.id || c.title), "section-" + (ci + 1)),
-        title: str(c && c.title, 40), blurb: str(c && c.blurb, 200),
+        title: str(c && c.title, 40), blurb: str(c && c.blurb, 200), hidden: !!(c && c.hidden),
         items: uniqIds(arr(c && c.items, 12).map((it, ii) => ({
           id: slug(it && (it.id || it.title), "item-" + (ii + 1)),
           title: str(it && it.title, 40), kicker: str(it && it.kicker, 40), line: str(it && it.line, 160),
@@ -116,7 +116,11 @@
         jobWord: str(p.owner && p.owner.jobWord, 20).toLowerCase() || "job",
         stages: (arr(p.owner && p.owner.stages, 8).map(x => str(x, 16)).filter(Boolean).length >= 3 ? arr(p.owner.stages, 8).map(x => str(x, 16)).filter(Boolean) : ["New", "Quoted", "Booked", "Done", "Paid"])
       },
-      todos: arr(p.todos, 20).map(x => str(x, 160)).filter(Boolean)
+      todos: arr(p.todos, 20).map(x => str(x, 160)).filter(Boolean),
+      // Section switches Ben can flip in the Studio. Missing means shown.
+      show: ["recent", "proof", "about", "pricing", "visit"].reduce((o, k) => (o[k] = !(p.show && p.show[k] === false), o), {}),
+      // Questions the planner wants Ben to answer. Never rendered on the client's pages.
+      questions: uniqIds(arr(p.questions, 4).map((q, i) => ({ id: slug(q && (q.id || q.question), "q" + (i + 1)), question: str(q && q.question, 200), options: arr(q && q.options, 4).map(o => str(o, 60)).filter(Boolean) })).filter(q => q.question))
     };
     if (!out.hero.lines.length) out.hero.lines = [out.business.name];
     if (!out.booking.types.length) out.booking.types = [{ id: "general", label: "General question", fields: [] }];
@@ -323,13 +327,13 @@ footer{border-top:2px solid var(--ink);margin-top:40px;padding-block:28px calc(2
     const own = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
     const art = label => `<div class="art" aria-hidden="true"><span>${esc(label)}</span></div>`;
     const extra = path => (edits["gal:" + path] || []).map(safeSrc).filter(Boolean);
-    const B = P.business, cols = P.collections;
+    const B = P.business, cols = P.collections.filter(c => !c.hidden), SHOW = P.show;
     const route = h => "#" + h;
     const ownerLink = OPT.preview ? "#owner" : (OPT.dashboardHref || "owner.html");
 
     document.title = B.name + (B.kind ? " · " + B.kind : "") + (B.city ? " in " + B.city : "");
     const bookLabel = P.booking.title || "Book";
-    const navItems = [["home", "Home"], ...cols.map(c => [c.id, c.title]), ...(P.about.paragraphs.length ? [["about", "About"]] : []), ...(P.pricing.lanes.length ? [["pricing", "Pricing"]] : [])];
+    const navItems = [["home", "Home"], ...cols.map(c => [c.id, c.title]), ...(SHOW.about && P.about.paragraphs.length ? [["about", "About"]] : []), ...(SHOW.pricing && P.pricing.lanes.length ? [["pricing", "Pricing"]] : [])];
 
     function brand() { const parts = B.name.split(" "); return parts.length > 1 ? `${esc(parts.slice(0, -1).join(" "))} <span>${esc(parts[parts.length - 1])}</span>` : esc(B.name); }
     document.body.innerHTML = `
@@ -374,8 +378,8 @@ ${B.tagline ? `<p class="tagline">${esc(B.tagline)}</p>` : ""}
 <div class="deck" id="deck" aria-label="Featured">${(heroPics.length ? heroPics : [null, null, null]).slice(0, 3).map((p, i) => `<figure>${p ? img("hero:" + i, p, 1200, p.alt) : art(B.name)}${p && p.alt ? `<figcaption class="mono">${esc(p.alt.slice(0, 40))}</figcaption>` : ""}</figure>`).join("")}</div>
 </section>
 ${cols.map((c, ci) => `<section class="sec"><div class="sec-head"><h2>${esc(c.title)}</h2>${c.blurb ? `<p>${esc(c.blurb)}</p>` : ""}</div>${deckOf("d" + ci, withPath(c))}</section>`).join("")}
-${P.recent.photos.length ? `<section class="sec"><div class="sec-head"><h2>${esc(P.recent.title)}</h2></div><div class="masonry">${P.recent.photos.map((p, i) => `<figure>${img("recent:" + i, p, 1000, p.alt || "Recent work by " + B.name)}</figure>`).join("")}</div></section>` : ""}
-${P.proof.items.length ? `<section class="sec"><div class="sec-head"><h2>${esc(P.proof.title)}</h2></div><div class="strip">${P.proof.items.map(x => `<span>${esc(x)}</span>`).join("")}</div></section>` : ""}
+${SHOW.recent && P.recent.photos.length ? `<section class="sec"><div class="sec-head"><h2>${esc(P.recent.title)}</h2></div><div class="masonry">${P.recent.photos.map((p, i) => `<figure>${img("recent:" + i, p, 1000, p.alt || "Recent work by " + B.name)}</figure>`).join("")}</div></section>` : ""}
+${SHOW.proof && P.proof.items.length ? `<section class="sec"><div class="sec-head"><h2>${esc(P.proof.title)}</h2></div><div class="strip">${P.proof.items.map(x => `<span>${esc(x)}</span>`).join("")}</div></section>` : ""}
 ${visit()}`;
       },
       collection(c, sub) {
@@ -383,7 +387,7 @@ ${visit()}`;
         const tabs = `<div class="subtabs">${items.map(x => `<a href="${route(x.path)}" aria-current="${!!(it && it.id === x.id)}">${esc(x.title)}</a>`).join("")}</div>`;
         if (!it) return `<section class="sec"><div class="sec-head"><h2>${esc(c.title)}</h2>${c.blurb ? `<p>${esc(c.blurb)}</p>` : ""}</div>${tabs}
 <div class="roster">${items.map(x => `<a class="tile tilt" href="${route(x.path)}">${img("cover:" + x.path, x.photos[0] || { src: extra(x.path)[0] }, 800, x.title) || art(x.title.slice(0, 1))}<span class="cap"><small>${esc(x.kicker)}</small><b>${esc(x.title)}</b></span></a>`).join("")}</div></section>`;
-        const link = OPT.preview ? `${B.domain || "yoursite.com"}/#${it.path}` : location.origin + location.pathname + "#" + it.path;
+        const link = B.domain ? `https://${B.domain}/#${it.path}` : location.origin + location.pathname + "#" + it.path;
         const pics = it.photos.map((p, i) => i === 0 ? img("cover:" + it.path, p, 1600, p.alt || it.title) : img("photo:" + it.path + ":" + i, p, 1600, p.alt || it.title)).filter(Boolean).concat(extra(it.path).map(s => `<img src="${esc(s)}" alt="${esc(it.title)}" loading="lazy">`));
         return `<section class="sec">${tabs}<div class="gal-hero"><h3>${esc(it.title)}</h3><div class="meta">${it.line ? `<div class="mono">${esc(it.line)}</div>` : ""}
 <div class="share"><code>${esc(link)}</code><button class="iconbtn" data-copy="${esc(link)}" type="button">Copy link</button></div>
@@ -441,18 +445,23 @@ ${K.minors ? `<div class="check"><input type="checkbox" id="f-guardian" name="gu
       if (C.serviceArea) f.push(`<div><b>Service area</b>${say(C.serviceArea)}</div>`);
       return f.length ? `<div class="facts">${f.join("")}</div>` : "";
     }
-    function visit() { const v = visitFacts(); return v ? `<section class="sec"><div class="sec-head"><h2>Visit</h2></div>${v}</section>` : ""; }
+    function visit() { if (!SHOW.visit) return ""; const v = visitFacts(); return v ? `<section class="sec"><div class="sec-head"><h2>Visit</h2></div>${v}</section>` : ""; }
 
     const app = document.getElementById("app"), nav = document.getElementById("nav"), menuBtn = document.getElementById("menuBtn"), mbook = document.getElementById("mbook");
     const lb = document.getElementById("lb"), lbImg = document.getElementById("lbImg");
     const ol = document.getElementById("ownerLink");
     if (ol && OPT.preview) ol.addEventListener("click", e => { e.preventDefault(); try { parent.postMessage({ plStudio: "open", page: "dashboard" }, "*"); } catch (x) {} });
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // Routes live in a variable, not only in the address bar: inside the Studio's srcdoc preview a "#x" link
+    // resolves against the Studio's own URL and would load the Studio into the frame.
+    let here = location.hash.slice(1);
+    function go(h) { here = String(h || "").slice(0, 200); try { history.pushState(null, "", "#" + here); } catch (e) {} render(); }
+    document.addEventListener("click", e => { const a = e.target.closest && e.target.closest('a[href^="#"]'); if (!a || e.defaultPrevented) return; e.preventDefault(); go(a.getAttribute("href").slice(1)); });
     function render() {
-      let raw = location.hash.slice(1) || "home";
-      if (/^owner(?:$|[/?])/.test(raw)) { if (OPT.preview) { try { parent.postMessage({ plStudio: "open", page: "dashboard" }, "*"); } catch (e) {} } try { history.replaceState(null, "", "#home"); } catch (e) {} raw = "home"; }
+      let raw = here || "home";
+      if (/^owner(?:$|[/?])/.test(raw)) { if (OPT.preview) { try { parent.postMessage({ plStudio: "open", page: "dashboard" }, "*"); } catch (e) {} } here = "home"; try { history.replaceState(null, "", "#home"); } catch (e) {} raw = "home"; }
       const [path, q] = raw.split("?"), [page, sub] = path.split("/");
-      const col = cols.find(c => c.id === page), known = own(pages, page) && page !== "collection";
+      const col = cols.find(c => c.id === page), known = own(pages, page) && page !== "collection" && !(page === "about" && !SHOW.about) && !(page === "pricing" && !SHOW.pricing);
       const html = col ? pages.collection(col, sub) : known ? pages[page](q) : pages.home();
       app.innerHTML = `<div class="page">${html}</div>`;
       nav.querySelectorAll("a").forEach(a => a.setAttribute("aria-current", a.getAttribute("href") === "#" + (col ? col.id : known ? page : "home") ? "page" : "false"));
@@ -526,11 +535,12 @@ ${K.minors ? `<div class="check"><input type="checkbox" id="f-guardian" name="gu
     const applyTheme = () => { if (th === "auto") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme", th); themeBtn.textContent = th[0].toUpperCase() + th.slice(1); };
     themeBtn.onclick = () => { th = themes[(themes.indexOf(th) + 1) % 3]; try { localStorage.setItem("pl:theme", th); } catch (e) {} applyTheme(); };
     applyTheme();
-    addEventListener("scroll", () => { mbook.hidden = location.hash.startsWith("#book") || scrollY < 520; }, { passive: true });
+    addEventListener("scroll", () => { mbook.hidden = /^book/.test(here) || scrollY < 520; }, { passive: true });
     addEventListener("storage", e => { if (e.key === KEY) { edits = store.get(); render(); } });
-    addEventListener("hashchange", render);
+    addEventListener("hashchange", () => { here = location.hash.slice(1); render(); });
+    addEventListener("popstate", () => { here = location.hash.slice(1); render(); });
     // In the Studio preview the parent page can jump to a section (only the Studio, nothing else).
-    if (OPT.preview) addEventListener("message", e => { if (e.source === parent && e.data && e.data.plStudio === "go" && typeof e.data.hash === "string") location.hash = e.data.hash.replace(/[^a-z0-9\-/?=]/gi, ""); });
+    if (OPT.preview) addEventListener("message", e => { if (e.source === parent && e.data && e.data.plStudio === "go" && typeof e.data.hash === "string") go(e.data.hash.replace(/[^a-z0-9\-/?=]/gi, "")); });
     render();
   }
 
@@ -646,7 +656,7 @@ h2{font:800 25px/1 var(--display);text-transform:var(--up);margin:0}
     const saveSite = () => ls.set("edits", site);
     const iso = d => d.toISOString().slice(0, 10);
     const addDays = n => { const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + n); return iso(d); };
-    const GALS = P.collections.flatMap(c => c.items.map(it => ({ path: c.id + "/" + it.id, name: it.title, sec: c.title, photo: it.photos[0] || null, count: it.photos.length })));
+    const GALS = P.collections.filter(c => !c.hidden).flatMap(c => c.items.map(it => ({ path: c.id + "/" + it.id, name: it.title, sec: c.title, photo: it.photos[0] || null, count: it.photos.length })));
     const coverOf = g => safeSrc(site["img:cover:" + g.path] || (g.photo && sized(g.photo.src, 700)) || (site["gal:" + g.path] || [])[0] || "");
     const city = B.city || "town";
     // Example jobs are clearly marked and use no real people's names.
@@ -681,7 +691,7 @@ h2{font:800 25px/1 var(--display);text-transform:var(--up);margin:0}
       pricing: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 12l-8 8-9-9V3h8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>',
       site: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 4l6 6L9 21H3v-6z"/></svg>'
     };
-    const TABS = [["today", "Today"], ["jobs", cap(WORD) + "s"], ...(GALS.length ? [["pages", "Photos"]] : []), ...(P.pricing.lanes.length ? [["pricing", "Pricing"]] : []), ["site", "My site"]];
+    const TABS = [["today", "Today"], ["jobs", cap(WORD) + "s"], ...(GALS.length ? [["pages", "Photos"]] : []), ...(P.show.pricing && P.pricing.lanes.length ? [["pricing", "Pricing"]] : []), ["site", "My site"]];
     let tab = location.hash.slice(1) || "today"; if (!TABS.some(t => t[0] === tab)) tab = "today";
     const note = OPT.preview ? "Preview: changes stay in this window and aren't saved" : canStore ? "Saved on this device. Your site shows them in this browser until it's connected" : "This browser won't save changes";
     let sortBy = "date", filter = "all";
