@@ -482,19 +482,21 @@ function rulesAgent(c){
 async function aiTurn(id){
   let c = getConvo(id); if (!c) return;
   S.typing.add(id); render();
-  let out = null;
+  let out = null, sort = null;
   if (S.aiMode === "claude"){
     try {
       S.sentToAi = true;
-      const r = await fetch("/api/chat", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({prompt: buildPrompt(c)})});
+      const latest = c.msgs.filter(m => m.from === "customer").slice(-3).map(m => m.text).join("\n");
+      const r = await fetch("/api/chat", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({prompt: buildPrompt(c), latest})});
       if (r.status === 501 || r.status === 429) S.aiMode = "rules"; // no key, or this visitor hit the limit: built-in replies
-      else if (r.ok) out = (await r.json()).result;
+      else if (r.ok){ const j = await r.json(); out = j.result; sort = j.sort || null; }
     } catch(e){ console.warn("chat", e); }
   }
   if (!out || typeof out !== "object" || !out.reply) out = rulesAgent(c);
   S.typing.delete(id);
   c = getConvo(id); if (!c) return;
   if (c.status === "human"){ render(); return; } // staff took over mid-reply
+  c.sort = sort; // set on the fresh copy; cleared when this turn had no sort
   applyAi(c, out);
   saveConvo(c);
 }
@@ -710,7 +712,8 @@ function renderThreadPane(){
   }
   if (S.typing.has(c.id)) body += `<div class="wsum">Assistant is typing…</div>`;
   pane.innerHTML = `<div class="t-head"><div><h3>${esc(c.name || "New customer")} <span class="st ${st}">${STATUS_LABEL[st]}</span></h3>
-      ${c.status === "needs_human" ? `<div class="reason">Flagged: ${esc(c.handoffReason)}</div>` : `<div class="note">${c.phone ? esc(c.phone) + " · " : ""}started ${fmtTime(c.createdAt)}</div>`}</div>
+      ${c.status === "needs_human" ? `<div class="reason">Flagged: ${esc(c.handoffReason)}</div>` : `<div class="note">${c.phone ? esc(c.phone) + " · " : ""}started ${fmtTime(c.createdAt)}</div>`}
+      ${c.sort ? `<div class="note">Sorted: ${esc(c.sort.intent)}${c.sort.confidence != null ? ` · ${Math.round(c.sort.confidence*100)}% sure` : ""}${c.sort.needsPerson != null ? ` · needs a person ${Math.round(c.sort.needsPerson*100)}%` : ""}</div>` : ""}</div>
       <div class="t-actions">${c.status === "human" ? `<button class="btn ghost" data-act="back" data-id="${c.id}">Hand back to assistant</button>` : `<button class="btn ${c.status === "needs_human" ? "warn" : ""}" data-act="take" data-id="${c.id}">Take over</button>`}</div></div>
     <div class="t-body" id="tbody">${body}</div>
     <form class="t-comp" id="staffForm" data-id="${c.id}"><input id="staffIn" autocomplete="off" placeholder="Reply as ${esc(cfg.staffName)}${c.status === "human" ? "" : " (takes over the chat)"}" aria-label="Staff reply"><button class="btn">Send</button></form>`;

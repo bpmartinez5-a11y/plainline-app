@@ -44,6 +44,79 @@ function looksLikeDemo(prompt) {
     && prompt.trimEnd().endsWith('"customerName": string | null}');
 }
 
+// Optional sort step (Jev by TypeSafe AI). Off unless JEV_API_KEY is set in Vercel.
+// Jev labels the customer's latest texts and scores whether a person is needed. It runs alongside the
+// Claude call, can only ADD a hand-off on top of Claude's own judgment (never remove one), and any Jev
+// failure is ignored so the demo works exactly as before. TypeSafe is a sub-processor: see docs/subprocessors.md.
+const JEV_URL = "https://api.typesafe.ai/v1/systemone";
+const JEV_MODEL = process.env.JEV_MODEL || "jev-latest";
+const handoffAt = Number(process.env.JEV_HANDOFF_AT); // 0..1; lower = more hand-offs
+const NEEDS_PERSON_AT = Number.isFinite(handoffAt) && handoffAt > 0 && handoffAt <= 1 ? handoffAt : 0.6;
+const MAX_LATEST_CHARS = 2000; // the last three customer texts
+const INTENTS = {
+  book: "wants to book or check openings",
+  question: "asks about prices, services, hours or policies",
+  reschedule: "wants to move or cancel a booking",
+  urgent: "pain, emergency or a safety problem",
+  complaint: "upset, complaining, refund or billing dispute",
+  person: "asks to talk to a person",
+  other: "small talk or anything else"
+};
+const PERSON_INTENTS = new Set(["urgent", "complaint", "person"]);
+
+async function jevSort(key, text) {
+  try {
+    const r = await fetch(JEV_URL, {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + key, "content-type": "application/json" },
+      body: JSON.stringify({
+        model: JEV_MODEL,
+        state: text,
+        questions: {
+          intent: { type: "choice", instructions: "What is this customer texting a local business about?",
+            criteria: Object.entries(INTENTS).map(([id, d]) => `${id}: ${d}`).join("\n") },
+          needs_person: { type: "noul", instructions: "A staff member should step in personally instead of an automated assistant replying." }
+        }
+      }),
+      signal: AbortSignal.timeout(4000)
+    });
+    if (!r.ok) { console.error("jev error", r.status); return null; } // status only: the body may echo the visitor's text
+    const a = (await r.json()).answers || {};
+    let intent = a.intent && String(a.intent.choice || "").split(":")[0].trim().toLowerCase();
+    if (!Object.hasOwn(INTENTS, intent)) intent = "other";
+    const conf = Number(a.intent && a.intent.confidence);
+    const needs = Number(a.needs_person && a.needs_person.noul);
+    return {
+      by: "jev",
+      intent,
+      confidence: Number.isFinite(conf) ? Math.round(conf * 100) / 100 : null,
+      needsPerson: Number.isFinite(needs) ? Math.round(needs * 100) / 100 : null
+    };
+  } catch (e) { console.error("jev failed", e.name); return null; }
+}
+
+// Sorting can only add a hand-off. Urgent replies point to 911 first. Any urgent-looking intent hands off
+// whatever its confidence: a needless hand-off costs a staff glance, a missed emergency costs far more.
+function applySort(result, sort) {
+  if (!sort) return result;
+  if (result.handoff) {
+    if (sort.intent === "urgent" && !/911/.test(result.reply)) return { ...result, reply: "If this is an emergency, please call 911. " + result.reply };
+    return result;
+  }
+  if (!PERSON_INTENTS.has(sort.intent) && (sort.needsPerson ?? 0) < NEEDS_PERSON_AT) return result;
+  return {
+    ...result,
+    handoff: true,
+    handoffReason: "Sorted as: " + (PERSON_INTENTS.has(sort.intent) ? INTENTS[sort.intent] : "likely needs a person"),
+    reply: (sort.intent === "urgent" ? "If this is an emergency, please call 911. " : "Thanks for letting us know. ") +
+      "Someone from our team will reply here shortly.",
+    show: "none",
+    chips: [],
+    serviceId: null,
+    date: null
+  };
+}
+
 function parseJson(text) {
   try { return JSON.parse(text); } catch {}
   const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -55,6 +128,7 @@ function parseJson(text) {
 
 module.exports = async function handler(req, res) {
   const key = process.env.ANTHROPIC_API_KEY;
+  const jevKey = process.env.JEV_API_KEY;
   res.setHeader("Cache-Control", "no-store");
 
   if (req.method === "GET") return res.status(200).json({ ai: Boolean(key) });
@@ -68,6 +142,8 @@ module.exports = async function handler(req, res) {
 
   const ip = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "unknown";
   if (overLimit(ip)) return res.status(429).json({ error: "Limit reached" });
+  const latest = body && typeof body.latest === "string" ? body.latest.slice(0, MAX_LATEST_CHARS) : "";
+  const sorting = jevKey && latest ? jevSort(jevKey, latest) : Promise.resolve(null); // runs alongside Claude
 
   try {
     const r = await fetch("https://api.anthropic.com/v1/messages", {
@@ -93,7 +169,9 @@ module.exports = async function handler(req, res) {
     const text = (data.content || []).filter(p => p.type === "text").map(p => p.text).join("");
     const result = parseJson(text);
     if (!result || typeof result.reply !== "string" || result.reply.length > MAX_REPLY_CHARS) return res.status(502).json({ error: "AI returned an unexpected reply" });
-    return res.status(200).json({ result: pick(result) });
+    const sort = await sorting;
+    const out = pick(applySort(result, sort));
+    return res.status(200).json(sort ? { result: out, sort } : { result: out });
   } catch (e) {
     console.error(e);
     return res.status(502).json({ error: "AI request failed" });

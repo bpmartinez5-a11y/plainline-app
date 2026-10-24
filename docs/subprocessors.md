@@ -7,6 +7,7 @@ The client agreement (§§7.7, 7.10, 7.12, 7.15) promises clients a current list
 | Vercel | Hosting, API functions, cookieless analytics | Confirm region setting | Confirm | No (hosting) | Confirm |
 | Supabase | Database (leads, bookings, conversations) | Confirm project region | Yes (we delete rows) | No | Confirm |
 | Anthropic | AI model that writes replies | Confirm current API terms | Confirm current API retention terms | Confirm current API terms | Confirm |
+| TypeSafe AI (Jev) | Sorting incoming messages (booking, urgent, needs a person); off until `JEV_API_KEY` is set | Confirm current API terms | Confirm current API retention terms | Confirm current API terms | Not for PHI until confirmed |
 | SMS provider | Text messaging and hand-off notices | Not chosen yet | — | — | — |
 | Claude (Claude Code and Claude app sessions) | Agents that build, review and run reports | Confirm current terms | Confirm | Confirm current terms per plan | Confirm |
 | GitHub | Client site code repos | Confirm | Yes | Confirm | Not for PHI |
