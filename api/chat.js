@@ -50,7 +50,8 @@ function looksLikeDemo(prompt) {
 // failure is ignored so the demo works exactly as before. TypeSafe is a sub-processor: see docs/subprocessors.md.
 const JEV_URL = "https://api.typesafe.ai/v1/systemone";
 const JEV_MODEL = process.env.JEV_MODEL || "jev-latest";
-const NEEDS_PERSON_AT = Number(process.env.JEV_HANDOFF_AT) || 0.6; // 0..1; lower = more hand-offs
+const handoffAt = Number(process.env.JEV_HANDOFF_AT); // 0..1; lower = more hand-offs
+const NEEDS_PERSON_AT = Number.isFinite(handoffAt) && handoffAt > 0 && handoffAt <= 1 ? handoffAt : 0.6;
 const MAX_LATEST_CHARS = 2000; // the last three customer texts
 const INTENTS = {
   book: "wants to book or check openings",
@@ -81,8 +82,8 @@ async function jevSort(key, text) {
     });
     if (!r.ok) { console.error("jev error", r.status); return null; } // status only: the body may echo the visitor's text
     const a = (await r.json()).answers || {};
-    let intent = a.intent && String(a.intent.choice || "").split(":")[0].trim();
-    if (!INTENTS[intent]) intent = "other";
+    let intent = a.intent && String(a.intent.choice || "").split(":")[0].trim().toLowerCase();
+    if (!Object.hasOwn(INTENTS, intent)) intent = "other";
     const conf = Number(a.intent && a.intent.confidence);
     const needs = Number(a.needs_person && a.needs_person.noul);
     return {
@@ -94,9 +95,14 @@ async function jevSort(key, text) {
   } catch (e) { console.error("jev failed", e.name); return null; }
 }
 
-// Sorting can only add a hand-off. Urgent replies point to 911 first.
+// Sorting can only add a hand-off. Urgent replies point to 911 first. Any urgent-looking intent hands off
+// whatever its confidence: a needless hand-off costs a staff glance, a missed emergency costs far more.
 function applySort(result, sort) {
-  if (!sort || result.handoff) return result;
+  if (!sort) return result;
+  if (result.handoff) {
+    if (sort.intent === "urgent" && !/911/.test(result.reply)) return { ...result, reply: "If this is an emergency, please call 911. " + result.reply };
+    return result;
+  }
   if (!PERSON_INTENTS.has(sort.intent) && (sort.needsPerson ?? 0) < NEEDS_PERSON_AT) return result;
   return {
     ...result,
@@ -105,7 +111,9 @@ function applySort(result, sort) {
     reply: (sort.intent === "urgent" ? "If this is an emergency, please call 911. " : "Thanks for letting us know. ") +
       "Someone from our team will reply here shortly.",
     show: "none",
-    chips: []
+    chips: [],
+    serviceId: null,
+    date: null
   };
 }
 
@@ -123,7 +131,7 @@ module.exports = async function handler(req, res) {
   const jevKey = process.env.JEV_API_KEY;
   res.setHeader("Cache-Control", "no-store");
 
-  if (req.method === "GET") return res.status(200).json({ ai: Boolean(key), sort: Boolean(key && jevKey) });
+  if (req.method === "GET") return res.status(200).json({ ai: Boolean(key) });
   if (req.method !== "POST") return res.status(405).json({ error: "Use POST" });
   if (!key) return res.status(501).json({ error: "AI not configured" });
   if (!sameSite(req)) return res.status(403).json({ error: "Wrong origin" });

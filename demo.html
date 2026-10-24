@@ -482,20 +482,21 @@ function rulesAgent(c){
 async function aiTurn(id){
   let c = getConvo(id); if (!c) return;
   S.typing.add(id); render();
-  let out = null;
+  let out = null, sort = null;
   if (S.aiMode === "claude"){
     try {
       S.sentToAi = true;
       const latest = c.msgs.filter(m => m.from === "customer").slice(-3).map(m => m.text).join("\n");
       const r = await fetch("/api/chat", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({prompt: buildPrompt(c), latest})});
       if (r.status === 501 || r.status === 429) S.aiMode = "rules"; // no key, or this visitor hit the limit: built-in replies
-      else if (r.ok){ const j = await r.json(); out = j.result; if (j.sort) c.sort = j.sort; }
+      else if (r.ok){ const j = await r.json(); out = j.result; sort = j.sort || null; }
     } catch(e){ console.warn("chat", e); }
   }
   if (!out || typeof out !== "object" || !out.reply) out = rulesAgent(c);
   S.typing.delete(id);
   c = getConvo(id); if (!c) return;
   if (c.status === "human"){ render(); return; } // staff took over mid-reply
+  c.sort = sort; // set on the fresh copy; cleared when this turn had no sort
   applyAi(c, out);
   saveConvo(c);
 }
