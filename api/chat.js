@@ -6,21 +6,52 @@
 const MODEL = process.env.ANTHROPIC_MODEL || "claude-haiku-5-5";
 const MAX_PROMPT_CHARS = 12000; // the demo's prompt is ~3-6k characters
 const LIMIT = 30, WINDOW_MS = 60 * 60 * 1000; // AI replies per IP per hour
+const GLOBAL_LIMIT = 600; // AI replies per warm instance per hour, all visitors combined: caps a spike from many IPs
+const MAX_REPLY_CHARS = 600; // the demo asks for under 280; anything far longer isn't a booking text
 const hits = new Map(); // ip -> [count, windowStart]; per warm instance, so a soft cap (set a spend limit on the key too)
+let total = [0, 0]; // [count, windowStart] across all IPs on this instance
 
+// Called only for valid demo requests, right before Claude is called, so junk requests can't use up the budget.
+// Per-IP first; the instance-wide count only moves when a request is actually going to Claude.
 function overLimit(ip) {
-  const now = Date.now(), h = hits.get(ip);
-  if (!h || now - h[1] > WINDOW_MS) { hits.set(ip, [1, now]); return false; }
-  return ++h[0] > LIMIT;
+  const now = Date.now();
+  if (hits.size > 5000) for (const [k, h] of hits) if (now - h[1] > WINDOW_MS) hits.delete(k); // drop expired windows only
+  const h = hits.get(ip);
+  if (!h || now - h[1] > WINDOW_MS) hits.set(ip, [1, now]);
+  else if (++h[0] > LIMIT) return true;
+  if (now - total[1] > WINDOW_MS) total = [0, now];
+  return ++total[0] > GLOBAL_LIMIT;
+}
+
+// Return only the fields demo.html reads, so the endpoint can't hand back arbitrary model output.
+const FIELDS = ["reply", "show", "serviceId", "date", "chips", "handoff", "handoffReason", "customerName"];
+const pick = o => Object.fromEntries(FIELDS.filter(k => k in o).map(k => [k, o[k]]));
+
+// Only this site's own pages may call the endpoint. Browsers always send Origin on a POST from fetch(),
+// and Sec-Fetch-Site when they support it, so a missing Origin means a script, not the demo.
+function sameSite(req) {
+  const origin = req.headers.origin;
+  if (!origin || origin.replace(/^https?:\/\//, "") !== req.headers.host) return false;
+  const site = req.headers["sec-fetch-site"];
+  return !site || site === "same-origin";
+}
+
+// The demo's prompt always comes from buildPrompt() in demo.html. Reject anything that isn't that template,
+// so the endpoint can't be used as a general-purpose Claude proxy.
+function looksLikeDemo(prompt) {
+  return prompt.startsWith("You are the text-message booking assistant for ")
+    && prompt.includes("\nCONVERSATION SO FAR\n")
+    && prompt.trimEnd().endsWith('"customerName": string | null}');
 }
 
 // Optional sort step (Jev by TypeSafe AI). Off unless JEV_API_KEY is set in Vercel.
-// Jev labels the customer's latest texts and says how likely it is that a person is needed.
-// It can only ADD a hand-off on top of Claude's own judgment, never remove one, and any
-// Jev failure is ignored so the chat works exactly as before.
+// Jev labels the customer's latest texts and scores whether a person is needed. It runs alongside the
+// Claude call, can only ADD a hand-off on top of Claude's own judgment (never remove one), and any Jev
+// failure is ignored so the demo works exactly as before. TypeSafe is a sub-processor: see docs/subprocessors.md.
 const JEV_URL = "https://api.typesafe.ai/v1/systemone";
 const JEV_MODEL = process.env.JEV_MODEL || "jev-latest";
-const NEEDS_PERSON_AT = Number(process.env.JEV_HANDOFF_AT || 0.6); // 0..1; lower = more hand-offs
+const NEEDS_PERSON_AT = Number(process.env.JEV_HANDOFF_AT) || 0.6; // 0..1; lower = more hand-offs
+const MAX_LATEST_CHARS = 2000; // the last three customer texts
 const INTENTS = {
   book: "wants to book or check openings",
   question: "asks about prices, services, hours or policies",
@@ -48,7 +79,7 @@ async function jevSort(key, text) {
       }),
       signal: AbortSignal.timeout(4000)
     });
-    if (!r.ok) { console.error("jev error", r.status, await r.text()); return null; }
+    if (!r.ok) { console.error("jev error", r.status); return null; } // status only: the body may echo the visitor's text
     const a = (await r.json()).answers || {};
     let intent = a.intent && String(a.intent.choice || "").split(":")[0].trim();
     if (!INTENTS[intent]) intent = "other";
@@ -60,7 +91,22 @@ async function jevSort(key, text) {
       confidence: Number.isFinite(conf) ? Math.round(conf * 100) / 100 : null,
       needsPerson: Number.isFinite(needs) ? Math.round(needs * 100) / 100 : null
     };
-  } catch (e) { console.error("jev failed", e.message); return null; }
+  } catch (e) { console.error("jev failed", e.name); return null; }
+}
+
+// Sorting can only add a hand-off. Urgent replies point to 911 first.
+function applySort(result, sort) {
+  if (!sort || result.handoff) return result;
+  if (!PERSON_INTENTS.has(sort.intent) && (sort.needsPerson ?? 0) < NEEDS_PERSON_AT) return result;
+  return {
+    ...result,
+    handoff: true,
+    handoffReason: "Sorted as: " + (PERSON_INTENTS.has(sort.intent) ? INTENTS[sort.intent] : "likely needs a person"),
+    reply: (sort.intent === "urgent" ? "If this is an emergency, please call 911. " : "Thanks for letting us know. ") +
+      "Someone from our team will reply here shortly.",
+    show: "none",
+    chips: []
+  };
 }
 
 function parseJson(text) {
@@ -74,22 +120,21 @@ function parseJson(text) {
 
 module.exports = async function handler(req, res) {
   const key = process.env.ANTHROPIC_API_KEY;
+  const jevKey = process.env.JEV_API_KEY;
   res.setHeader("Cache-Control", "no-store");
 
-  const jevKey = process.env.JEV_API_KEY;
   if (req.method === "GET") return res.status(200).json({ ai: Boolean(key), sort: Boolean(key && jevKey) });
   if (req.method !== "POST") return res.status(405).json({ error: "Use POST" });
   if (!key) return res.status(501).json({ error: "AI not configured" });
-  const origin = req.headers.origin;
-  if (origin && origin.replace(/^https?:\/\//, "") !== req.headers.host) return res.status(403).json({ error: "Wrong origin" });
-  const ip = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "unknown";
-  if (overLimit(ip)) return res.status(429).json({ error: "Limit reached" });
-
+  if (!sameSite(req)) return res.status(403).json({ error: "Wrong origin" });
   let body = req.body;
   if (typeof body === "string") { try { body = JSON.parse(body); } catch { body = {}; } }
   const prompt = body && typeof body.prompt === "string" ? body.prompt : "";
-  if (!prompt || prompt.length > MAX_PROMPT_CHARS) return res.status(400).json({ error: "Bad prompt" });
-  const latest = body && typeof body.latest === "string" ? body.latest.slice(0, 2000) : "";
+  if (!prompt || prompt.length > MAX_PROMPT_CHARS || !looksLikeDemo(prompt)) return res.status(400).json({ error: "Bad prompt" });
+
+  const ip = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "unknown";
+  if (overLimit(ip)) return res.status(429).json({ error: "Limit reached" });
+  const latest = body && typeof body.latest === "string" ? body.latest.slice(0, MAX_LATEST_CHARS) : "";
   const sorting = jevKey && latest ? jevSort(jevKey, latest) : Promise.resolve(null); // runs alongside Claude
 
   try {
@@ -115,16 +160,10 @@ module.exports = async function handler(req, res) {
     const data = await r.json();
     const text = (data.content || []).filter(p => p.type === "text").map(p => p.text).join("");
     const result = parseJson(text);
-    if (!result || typeof result.reply !== "string") return res.status(502).json({ error: "AI returned an unexpected reply" });
+    if (!result || typeof result.reply !== "string" || result.reply.length > MAX_REPLY_CHARS) return res.status(502).json({ error: "AI returned an unexpected reply" });
     const sort = await sorting;
-    if (sort && !result.handoff && (PERSON_INTENTS.has(sort.intent) || (sort.needsPerson ?? 0) >= NEEDS_PERSON_AT)) {
-      result.handoff = true;
-      result.handoffReason = "Sorted as: " + (PERSON_INTENTS.has(sort.intent) ? INTENTS[sort.intent] : "likely needs a person");
-      result.reply = (sort.intent === "urgent" ? "If this is an emergency, please call 911. " : "Thanks for letting us know. ") +
-        "Someone from our team will reply here shortly.";
-      result.show = "none"; result.chips = [];
-    }
-    return res.status(200).json(sort ? { result, sort } : { result });
+    const out = pick(applySort(result, sort));
+    return res.status(200).json(sort ? { result: out, sort } : { result: out });
   } catch (e) {
     console.error(e);
     return res.status(502).json({ error: "AI request failed" });

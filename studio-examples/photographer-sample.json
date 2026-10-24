@@ -1,0 +1,295 @@
+{
+ "business": {
+  "name": "Juniper Lane Photo",
+  "kind": "Sports & portrait photographer",
+  "city": "Lawrence",
+  "region": "KS",
+  "domain": "juniperlanephoto.example",
+  "tagline": "Sample business \u00b7 values illustrative",
+  "socials": [
+   {
+    "label": "Instagram",
+    "url": "https://instagram.com/juniperlanephoto.example"
+   }
+  ]
+ },
+ "look": "studio",
+ "voice": "bold",
+ "accent": "#C8202B",
+ "hero": {
+  "eyebrow": "Sports & portrait photographer \u00b7 Lawrence, KS \u00b7 sample",
+  "lines": [
+   "Big plays,",
+   "caught clean."
+  ],
+  "highlight": "caught clean.",
+  "lede": "Game coverage, team media days, senior sessions and weddings, shot by a photographer who spends most weekends on a sideline.",
+  "cta": "Check a date",
+  "photos": [
+   {
+    "src": "https://images.example.com/photographer/hero-1.jpg",
+    "alt": "Volleyball spike"
+   },
+   {
+    "src": "https://images.example.com/photographer/hero-2.jpg",
+    "alt": "Relay handoff"
+   },
+   {
+    "src": "https://images.example.com/photographer/hero-3.jpg",
+    "alt": "Soccer header"
+   }
+  ]
+ },
+ "collections": [
+  {
+   "id": "sports",
+   "title": "Sports",
+   "blurb": "Each sport has its own page and link, so a coach only sees their team's work.",
+   "items": [
+    {
+     "id": "soccer",
+     "title": "Soccer",
+     "kicker": "High school & club",
+     "line": "Varsity and club matches",
+     "photos": [
+      {
+       "src": "https://images.example.com/photographer/soccer-1.jpg",
+       "alt": "Soccer header"
+      }
+     ]
+    },
+    {
+     "id": "volleyball",
+     "title": "Volleyball",
+     "kicker": "High school",
+     "line": "Home games and tournaments",
+     "photos": [
+      {
+       "src": "https://images.example.com/photographer/volleyball-1.jpg",
+       "alt": "Volleyball spike"
+      }
+     ]
+    },
+    {
+     "id": "track",
+     "title": "Track & Field",
+     "kicker": "Meets",
+     "line": "Sprints, relays and field events",
+     "photos": [
+      {
+       "src": "https://images.example.com/photographer/track-1.jpg",
+       "alt": "Relay handoff"
+      }
+     ]
+    },
+    {
+     "id": "softball",
+     "title": "Softball",
+     "kicker": "High school",
+     "line": "Regular season and playoffs",
+     "photos": []
+    }
+   ]
+  },
+  {
+   "id": "portraits",
+   "title": "Portraits",
+   "blurb": "Seniors, weddings and studio work, kept apart from the sports portfolio.",
+   "items": [
+    {
+     "id": "seniors",
+     "title": "Seniors",
+     "kicker": "Portraits",
+     "line": "On location or in uniform",
+     "photos": [
+      {
+       "src": "https://images.example.com/photographer/seniors-1.jpg",
+       "alt": "Senior portrait in a field"
+      }
+     ]
+    },
+    {
+     "id": "weddings",
+     "title": "Weddings",
+     "kicker": "Portraits",
+     "line": "Ceremony, portraits and reception",
+     "photos": []
+    },
+    {
+     "id": "studio",
+     "title": "Studio",
+     "kicker": "Portraits",
+     "line": "Headshots and creative sessions",
+     "photos": []
+    }
+   ]
+  }
+ ],
+ "recent": {
+  "title": "Recent work",
+  "photos": [
+   {
+    "src": "https://images.example.com/photographer/recent-1.jpg",
+    "alt": "Recent sports photo"
+   },
+   {
+    "src": "https://images.example.com/photographer/recent-2.jpg",
+    "alt": "Recent portrait"
+   }
+  ]
+ },
+ "proof": {
+  "title": "Shot for",
+  "items": [
+   "Sample High School",
+   "Sample Soccer Club",
+   "Sample Track Meet"
+  ]
+ },
+ "about": {
+  "title": "Meet Jordan",
+  "photo": {
+   "src": "https://images.example.com/photographer/about.jpg",
+   "alt": "Jordan with a camera"
+  },
+  "paragraphs": [
+   "Jordan runs Juniper Lane Photo, a made-up sports and portrait studio used to test the Plainline Studio engine.",
+   "ADD: years in business and where they've shot"
+  ],
+  "why": [
+   {
+    "title": "Sideline tested",
+    "text": "Fast, clean action shots from game day."
+   },
+   {
+    "title": "Built for teams",
+    "text": "Galleries split by team so coaches can share them."
+   }
+  ],
+  "timeline": [
+   {
+    "when": "2021",
+    "text": "First season shooting high school games."
+   },
+   {
+    "when": "2024",
+    "text": "First wedding as lead photographer."
+   }
+  ],
+  "signoff": "Jordan"
+ },
+ "pricing": {
+  "intro": "Starting prices so you know where things land.",
+  "lanes": [
+   {
+    "id": "teams",
+    "name": "Teams",
+    "who": "Schools & clubs",
+    "startingAt": "ADD: starting price",
+    "items": [
+     "Game coverage",
+     "Team media days",
+     "Shareable team gallery"
+    ]
+   },
+   {
+    "id": "seniors",
+    "name": "Seniors",
+    "who": "Athletes & graduates",
+    "startingAt": "ADD: starting price",
+    "items": [
+     "On-location session",
+     "Online gallery"
+    ]
+   },
+   {
+    "id": "weddings",
+    "name": "Weddings",
+    "who": "Couples",
+    "startingAt": "ADD: starting price",
+    "items": [
+     "Ceremony and portraits",
+     "Reception coverage"
+    ]
+   }
+  ],
+  "note": "Travel outside the area is quoted separately."
+ },
+ "contact": {
+  "serviceArea": "Lawrence and nearby"
+ },
+ "booking": {
+  "title": "Book",
+  "intro": "Tell me what you're planning and I'll reply with availability.",
+  "steps": [
+   "Send the form with your date.",
+   "I confirm and send a quote.",
+   "A deposit holds your date."
+  ],
+  "types": [
+   {
+    "id": "team",
+    "label": "Team or club",
+    "fields": [
+     {
+      "id": "team",
+      "label": "Team or school"
+     },
+     {
+      "id": "sport",
+      "label": "Sport",
+      "kind": "select",
+      "options": [
+       "Soccer",
+       "Volleyball",
+       "Track & Field",
+       "Softball",
+       "Other"
+      ]
+     }
+    ]
+   },
+   {
+    "id": "senior",
+    "label": "Senior or athlete",
+    "fields": [
+     {
+      "id": "school",
+      "label": "School"
+     },
+     {
+      "id": "grad",
+      "label": "Graduation year",
+      "kind": "number"
+     }
+    ]
+   },
+   {
+    "id": "wedding",
+    "label": "Wedding",
+    "fields": [
+     {
+      "id": "venue",
+      "label": "Venue"
+     }
+    ]
+   }
+  ],
+  "minors": true
+ },
+ "owner": {
+  "jobWord": "shoot",
+  "stages": [
+   "New",
+   "Quoted",
+   "Booked",
+   "Shot",
+   "Editing",
+   "Delivered",
+   "Paid"
+  ]
+ },
+ "todos": [
+  "Starting prices for each lane"
+ ]
+}

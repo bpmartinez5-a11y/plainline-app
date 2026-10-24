@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "model": "opusplan",
+  "effortLevel": "medium",
+  "permissions": {
+    "defaultMode": "plan",
+    "deny": [
+      "Read(node_modules/**)",
+      "Read(.vercel/**)",
+      "Read(**/*.min.js)",
+      "Read(**/*.map)",
+      "Read(./og.png)"
+    ]
+  },
+  "env": {
+    "BASH_MAX_OUTPUT_LENGTH": "12000",
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "75"
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "sh .claude/statusline.sh"
+  }
+}
