@@ -40,6 +40,7 @@ Put the tier at the top of the PR body. A fresh agent that didn't write the chan
 - Every change ends with the review gate: `reviewer`, then `refuter`.
 
 ## Working style
+- Blocked or missing something? Before saying "can't" or asking Ben to change a setting, follow jarvis-app's `situational-awareness` skill (`.claude/skills/situational-awareness/SKILL.md`; `add_repo` jarvis-app if it isn't here). Standing OK (Ben, Oct 29): when the sandbox network blocks a public website, fetch it through Firecrawl; no sign-ins or forms, nothing personal in the request.
 - Plan mode before multi-file edits. Edit with small diffs; never rewrite a whole file to change part of it.
 - Find things with Grep or Glob first, then Read only the line range you need. `demo.html` is ~58 KB; don't read it whole.
 - Hand searches, reviews and research to the Sonnet subagents in `.claude/agents/`.
