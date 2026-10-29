@@ -14,10 +14,12 @@
     backstage: { name: "Backstage",  light: { bg: "#0B100F", surface: "#121A18", ink: "#E9F2EF", muted: "#8FA29B", line: "#24302C", chalk: "#17201E" }, dark: { bg: "#0B100F", surface: "#121A18", ink: "#E9F2EF", muted: "#8FA29B", line: "#24302C", chalk: "#17201E" }, grid: true, darkOnly: true }
   };
   const VOICES = {
-    bold:  { display: "Big Shoulders Display", dw: "800;900", body: "Archivo", bw: "400;500;600;700", upper: true,  fallback: '"Arial Narrow",Impact,sans-serif' },
-    clean: { display: "Schibsted Grotesk",    dw: "700;800", body: "Figtree", bw: "400;500;600;700", upper: false, fallback: '"Avenir Next","Segoe UI",sans-serif' },
-    warm:  { display: "Young Serif",          dw: "400",     body: "Instrument Sans", bw: "400;500;600;700", upper: false, fallback: 'Georgia,"Times New Roman",serif' }
+    bold:  { display: "Big Shoulders Display", body: "Archivo", upper: true,  fallback: '"Arial Narrow",Impact,sans-serif' },
+    clean: { display: "Schibsted Grotesk",    body: "Figtree", upper: false, fallback: '"Avenir Next","Segoe UI",sans-serif' },
+    warm:  { display: "Young Serif",          body: "Instrument Sans", upper: false, fallback: 'Georgia,"Times New Roman",serif' }
   };
+  // Fonts are self-hosted (scripts/fonts.py); absolute so a site served from the client's own domain still finds them
+  const FONT_HOST = "https://plainlineops.com";
   const has = (o, k) => typeof k === "string" && Object.prototype.hasOwnProperty.call(o, k);
   const RESERVED = ["home", "about", "pricing", "book", "owner", "site", "collection"];
   const DEFAULT_ACCENT = { studio: "#C8202B", grid: "#0D8A72", backstage: "#E2A23B" };
@@ -135,7 +137,6 @@
   }
 
   /* ---------- Shared bits ---------- */
-  const fontLink = v => `https://fonts.googleapis.com/css2?family=${encodeURIComponent(v.display).replace(/%20/g, "+")}:wght@${v.dw}&family=${encodeURIComponent(v.body).replace(/%20/g, "+")}:wght@${v.bw}&family=IBM+Plex+Mono:wght@400;500&display=swap`;
   const escHtml = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const embed = o => JSON.stringify(o).replace(/</g, "\\u003c").replace(/>/g, "\\u003e").replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
   function tokens(p) {
@@ -149,7 +150,6 @@ ${L.darkOnly ? "" : `@media (prefers-color-scheme:dark){:root:not([data-theme="l
 ${L.grid ? `body{background-image:linear-gradient(color-mix(in srgb,var(--line) 55%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--line) 55%,transparent) 1px,transparent 1px);background-size:28px 28px}` : ""}`;
   }
   function head(p, title, extra) {
-    const V = VOICES[p.voice];
     return `<!doctype html>
 <html lang="en">
 <head>
@@ -157,9 +157,7 @@ ${L.grid ? `body{background-image:linear-gradient(color-mix(in srgb,var(--line) 
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${escHtml(title)}</title>
 ${extra || ""}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="${fontLink(V)}">
+<link rel="stylesheet" href="${FONT_HOST}/fonts/voice-${p.voice}.css">
 <style>
 ${tokens(p)}
 ${BASE_CSS}`;

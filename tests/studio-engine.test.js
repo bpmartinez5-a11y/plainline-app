@@ -110,3 +110,14 @@ test("live and downloaded pages don't carry the planner's questions or Ben's tod
   assert.ok(!live.includes("Internal question?") && !live.includes("Starting prices for each lane"));
   assert.ok(preview.includes("Internal question?"));
 });
+
+test("client sites load self-hosted fonts, never Google's", () => {
+  const fs = require("node:fs"), path = require("node:path");
+  for (const voice of ["bold", "clean", "warm", "nonsense"]) {
+    const out = E.render({ ...photographer, voice });
+    for (const page of [out.site, out.dashboard]) assert.ok(!/fonts\.(googleapis|gstatic)/.test(page), "no Google Fonts");
+    const css = out.site.match(/https:\/\/plainlineops\.com\/fonts\/(voice-\w+\.css)/);
+    assert.ok(css, "links the voice's stylesheet");
+    assert.ok(fs.existsSync(path.join(__dirname, "..", "fonts", css[1])), `${css[1]} exists`);
+  }
+});
