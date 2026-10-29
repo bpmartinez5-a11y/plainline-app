@@ -1,0 +1,84 @@
+{
+  "fictional": true,
+  "sample_note": "Made-up Missouri cannabis delivery business; values illustrative.",
+  "business": "Larkspur Road Provisions",
+  "initials": "LR",
+  "trade": "Licensed adult-use cannabis delivery to Missouri homes (21+, valid photo ID checked at handoff)",
+  "accent": "#5E7F5B",
+  "hook": [
+    "Someone texts at 9pm,",
+    "asking where their order is.",
+    "The assistant answers in seconds,",
+    "and your drivers keep driving."
+  ],
+  "outcome": [
+    "Every 'where's my order' text answered,",
+    "every delivery window filled,",
+    "every customer reminded of the ID rule before the door opens."
+  ],
+  "inbox": [
+    {
+      "from": "Customer, Kirkwood",
+      "text": "Hi, do you deliver to my address? And do I need to show ID when it gets here?",
+      "status": "auto"
+    },
+    {
+      "from": "Customer, Raytown",
+      "text": "Where's my order? It said between 5 and 7.",
+      "status": "auto"
+    },
+    {
+      "from": "Customer, Independence",
+      "text": "Is there a minimum order, and what are the delivery windows tomorrow?",
+      "status": "auto"
+    },
+    {
+      "from": "Customer, Florissant",
+      "text": "The bag has the wrong item in it, and the driver already left.",
+      "status": "owner"
+    }
+  ],
+  "stages": [
+    "Answer",
+    "Check zone & ID rule",
+    "Dispatch",
+    "Follow up"
+  ],
+  "log": [
+    "Replied to a menu question and said it is an automated assistant",
+    "Checked the address against the Missouri delivery zone: inside",
+    "Reminded the customer a valid government photo ID is checked at the door (21+)",
+    "Booked the Thursday evening delivery window and sent the confirmation",
+    "Sent the driver-on-the-way update with the window",
+    "Flagged a wrong-item report and handed it to the manager"
+  ],
+  "stats": [
+    { "label": "Order-status texts answered automatically", "value": "41 this week" },
+    { "label": "Delivery windows filled", "value": "18 of 25" },
+    { "label": "Reply time on new messages", "value": "under 1 min" }
+  ],
+  "handoff": "Wrong items, ID problems at the door, complaints, or anything medical goes to the manager's phone in under 5 minutes, with the order and the conversation attached.",
+  "includes": [
+    "One inbox for Weedmaps, Google Business messages, Instagram DMs, texts and missed calls",
+    "Automated answers on zones, windows, minimums, order status and the 21+ ID check",
+    "Delivery windows booked and confirmed, with driver updates",
+    "Every send logged, STOP honored, and a person alerted when it matters"
+  ],
+  "chaos": [
+    "Weedmaps inbox",
+    "Google Business messages",
+    "Instagram DMs",
+    "Missed calls and voicemail",
+    "Text messages to the store line",
+    "Driver notes on paper"
+  ],
+  "calLabel": "delivery windows this week",
+  "week": [
+    [2, 2, 1, 0, 2],
+    [2, 1, 2, 2, 0],
+    [1, 2, 2, 0, 0],
+    [2, 2, 0, 2, 1],
+    [0, 2, 2, 1, 0]
+  ],
+  "img": "Documentary photo, dusk: a sealed opaque delivery bag on the passenger seat of a parked car on a quiet Missouri suburban street, porch lights coming on; no people, no text, no logos, no visible product."
+}
