@@ -3,11 +3,11 @@
 > Plainline builds and runs the operations behind a business: every customer answered, every follow-up done. It ranges from an AI front desk for one location to a back-office team that Plainline staffs and runs for a large company.
 
 - Plans, from most to least run by Plainline:
-  - Back Office (large companies): Plainline staffs and runs customer messages, scheduling, follow-up, record keeping and reporting. AI handles the volume, Plainline's operators handle the judgment calls, and the client's managers see everything.
-  - Operations (multi-location teams): one system across every location for intake, scheduling, follow-up and a weekly report, with a named Plainline lead.
-  - Front Office (growing teams): the front desk plus follow-up on every inquiry and open quote, reminders and review requests.
+  - Back Office (large companies): Plainline staffs and runs customer messages, scheduling, follow-up, record keeping and reporting. AI handles the volume and tells customers it is automated; Plainline's operators handle the judgment calls; the client's managers can see the work.
+  - Operations (multi-location teams): one system across every location for intake, scheduling, follow-up and a weekly report, with a Plainline lead.
+  - Front Office (growing teams): the front desk plus follow-up on inquiries and open quotes.
   - Front Desk (one location): an AI text assistant that answers customers by text and website chat, books open times and hands anything tricky to the owner. It tells customers it is an automated assistant.
-- How it starts: a walkthrough of how the business runs today, then Plainline builds and tests everything, the client tries it, and Plainline runs it and tunes it monthly.
+- How it starts: a walkthrough of how the business runs today, then each plan is scoped, Plainline builds and tests everything, the client tries it, and Plainline runs it and tunes it monthly.
 - Pricing: scoped per business after a walkthrough.
 - Run by Plainlineops LLC.
 
