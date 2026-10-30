@@ -12,6 +12,7 @@
 | `privacy.html`, `terms.html` | Legal pages. Keep in step with what the API stores or logs | |
 | `llms.txt`, `sitemap.xml`, `robots.txt`, `og.png` | Search and AI-answer discovery, share image | |
 | `vercel.json` | Clean URLs, the book.* redirect, security headers | |
+| `docs/claude/go-live.md` | Internal checklist for taking a signed client live (moved off the public demo, Oct 30) | |
 
 In `demo.html`, the sample businesses live in a JS object where each one has `policies:` strings. Those are the demo client's own prices, not Plainline's, so they may stay.
 
