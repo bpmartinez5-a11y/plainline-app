@@ -1,17 +1,21 @@
 # Plainline
 
-> Plainline is an AI text receptionist for local service businesses. It answers customer questions by text and website chat, books customers into the business's open times, and hands anything tricky to the owner. Plainline does the setup.
+> Plainline is an AI agency. It brings AI into how a company's team works, builds AI tools for businesses (websites and apps are coming next) and runs the operations behind a business: every customer answered, every follow-up done, from an AI front desk for one location to a back-office team that Plainline staffs and runs for a large company.
 
-- Who it's for: appointment-based local businesses such as hair salons, auto detailing, heating and air, gyms and studios.
-- What it does: is set up to answer only from the business's own services, prices, hours and policies; books real open times inside the chat (with an optional deposit); is set up to flag upset customers, emergencies and refund questions to the owner, who can take over any chat. It tells customers it is an automated assistant.
-- How setup works: a short call, then Plainline builds and tests the assistant, the owner tries it, then it goes live on the website chat and text messages.
-- Pricing: quoted per business.
-- Capacity: three new setups a month, each built and tested by hand.
+- AI integration: Plainline researches a company's industry, picks the AI model that fits its work and rules (Claude or another enterprise model), sets it up with the team's own tools, playbooks and skills, trains the staff and keeps it current.
+- What Plainline builds: custom AI tools for a business's staff (dashboards, intake helpers, review desks, assistants). Websites built in Plainline's Studio and custom apps are coming soon.
+- Operations plans, from most to least run by Plainline:
+  - Back Office (large companies): Plainline staffs and runs customer messages, scheduling, follow-up, record keeping and reporting. AI handles the volume and tells customers it is automated; Plainline's operators handle the judgment calls; the client's managers can see the work.
+  - Operations (multi-location teams): one system across every location for intake, scheduling, follow-up and a weekly report, with a Plainline lead.
+  - Front Office (growing teams): the front desk plus follow-up on inquiries and open quotes.
+  - Front Desk (one location): an AI text assistant that answers customers by text and website chat, books open times and hands anything tricky to the owner. It tells customers it is an automated assistant.
+- How it starts: a walkthrough of how the business runs today, then each plan is scoped, Plainline builds and tests everything, the client tries it, and Plainline runs it and tunes it monthly.
+- Pricing: every engagement is quoted per company after a walkthrough and research on the business. Plainline doesn't publish prices.
 - Run by Plainlineops LLC.
 
 ## Pages
 
-- [Home](https://plainlineops.com/): what Plainline does, how setup works, common questions, contact form
+- [Home](https://plainlineops.com/): what Plainline runs, what Plainline builds, the four plans, how it starts, common questions, contact form
 - [Live demo](https://plainlineops.com/demo): text as a customer and watch the front desk side
 - [Privacy policy](https://plainlineops.com/privacy)
 - [Terms of use](https://plainlineops.com/terms)
