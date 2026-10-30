@@ -369,8 +369,6 @@ const S = {
 const C = () => S.config || PRESETS.salon;
 const svcById = id => C().services.find(s => s.id === id);
 /* Each client takes deposits through their own processor; Plainline stores only which one and the client's payment link, never their customers' money */
-const PROCESSORS = {demo:"Demo button (no real charge)", stripe:"Stripe", square:"Square", clover:"Clover", other:"Other"};
-const payLink = () => { const p = C().pay || {}; return p.processor && p.processor !== "demo" && /^https:\/\/[^\s"'<>]{4,490}$/.test(p.link || "") ? p.link : ""; };
 
 /* ---------- store: chats and bookings live only in this tab, so they stay private and a refresh starts over; the setup is remembered in this browser ---------- */
 const CHAT_LIMIT = 10; // customer messages per chat, to keep each demo chat (and its AI usage) small
@@ -557,14 +555,13 @@ function submitIntake(mid, form){
     saveConvo(c);
   } else finalize(c, svc, m.widget.slot, {name, phone, notes}, false);
 }
-function payDeposit(mid, viaLink){
+function payDeposit(mid){
   const c = myConvo(); if (!c) return;
   const m = c.msgs.find(x => x.id === mid); if (!m || m.used) return; /* a second click does nothing */
   const w = m.widget, svc = svcById(w.serviceId);
   m.used = true;
-  /* a real checkout confirms in the client's own processor, so the booking isn't marked paid here */
-  push(c, {from:"customer", text: viaLink ? `Opened the ${money(svc.deposit)} deposit checkout` : `Paid ${money(svc.deposit)} deposit`});
-  finalize(c, svc, w.slot, w, !viaLink);
+  push(c, {from:"customer", text: `Paid ${money(svc.deposit)} deposit`});
+  finalize(c, svc, w.slot, w, true);
 }
 function finalize(c, svc, slot, who, paid){
   if (!slotFree(svc, slot)){
@@ -665,8 +662,7 @@ function widgetHTML(m){
     const svc = svcById(w.serviceId);
     return `<div class="w"><div class="w-h">Deposit <small>${esc(svc?.name || "")}</small></div><div class="w-pay">
       <div class="amt">${money(svc?.deposit)}</div><div class="note">${esc(fmtWhen(w.slot))} · applied to your ${money(svc?.price)} visit</div>
-      ${m.used ? `<div class="w-done" style="padding:0">${payLink() ? "Checkout opened ✓" : "Paid ✓"}</div>` : payLink()
-        ? `<a class="btn" data-act="paylink" data-mid="${m.id}" href="${esc(payLink())}" target="_blank" rel="noopener noreferrer">Pay ${money(svc?.deposit)} deposit</a><div class="note">Opens ${esc(PROCESSORS[C().pay.processor])} checkout in a new tab.</div>`
+      ${m.used ? `<div class="w-done" style="padding:0">Paid ✓</div>`
         : `<button class="btn" data-act="pay" data-mid="${m.id}">Pay ${money(svc?.deposit)} deposit</button><div class="note">Demo payment. No card is charged.</div>`}</div></div>`;
   }
   if (w.type === "confirm"){
@@ -721,7 +717,7 @@ function renderThreadPane(){
     if (m.from !== prev) body += `<div class="who ${m.from === "customer" ? "cust" : m.from === "staff" ? "staff" : ""}">${m.from === "customer" ? esc(c.name || "Customer") : m.from === "staff" ? esc(cfg.staffName) : "Assistant"}</div>`;
     if (m.text) body += `<div class="b ${m.from === "customer" ? "me" : "them"}${m.from === "staff" ? " staff" : ""}">${esc(m.text)}</div>`;
     if (m.widget){ const w = m.widget, s = w.serviceId && svcById(w.serviceId);
-      body += `<div class="wsum">${{services:"Showed service menu", slots:`Showed times for ${s?.name || "service"}`, intake:"Asked for contact details", deposit:`Requested ${money(s?.deposit)} deposit`, confirm:"Sent booking confirmation"}[w.type] || ""}${m.used && w.type === "slots" ? ` → picked ${fmtWhen(m.used)}` : ""}${m.used && w.type === "deposit" ? (payLink() ? " → checkout opened" : " → paid") : ""}</div>`; }
+      body += `<div class="wsum">${{services:"Showed service menu", slots:`Showed times for ${s?.name || "service"}`, intake:"Asked for contact details", deposit:`Requested ${money(s?.deposit)} deposit`, confirm:"Sent booking confirmation"}[w.type] || ""}${m.used && w.type === "slots" ? ` → picked ${fmtWhen(m.used)}` : ""}${m.used && w.type === "deposit" ? " → paid" : ""}</div>`; }
     prev = m.from;
   }
   if (S.typing.has(c.id)) body += `<div class="wsum">Assistant is typing…</div>`;
@@ -755,10 +751,6 @@ function renderSetup(force){
       <div><button class="btn ghost" id="addSvc" type="button">Add service</button></div></section>
     <section><h4>Hours</h4><div class="hours">${DAYS.map((d,i) => { const h = cfg.hours[i];
       return `<div class="hrow"><b>${d}</b><div><select id="h-o-${i}" aria-label="${d} opens">${hourOpts(h ? h[0] : null, true)}</select><select id="h-c-${i}" aria-label="${d} closes" ${h ? "" : "disabled"}>${hourOpts(h ? h[1] : 17, false)}</select></div></div>`; }).join("")}</div></section>
-    <section><h4>Payments</h4><div class="fgrid">
-      <label>Deposits go through<select id="f-proc">${Object.keys(PROCESSORS).map(k => `<option value="${k}" ${((cfg.pay||{}).processor||"demo") === k ? "selected" : ""}>${PROCESSORS[k]}</option>`).join("")}</select></label>
-      <label>Your payment link<input id="f-paylink" type="url" inputmode="url" placeholder="https://buy.stripe.com/…" value="${esc((cfg.pay||{}).link || "")}"></label></div>
-      <div class="note">Use a link from your own Stripe, Square or Clover account. The money goes straight to you, and the link carries only the amount: no service or visit details.</div></section>
     <section><h4>Policies & FAQ</h4><label>One per line. The assistant answers from these and hands off anything else.<textarea id="f-pol">${esc(cfg.policies)}</textarea></label></section>
     <div class="save-bar"><button class="btn" id="saveCfg" type="button">Save and put live</button><span class="saved" id="savedMsg"></span></div>
     <section class="golive" style="margin-top:12px"><h4>Your setup</h4>
@@ -773,8 +765,7 @@ function readSetup(){
     return {id: tr.dataset.sid, name: ins[0].value.trim(), minutes: Math.max(15, Number(ins[1].value)||30), price: Math.max(0, Number(ins[2].value)||0), deposit: Math.max(0, Number(ins[3].value)||0)}; }).filter(s => s.name);
   const hours = {}; DAYS.forEach((d,i) => { const o = $("#h-o-"+i).value, c = Number($("#h-c-"+i).value); hours[i] = o === "" ? null : [Number(o), Math.max(Number(o)+.5, c)]; });
   return {preset: $("#presetSel").value === "custom" ? "custom" : $("#presetSel").value, name: $("#f-name").value.trim() || "My Business", color: $("#f-color").value,
-    staffName: $("#f-staff").value.trim() || "Team", tone: $("#f-tone").value.trim(), services: services.length ? services : C().services, hours, policies: $("#f-pol").value.trim(),
-    pay: {processor: PROCESSORS[$("#f-proc").value] ? $("#f-proc").value : "demo", link: $("#f-paylink").value.trim()}};
+    staffName: $("#f-staff").value.trim() || "Team", tone: $("#f-tone").value.trim(), services: services.length ? services : C().services, hours, policies: $("#f-pol").value.trim()};
 }
 
 /* ---------- top-level render ---------- */
@@ -801,7 +792,6 @@ document.addEventListener("click", e => {
   else if (a === "svc") pickService(t.dataset.mid, t.dataset.sid);
   else if (a === "day"){ S.uiDay[t.dataset.mid] = t.dataset.day; renderPhone(); }
   else if (a === "slot") pickSlot(t.dataset.mid, t.dataset.iso);
-  else if (a === "paylink") setTimeout(() => payDeposit(t.dataset.mid, true), 300); /* the link itself opens the checkout */
   else if (a === "pay"){ t.disabled = true; t.textContent = "Processing…"; setTimeout(() => payDeposit(t.dataset.mid), 700); }
   else if (a === "sel"){ S.selected = t.dataset.id; renderDesk(); }
   else if (a === "take") takeOver(t.dataset.id);
