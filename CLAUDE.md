@@ -2,7 +2,7 @@
 
 plainlineops.com: the Plainline site, the live demo (`demo.html`), the Studio (`studio.html`, Ben-only site builder) and the API in `api/`, deployed on Vercel. Ben is not a developer; Claude does all the coding. These apply here too, from the jarvis-app repo: the agent rules (`agents/README.md` › Rules every agent follows) and CLAUDE.md's "Keep it lean" and "Before anything ships" (the-enforcer).
 
-Plainline sells finished jobs to local businesses (every customer answered, the calendar filled). It doesn't sell software.
+Plainline is an AI agency (Oct 30): it brings AI into how a company's team works, builds AI tools (websites and apps next), and runs the work behind a business, from an AI front desk for one location up to a staffed back office for a large company, with the top end of the market as the focus. It sells finished work, not software seats.
 
 ## Hard rules
 - Never show a Plainline price, plan price, unit rate or dollar amount on the website or anything client-facing, ever (Ben, Oct 30). Every engagement is quoted after qualification, research and a walkthrough. The price ladder lives only in Ben's private plan page. Calls to action say "Book a walkthrough".
