@@ -5,7 +5,7 @@ plainlineops.com: the Plainline site, the live demo (`demo.html`), the Studio (`
 Plainline sells finished jobs to local businesses (every customer answered, the calendar filled). It doesn't sell software.
 
 ## Hard rules
-- Never show a Plainline price, plan price or dollar amount on anything client-facing. Ben prices each client after a walkthrough. Calls to action say "Book a walkthrough".
+- Never show a Plainline price, plan price, unit rate or dollar amount on the website or anything client-facing, ever (Ben, Oct 30). Every engagement is quoted after qualification, research and a walkthrough. The price ladder lives only in Ben's private plan page. Calls to action say "Book a walkthrough".
 - No AI-looking imagery: no generated faces, robots or glowing-brain art. Visuals are real-looking UI cards built from the client's own data, over documentary photos from Higgsfield.
 - Example businesses and numbers are labeled "values illustrative" until real client data replaces them.
 - Client builds keep the promises in the client agreement (client-docs skill): the assistant says it is automated; hand-offs reach the designated contact in under 5 minutes, failed sends are resent by the Fact Sheet backup method, and every send is logged (§§2.3, 3.3, 7.12); outbound message types in the Order Form go only to numbers with a consent record and never during quiet hours; STOP is honored automatically; replies to a customer's own message and hand-off notices to the client are not blocked (§3.4).

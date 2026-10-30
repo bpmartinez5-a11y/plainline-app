@@ -10,7 +10,7 @@
   - Front Office (growing teams): the front desk plus follow-up on inquiries and open quotes.
   - Front Desk (one location): an AI text assistant that answers customers by text and website chat, books open times and hands anything tricky to the owner. It tells customers it is an automated assistant.
 - How it starts: a walkthrough of how the business runs today, then each plan is scoped, Plainline builds and tests everything, the client tries it, and Plainline runs it and tunes it monthly.
-- Pricing: scoped per business after a walkthrough.
+- Pricing: every engagement is quoted per company after a walkthrough and research on the business. Plainline doesn't publish prices.
 - Run by Plainlineops LLC.
 
 ## Pages
