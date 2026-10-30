@@ -25,4 +25,5 @@ The ten templates live in the Plainline Client Docs artifact (https://claude.ai/
 3. Monthly reports use the client's real numbers from the owner app or Supabase: aggregate counts only, never message text or customer names. Exclude "Plainline test" entries. If a number isn't available, leave it out; never estimate it. Remove the "values illustrative" tag only when every number is real.
 4. Real-client profiles and filled documents live in the Client Docs artifact, never in the repo. Ben sends every document. Draft them, save them, and put a card in his inbox; don't email clients directly.
 5. Feedback answers marked "Yes" for sharing go to the case-study writer. Anything negative goes to Ben the same day.
-6. Run the review gate (`reviewer`, then `refuter`) on any document that changes the agreement terms or the package menu.
+6. Write every document to `docs/claude/writing-standard.md`. The delivery guide, the Fact Sheet and any SOP get the full checklist. The agreement keeps the lawyer's wording.
+7. Run the review gate (`reviewer`, then `refuter`) on any document that changes the agreement terms or the package menu.
