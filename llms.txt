@@ -1,8 +1,9 @@
 # Plainline
 
-> Plainline builds and runs the operations behind a business: every customer answered, every follow-up done. It ranges from an AI front desk for one location to a back-office team that Plainline staffs and runs for a large company.
+> Plainline is an AI agency. It builds AI tools for businesses (websites and apps are coming next) and runs the operations behind a business: every customer answered, every follow-up done, from an AI front desk for one location to a back-office team that Plainline staffs and runs for a large company.
 
-- Plans, from most to least run by Plainline:
+- What Plainline builds: custom AI tools for a business's staff (dashboards, intake helpers, review desks, assistants). Websites built in Plainline's Studio and custom apps are coming soon.
+- Operations plans, from most to least run by Plainline:
   - Back Office (large companies): Plainline staffs and runs customer messages, scheduling, follow-up, record keeping and reporting. AI handles the volume and tells customers it is automated; Plainline's operators handle the judgment calls; the client's managers can see the work.
   - Operations (multi-location teams): one system across every location for intake, scheduling, follow-up and a weekly report, with a Plainline lead.
   - Front Office (growing teams): the front desk plus follow-up on inquiries and open quotes.
@@ -13,7 +14,7 @@
 
 ## Pages
 
-- [Home](https://plainlineops.com/): what Plainline runs, the four plans, how it starts, common questions, contact form
+- [Home](https://plainlineops.com/): what Plainline runs, what Plainline builds, the four plans, how it starts, common questions, contact form
 - [Live demo](https://plainlineops.com/demo): text as a customer and watch the front desk side
 - [Privacy policy](https://plainlineops.com/privacy)
 - [Terms of use](https://plainlineops.com/terms)
