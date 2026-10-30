@@ -24,6 +24,7 @@ Put the tier at the top of the PR body. A fresh agent that didn't write the chan
 - How to work cheaply in this repo: `docs/claude/token-habits.md`
 
 ## Studio engine (URL in, website + owner dashboard out)
+- Not to be confused with **The Engine** (Oct 30): Plainline's AI-run CRM, the Ops app in jarvis-app (`ops/`, ops.plainlineops.com) with Scout and the work ledger. "The Engine" in a request means that, unless it's about `studio-engine.js`.
 - Flow: `studio.html` search bar → `api/studio-scan` (reads their site) → `api/studio-profile` (Claude fills a site profile through one tool call) → `studio-engine.js` renders the website and the owner dashboard in the browser. The old freeform builder (`api/studio-build`) stays under "Classic builder".
 - Claude never writes page code on this path. Change the look or behavior of every client site in `studio-engine.js` only, and add or change fields in the profile schema in both `studio-engine.js` (`sanitize`) and `api/studio-profile.js` (`TOOL`).
 - Profile rules: facts from the scan only; unknowns are `"ADD: …"` placeholders (yellow on the site, listed in the Studio); no email addresses anywhere; a phone number only if the business publishes it; photos only from URLs in the scan.
