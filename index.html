@@ -4,26 +4,28 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0d6b71">
-<meta name="description" content="An AI text assistant for your local business. It answers customers, books open times and hands the tricky ones to you. Set up for you.">
+<meta name="description" content="Plainline builds and runs the operations behind your business: every customer answered, every follow-up done. From one front desk to a whole back office.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d6b71'/%3E%3Cpath d='M9 22V10h7a4 4 0 0 1 0 8h-7' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
-<title>Plainline · AI text receptionist for local businesses</title>
+<title>Plainline · We run the work behind your business</title>
 <link rel="canonical" href="https://plainlineops.com/">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <meta property="og:site_name" content="Plainline">
 <meta property="og:url" content="https://plainlineops.com/">
-<meta property="og:title" content="Plainline · AI text receptionist for local businesses">
-<meta property="og:description" content="An AI text assistant for your local business. It answers customers, books open times and hands the tricky ones to you. Set up for you.">
+<meta property="og:title" content="Plainline · We run the work behind your business">
+<meta property="og:description" content="Plainline builds and runs the operations behind your business: every customer answered, every follow-up done. From one front desk to a whole back office.">
 <meta property="og:image" content="https://plainlineops.com/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <script defer src="/_vercel/insights/script.js"></script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Plainline","url":"https://plainlineops.com/","logo":"https://plainlineops.com/og.png","description":"AI text assistants that answer customers and book appointments for local service businesses, set up for you."}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Plainline","url":"https://plainlineops.com/","logo":"https://plainlineops.com/og.png","description":"Plainline builds and runs customer operations for businesses, from an AI front desk for one location to a staffed back office for a large company."}</script>
 <!-- Answer engines (ChatGPT, Gemini, Claude) quote these. Keep in step with the Questions section below. -->
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
-{"@type":"Question","name":"What is Plainline?","acceptedAnswer":{"@type":"Answer","text":"Plainline is an AI text receptionist for local service businesses. It answers customer questions by text and website chat, books customers into your open times, and hands anything tricky to you. We set it up for you."}},
-{"@type":"Question","name":"Do I need to be technical?","acceptedAnswer":{"@type":"Answer","text":"No. We do the setup. You answer questions about your business and approve the result."}},
-{"@type":"Question","name":"What does it cost?","acceptedAnswer":{"@type":"Answer","text":"It depends on your setup. Tell us about your business and we'll reply with a quote."}},
-{"@type":"Question","name":"Can I step in on a conversation?","acceptedAnswer":{"@type":"Answer","text":"Yes. You can read every chat and take over any of them. The assistant is also set up to hand off on its own when a customer needs a person."}},
+{"@type":"Question","name":"What is Plainline?","acceptedAnswer":{"@type":"Answer","text":"Plainline builds and runs the operations behind a business. For one location, that's an AI front desk that answers customers by text and website chat and books them into open times. For a large company, it's a back-office team that Plainline staffs and runs: customer messages, scheduling, follow-up and reporting."}},
+{"@type":"Question","name":"Can someone run our back office for us?","acceptedAnswer":{"@type":"Answer","text":"Yes. On the Back Office plan, Plainline runs the work for you: answering customers, scheduling, following up on leads and quotes, keeping records current and reporting to your managers. AI handles the volume, Plainline's operators handle the judgment calls, and your team sees everything."}},
+{"@type":"Question","name":"How do we stop missing customer messages after hours?","acceptedAnswer":{"@type":"Answer","text":"Plainline answers every text and website chat right away, day or night, from your own services, hours and policies. Anything it can't answer goes to a person, so customers aren't left waiting."}},
+{"@type":"Question","name":"Who follows up on every lead and quote?","acceptedAnswer":{"@type":"Answer","text":"From the Front Office plan up, Plainline does. Every new inquiry and open quote gets a follow-up on a schedule you approve, and you see where each one stands."}},
+{"@type":"Question","name":"What does it cost?","acceptedAnswer":{"@type":"Answer","text":"It depends on how much we run for you. Book a walkthrough and we'll scope it with you."}},
+{"@type":"Question","name":"Can I step in on a conversation?","acceptedAnswer":{"@type":"Answer","text":"Yes. You can read every conversation and take over any of them. Plainline is also set up to hand off on its own when a customer needs a person."}},
 {"@type":"Question","name":"Can I see it working first?","acceptedAnswer":{"@type":"Answer","text":"Yes. The live demo at plainlineops.com/demo lets you text as a customer and watch the front desk side at the same time."}}]}</script>
 <link rel="stylesheet" href="/fonts/plainline.css">
 <link rel="stylesheet" href="/fonts/voice-bold.css">
@@ -66,6 +68,8 @@ section > h2{font-size:30px;margin-bottom:20px}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
 .card h3{font-size:18px;margin-bottom:6px}
+.tiers .tag{display:block;font:600 12px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.tiers .top{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)} .tiers .top .tag{color:var(--accent)}
 .card p{margin:0;color:var(--muted);font-size:15px}
 .steps{counter-reset:s;list-style:none;padding:0;margin:0}
 .steps li{counter-increment:s;position:relative;padding:0 0 18px 48px}
@@ -196,11 +200,11 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
 
   <div class="hero-grid">
   <header class="hero">
-    <span class="kicker">For local service businesses</span>
-    <h1><span class="mark">Plainline</span> <span class="line">Every customer answered. Your calendar filled.</span></h1>
-    <p>We set up an AI text assistant that sounds like your business, not a template. It answers questions, books customers into your open times, and hands anything tricky to you. You keep running the business.</p>
+    <span class="kicker">From one front desk to a whole back office</span>
+    <h1><span class="mark">Plainline</span> <span class="line">Every customer answered. Every follow-up done.</span></h1>
+    <p>Plainline builds and runs the work behind your business. AI answers and books customers around the clock, and on larger plans Plainline's own team runs the follow-up, scheduling and reporting behind it. You keep running the company.</p>
     <div class="cta"><a class="btn big" href="#contact">Book a walkthrough</a><a class="quiet" href="/demo">or try the live demo →</a></div>
-    <p class="slots"><b>Three new setups a month.</b> Each one is built and tested by hand, so we keep the number small.</p>
+    <p class="slots"><b>Built and tested by hand.</b> Every engagement starts with a walkthrough of how your business runs today.</p>
   </header>
   <figure class="thread" id="thread" aria-label="Example text conversation between a customer and a salon's Plainline assistant">
     <div class="thread-top"><i aria-hidden="true">C</i><div><b>Corner Cuts</b><small>Text assistant</small></div><button type="button" id="replay" hidden>Replay</button></div>
@@ -208,6 +212,17 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
     <figcaption class="thread-note">Example conversation · made-up salon</figcaption>
   </figure>
   </div>
+
+  <section id="plans">
+    <h2>How much do you want us to run?</h2>
+    <p class="lede">Four levels. Every one is set up and run by Plainline, and every one starts with a walkthrough.</p>
+    <div class="cards tiers">
+      <div class="card top"><span class="tag">For large companies</span><h3>Back Office</h3><p>Plainline staffs and runs the work behind your customer operation: messages, scheduling, follow-up, record keeping and reporting. AI takes the volume, our operators take the judgment calls, and your managers see everything.</p></div>
+      <div class="card"><span class="tag">For multi-location teams</span><h3>Operations</h3><p>One system across every location: intake, scheduling, follow-up and a weekly report, with a named Plainline lead who keeps it running.</p></div>
+      <div class="card"><span class="tag">For growing teams</span><h3>Front Office</h3><p>The front desk plus follow-up on every inquiry and open quote, reminders and review requests, on a schedule you approve.</p></div>
+      <div class="card"><span class="tag">For one location</span><h3>Front Desk</h3><p>An AI text assistant that answers customers by text and website chat, books open times and hands anything tricky to you.</p></div>
+    </div>
+  </section>
 
   <section class="looks">
     <h2>Every business gets its own voice</h2>
@@ -262,7 +277,7 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
   </section>
 
   <section>
-    <h2>What you get</h2>
+    <h2>What every plan includes</h2>
     <div class="cards">
       <div class="card"><h3>An assistant that knows your business</h3><p>Your services, prices, hours and policies go in during setup. It's set up to answer only from those facts and to hand off anything it can't answer.</p></div>
       <div class="card"><h3>Booking inside the text</h3><p>Customers pick a real open time without leaving the chat. Take a deposit to hold the spot if you want one.</p></div>
@@ -274,24 +289,26 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
   <section>
     <h2>How it works</h2>
     <ol class="steps">
-      <li><b>A short call</b><span>We learn your services, hours, booking rules and how you like to talk to customers.</span></li>
-      <li><b>We build it and test it</b><span>Your assistant is set up with your details. You try it yourself before any customer sees it.</span></li>
-      <li><b>You go live</b><span>On your website chat and text messages. We tune it with you after launch.</span></li>
+      <li><b>A walkthrough</b><span>We learn how your business runs today: your services, hours, rules, systems and how you talk to customers.</span></li>
+      <li><b>We build it and test it</b><span>Everything is set up with your details. You try it yourself before any customer sees it.</span></li>
+      <li><b>We run it</b><span>We go live, watch how it does and tune it with you every month.</span></li>
     </ol>
   </section>
 
   <section>
-    <h2>Built for local service businesses</h2>
-    <div class="who"><span>Hair salons</span><span>Auto detailing</span><span>Heating &amp; air</span><span>Gyms and studios</span><span>Other appointment businesses</span></div>
+    <h2>Who we work with</h2>
+    <div class="who"><span>Companies with a busy customer operation</span><span>Multi-location service brands</span><span>Home services</span><span>Salons, studios and gyms</span><span>Auto and detailing</span></div>
   </section>
 
   <section>
     <h2>Questions</h2>
     <dl>
-      <div><dt>What is Plainline?</dt><dd>Plainline is an AI text receptionist for local service businesses. It answers customer questions by text and website chat, books customers into your open times, and hands anything tricky to you. We set it up for you.</dd></div>
-      <div><dt>Do I need to be technical?</dt><dd>No. We do the setup. You answer questions about your business and approve the result.</dd></div>
-      <div><dt>What does it cost?</dt><dd>It depends on your setup. Tell us about your business below and we'll reply with a quote.</dd></div>
-      <div><dt>Can I step in on a conversation?</dt><dd>Yes. You can read every chat and take over any of them. The assistant is also set up to hand off on its own when a customer needs a person.</dd></div>
+      <div><dt>What is Plainline?</dt><dd>Plainline builds and runs the operations behind a business. For one location, that's an AI front desk that answers customers by text and website chat and books them into open times. For a large company, it's a back-office team that Plainline staffs and runs: customer messages, scheduling, follow-up and reporting.</dd></div>
+      <div><dt>Can someone run our back office for us?</dt><dd>Yes. On the Back Office plan, Plainline runs the work for you: answering customers, scheduling, following up on leads and quotes, keeping records current and reporting to your managers. AI handles the volume, Plainline's operators handle the judgment calls, and your team sees everything.</dd></div>
+      <div><dt>How do we stop missing customer messages after hours?</dt><dd>Plainline answers every text and website chat right away, day or night, from your own services, hours and policies. Anything it can't answer goes to a person, so customers aren't left waiting.</dd></div>
+      <div><dt>Who follows up on every lead and quote?</dt><dd>From the Front Office plan up, Plainline does. Every new inquiry and open quote gets a follow-up on a schedule you approve, and you see where each one stands.</dd></div>
+      <div><dt>What does it cost?</dt><dd>It depends on how much we run for you. Book a walkthrough and we'll scope it with you.</dd></div>
+      <div><dt>Can I step in on a conversation?</dt><dd>Yes. You can read every conversation and take over any of them. Plainline is also set up to hand off on its own when a customer needs a person.</dd></div>
       <div><dt>Can I see it working first?</dt><dd>Yes. <a href="/demo">The live demo</a> lets you text as a customer and watch the front desk side at the same time.</dd></div>
     </dl>
   </section>
@@ -304,8 +321,8 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
     <form id="leadForm" novalidate>
       <label>Your name<input name="name" required maxlength="200" autocomplete="name"></label>
       <label>Email<input name="email" type="email" required maxlength="320" autocomplete="email"></label>
-      <label>Business name and type<input name="business" maxlength="200" placeholder="e.g. Corner Cuts, hair salon"></label>
-      <label>What would you like the assistant to handle?<textarea name="message" maxlength="4500"></textarea></label>
+      <label>Company name and size<input name="business" maxlength="200" placeholder="e.g. Corner Cuts, 1 location"></label>
+      <label>What would you like us to run?<textarea name="message" maxlength="4500"></textarea></label>
       <label class="hp" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
       <button class="btn" id="sendBtn">Send</button>
       <p id="formMsg" role="status" aria-live="polite"></p>
