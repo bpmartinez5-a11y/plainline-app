@@ -230,8 +230,8 @@ button{cursor:pointer}
 .hrow select{padding:4px;font-size:12px;flex:1;background:var(--surface)}
 .save-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 16px 0}
 .saved{font-size:12.5px;color:var(--ok)}
-.golive ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
-.golive li span{color:var(--muted)}
+.golive p{margin:0 0 10px;color:var(--muted)}
+.golive .btn{display:inline-flex;align-items:center;text-decoration:none}
 </style>
 </head>
 <body>
@@ -757,17 +757,13 @@ function renderSetup(force){
       return `<div class="hrow"><b>${d}</b><div><select id="h-o-${i}" aria-label="${d} opens">${hourOpts(h ? h[0] : null, true)}</select><select id="h-c-${i}" aria-label="${d} closes" ${h ? "" : "disabled"}>${hourOpts(h ? h[1] : 17, false)}</select></div></div>`; }).join("")}</div></section>
     <section><h4>Payments</h4><div class="fgrid">
       <label>Deposits go through<select id="f-proc">${Object.keys(PROCESSORS).map(k => `<option value="${k}" ${((cfg.pay||{}).processor||"demo") === k ? "selected" : ""}>${PROCESSORS[k]}</option>`).join("")}</select></label>
-      <label>The client's payment link<input id="f-paylink" type="url" inputmode="url" placeholder="https://buy.stripe.com/…" value="${esc((cfg.pay||{}).link || "")}"></label></div>
-      <div class="note">Use a link from the client's own Stripe, Square or Clover account. The money goes straight to them, and the link carries only the amount: no service or visit details.</div></section>
+      <label>Your payment link<input id="f-paylink" type="url" inputmode="url" placeholder="https://buy.stripe.com/…" value="${esc((cfg.pay||{}).link || "")}"></label></div>
+      <div class="note">Use a link from your own Stripe, Square or Clover account. The money goes straight to you, and the link carries only the amount: no service or visit details.</div></section>
     <section><h4>Policies & FAQ</h4><label>One per line. The assistant answers from these and hands off anything else.<textarea id="f-pol">${esc(cfg.policies)}</textarea></label></section>
     <div class="save-bar"><button class="btn" id="saveCfg" type="button">Save and put live</button><span class="saved" id="savedMsg"></span></div>
-    <section class="golive" style="margin-top:12px"><h4>Taking a client live</h4>
-      <ol><li><b>Agreement.</b> <span>The client signs the Plainline service agreement before setup starts.</span></li>
-      <li><b>AI disclosure.</b> <span>Keep it on: customers see "automated assistant" in the header and at the start of every chat, and the assistant never claims to be a person.</span></li>
-      <li><b>Channels.</b> <span>Website chat widget and SMS first. iMessage through a phone-number provider such as Blooio next. Apple Messages for Business (verified logo, Apple Pay) after Apple approves the brand.</span></li>
-      <li><b>Calendar.</b> <span>Swap the demo availability for the client's real calendar: Google Calendar, Square, Vagaro, Calendly or GoHighLevel.</span></li>
-      <li><b>Deposits.</b> <span>Under Payments, pick the client's processor and paste their payment link. Plainline never holds their customers' money.</span></li>
-      <li><b>Alerts.</b> <span>Text or Slack the front desk when a chat is flagged "Needs you".</span></li></ol></section>
+    <section class="golive" style="margin-top:12px"><h4>Your setup</h4>
+      <p>We set this up with you in a walkthrough, from your own services, hours and rules. Nothing goes live until you've tried it yourself.</p>
+      <a class="btn" href="/#contact">Book a walkthrough</a></section>
   </div>`;
 }
 function svcRow(s,i){ return `<tr data-sid="${esc(s.id)}"><td><input id="s-n-${i}" value="${esc(s.name)}" aria-label="Service name"></td><td><input class="num" id="s-m-${i}" type="number" min="15" step="15" value="${s.minutes}" aria-label="Minutes"></td><td><input class="num" id="s-p-${i}" type="number" min="0" value="${s.price}" aria-label="Price"></td><td><input class="num" id="s-d-${i}" type="number" min="0" value="${s.deposit}" aria-label="Deposit"></td><td><button class="x" type="button" data-act="rmsvc" aria-label="Remove service">×</button></td></tr>`; }
