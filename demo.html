@@ -330,9 +330,18 @@ const PRESETS = {
       {id:"class",name:"Group class drop-in",minutes:60,price:25,deposit:0},
       {id:"scan",name:"Body composition scan",minutes:30,price:40,deposit:0}],
     hours:{0:[8,14],1:[6,20],2:[6,20],3:[6,20],4:[6,20],5:[6,19],6:[8,14]},
-    policies:"Memberships start at $129/month; first intro session is free.\nBring water and training shoes.\nCancel personal training 12 hours ahead or the deposit is kept.\nShowers and lockers on site."}
+    policies:"Memberships start at $129/month; first intro session is free.\nBring water and training shoes.\nCancel personal training 12 hours ahead or the deposit is kept.\nShowers and lockers on site."},
+  cleaning:{ preset:"cleaning", name:"Brightway Home Cleaning", color:"#2f7f8a", staffName:"Sam",
+    tone:"Friendly, quick and practical, like a neighbor who runs a tidy business.",
+    services:[
+      {id:"standard",name:"Standard clean (2 bed, 2 bath)",minutes:150,price:140,deposit:0},
+      {id:"deep",name:"Deep clean (2 bed, 2 bath)",minutes:240,price:260,deposit:50},
+      {id:"move",name:"Move-in / move-out clean",minutes:300,price:320,deposit:75},
+      {id:"walk",name:"Free walkthrough for larger homes",minutes:20,price:0,deposit:0}],
+    hours:{0:null,1:[8,18],2:[8,18],3:[8,18],4:[8,18],5:[8,18],6:[9,15]},
+    policies:"Prices are for a 2 bed, 2 bath home; each extra bedroom or bathroom adds $25.\nWeekly or every-other-week service saves 15% from the second visit.\nStandard: kitchen, bathrooms, dusting, floors. Deep adds baseboards, inside the microwave and window sills.\nInside the fridge or oven is $30 each.\nCancel 24 hours ahead or the deposit is kept.\nWe bring our own supplies; tell us about pets before the visit.\nDamage, a complaint or a refund question: hand off to the owner right away."}
 };
-const PRESET_LABEL = {salon:"Hair salon",detail:"Auto detailing",hvac:"Heating & air (home services)",fitness:"Gym / fitness studio",custom:"Custom"};
+const PRESET_LABEL = {salon:"Hair salon",detail:"Auto detailing",hvac:"Heating & air (home services)",fitness:"Gym / fitness studio",cleaning:"Home cleaning",custom:"Custom"};
 const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 
 /* ---------- helpers ---------- */

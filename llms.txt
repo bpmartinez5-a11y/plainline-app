@@ -3,6 +3,7 @@
 > Plainline is an AI agency. It brings AI into how a company's team works, builds AI tools for businesses (websites and apps are coming next) and runs the operations behind a business: every customer answered, every follow-up done, from an AI front desk for one location to a back-office team that Plainline staffs and runs for a large company.
 
 - AI integration: Plainline researches a company's industry, picks the AI model that fits its work and rules (Claude or another enterprise model), sets it up with the team's own tools, playbooks and skills, trains the staff and keeps it current.
+- The Engine: Plainline's AI-run CRM (leads, research notes on every account, tasks, and every piece of work measured, with AI agents working beside the reps). It runs Plainline's own team; companies can get it on its own or as part of a plan where Plainline runs the work with them.
 - What Plainline builds: custom AI tools for a business's staff (dashboards, intake helpers, review desks, assistants). Websites built in Plainline's Studio and custom apps are coming soon.
 - Operations plans, from most to least run by Plainline:
   - Back Office (large companies): Plainline staffs and runs customer messages, scheduling, follow-up, record keeping and reporting. AI handles the volume and tells customers it is automated; Plainline's operators handle the judgment calls; the client's managers can see the work.

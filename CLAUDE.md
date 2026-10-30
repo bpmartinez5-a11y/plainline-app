@@ -2,7 +2,7 @@
 
 plainlineops.com: the Plainline site, the live demo (`demo.html`), the Studio (`studio.html`, Ben-only site builder) and the API in `api/`, deployed on Vercel. Ben is not a developer; Claude does all the coding. These apply here too, from the jarvis-app repo: the agent rules (`agents/README.md` › Rules every agent follows) and CLAUDE.md's "Keep it lean" and "Before anything ships" (the-enforcer).
 
-Plainline is an AI agency (Oct 30): it brings AI into how a company's team works, builds AI tools (websites and apps next), and runs the work behind a business, from an AI front desk for one location up to a staffed back office for a large company, with the top end of the market as the focus. It sells finished work, not software seats.
+Plainline is an AI agency (Oct 30): it brings AI into how a company's team works, builds AI tools (websites and apps next), and runs the work behind a business, from an AI front desk for one location up to a staffed back office for a large company, with the top end of the market as the focus. It sells the finished result: software clients run (The Engine, its AI-run CRM, is the door-opener for smaller companies) plus the setup, coaching and staffed work that get them to their goal. Smaller companies come in through the product; larger ones buy the outcome (Ben, Oct 30).
 
 ## Hard rules
 - Never show a Plainline price, plan price, unit rate or dollar amount on the website or anything client-facing, ever (Ben, Oct 30). Every engagement is quoted after qualification, research and a walkthrough. The price ladder lives only in Ben's private plan page. Calls to action say "Book a walkthrough".
@@ -24,6 +24,7 @@ Put the tier at the top of the PR body. A fresh agent that didn't write the chan
 - How to work cheaply in this repo: `docs/claude/token-habits.md`
 
 ## Studio engine (URL in, website + owner dashboard out)
+- Not to be confused with **The Engine** (Oct 30): Plainline's AI-run CRM, the Ops app in jarvis-app (`ops/`, ops.plainlineops.com) with Scout and the work ledger. "The Engine" in a request means that, unless it's about `studio-engine.js`.
 - Flow: `studio.html` search bar → `api/studio-scan` (reads their site) → `api/studio-profile` (Claude fills a site profile through one tool call) → `studio-engine.js` renders the website and the owner dashboard in the browser. The old freeform builder (`api/studio-build`) stays under "Classic builder".
 - Claude never writes page code on this path. Change the look or behavior of every client site in `studio-engine.js` only, and add or change fields in the profile schema in both `studio-engine.js` (`sanitize`) and `api/studio-profile.js` (`TOOL`).
 - Profile rules: facts from the scan only; unknowns are `"ADD: …"` placeholders (yellow on the site, listed in the Studio); no email addresses anywhere; a phone number only if the business publishes it; photos only from URLs in the scan.
@@ -39,6 +40,7 @@ Put the tier at the top of the PR body. A fresh agent that didn't write the chan
 - `/debug-prod` → `debugger` · `/perf-pass` → `perf-engineer` · `/security-audit` → `security-auditor`
 - `/build-ui` card-kit style components · `/ship-it` review gate and Vercel deploy · `/client-kit` → `intake` · `/client-docs` the 10 client documents
 - Every change ends with the review gate: `reviewer`, then `refuter`.
+- Extra reviewers, all read-only, findings to `refuter`: `database-reviewer` on any schema, migration or query change; `silent-failure-hunter` on API and save paths (and Big audits); `test-gap-reviewer` on Medium and High PRs. Adapted from everything-claude-code (MIT, `docs/third-party.md`); nothing else from that repo is installed.
 
 ## Working style
 - Blocked or missing something? Before saying "can't" or asking Ben to change a setting, follow jarvis-app's `situational-awareness` skill (`.claude/skills/situational-awareness/SKILL.md`; `add_repo` jarvis-app if it isn't here). Standing OK (Ben, Oct 29): when the sandbox network blocks a public website, fetch it through Firecrawl; no sign-ins or forms, nothing personal in the request.
