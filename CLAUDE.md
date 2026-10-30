@@ -40,6 +40,7 @@ Put the tier at the top of the PR body. A fresh agent that didn't write the chan
 - `/debug-prod` → `debugger` · `/perf-pass` → `perf-engineer` · `/security-audit` → `security-auditor`
 - `/build-ui` card-kit style components · `/ship-it` review gate and Vercel deploy · `/client-kit` → `intake` · `/client-docs` the 10 client documents
 - Every change ends with the review gate: `reviewer`, then `refuter`.
+- Extra reviewers, all read-only, findings to `refuter`: `database-reviewer` on any schema, migration or query change; `silent-failure-hunter` on API and save paths (and Big audits); `test-gap-reviewer` on Medium and High PRs. Adapted from everything-claude-code (MIT, `docs/third-party.md`); nothing else from that repo is installed.
 
 ## Working style
 - Blocked or missing something? Before saying "can't" or asking Ben to change a setting, follow jarvis-app's `situational-awareness` skill (`.claude/skills/situational-awareness/SKILL.md`; `add_repo` jarvis-app if it isn't here). Standing OK (Ben, Oct 29): when the sandbox network blocks a public website, fetch it through Firecrawl; no sign-ins or forms, nothing personal in the request.
