@@ -615,7 +615,7 @@ function renderPhone(){
   if (!c || !c.msgs.length){
     const day = openDays(1)[0], first = cfg.services[0];
     const starters = [day ? `Any openings ${DAYS[day.getDay()] === DAYS[new Date().getDay()] ? "today" : new Date(day).toLocaleDateString([], {weekday:"long"})}?` : "Any openings this week?",
-      first ? `How much is a ${first.name.toLowerCase()}?` : "What do you offer?", "What are your hours?"];
+      first ? `How much is ${/^[aeiou]/i.test(first.name) ? "an" : "a"} ${first.name.toLowerCase()}?` : "What do you offer?", "What are your hours?"];
     th.innerHTML = `<div class="empty-chat">${logoHTML(cfg,56)}<div><b style="color:var(--ink)">Text ${esc(cfg.name)}</b><br>You're texting an automated assistant. Book a visit, ask about prices, or ask for a person anytime. Try one:</div>
       <div class="chips">${starters.map(s => `<button class="chip" data-act="chip" data-text="${esc(s)}">${esc(s)}</button>`).join("")}</div></div>`;
     return;
