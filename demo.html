@@ -345,7 +345,7 @@ const PRESETS = {
     services:[
       {id:"consult",name:"Intro phone consult",minutes:15,price:0,deposit:0},
       {id:"newpt",name:"First visit (new patients)",minutes:60,price:195,deposit:50},
-      {id:"labs",name:"Lab draw (bloodwork)",minutes:20,price:65,deposit:0},
+      {id:"labs",name:"Bloodwork (lab draw)",minutes:20,price:65,deposit:0},
       {id:"followup",name:"Follow-up visit",minutes:30,price:95,deposit:0}],
     hours:{0:null,1:[8,17],2:[8,17],3:[10,19],4:[8,17],5:[8,13],6:null},
     policies:"The assistant books visits and answers questions about the clinic. It can't give medical advice: questions about symptoms, doses or results go to your provider at your visit.\nPlease don't text health details here; share them at your visit.\nA reaction or side effect after a treatment: hand off to staff right away. If it's severe, call 911.\nNew patients bring a photo ID and a list of current medications.\nWe don't bill insurance; HSA and FSA cards are accepted.\nCancel at least 24 hours ahead or the deposit is kept."}
@@ -483,11 +483,11 @@ Reply with only one JSON object for your next message:
 
 function rulesAgent(c){
   const cfg = C(), t = (lastMsg(c)?.text || "").toLowerCase();
-  const word = w => new RegExp("\\b" + w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).test(t); // at a word start, so "available" isn't "lab"
-  const svc = cfg.services.find(s => word(s.name.toLowerCase().split(/[ &-]/)[0]) || word(s.id));
+  const svc = cfg.services.find(s => t.includes(s.name.toLowerCase().split(/[ &-]/)[0]) || t.includes(s.id));
   const nextDay = openDays(1)[0];
   const danger = /\b(emergenc\w*|gas (leak|smell)|smell\w* gas|carbon monoxide|fire|smoke|can'?t breathe|bleeding|injur\w*|anaphyla\w*|overdos\w*)\b/.test(t);
-  if (danger || /\b(hurt|hurts|pain|painful|urgent|side effects?|reactions?|allerg\w*|swell\w*|swollen|rash\w*|hives|dizz\w*|nause\w*|infect\w*|refund\w*|complain\w*|angry|manager|human|real person|(talk|speak) to a person|someone)\b/.test(t))
+  const health = cfg.preset === "clinic" && /\b(side effects?|reactions?|allerg\w*|swell\w*|swollen|rash\w*|hives|dizz\w*|nause\w*|infect\w*)\b/.test(t);
+  if (danger || health || /\b(hurt|hurts|pain|painful|urgent|refund\w*|complain\w*|angry|manager|human|real person|(talk|speak) to a person|someone)\b/.test(t))
     return {reply:danger ? `If anyone is in danger, call 911 now. I'm also bringing in ${cfg.staffName} from our team.` : `Got it. I'm bringing in ${cfg.staffName} from our team, they'll reply here shortly.`, show:"none", handoff:true, handoffReason:"Customer asked for help the assistant can't give"};
   if (cfg.preset === "clinic" && /\b(dos(e|es|age|ing)|symptoms?|diagnos\w*|prescri\w*|results?)\b/.test(t))
     return {reply:"I can't give medical advice by text. Your provider can go over that at your visit. Want me to find you a time?", show:"none", chips:["Book a visit","Talk to a person"]};

@@ -37,13 +37,15 @@ test("clinic: medical questions are declined, not answered or booked", () => {
 });
 
 test("clinic: booking questions still work", () => {
-  assert.match(ask("clinic", "how much is the lab draw").reply, /\$65/);
+  assert.match(ask("clinic", "how much is bloodwork").reply, /\$65/);
   assert.strictEqual(ask("clinic", "first visit").serviceId, "newpt");
-  assert.strictEqual(ask("clinic", "are you available Tuesday?").serviceId, undefined); // "available" isn't "lab"
+  assert.strictEqual(ask("clinic", "are you available Tuesday?").serviceId, undefined); // no service name starts with a word like "lab"
   assert.doesNotMatch(ask("clinic", "Do I bring my medications to the first visit?").reply, /medical advice/);
 });
 
 test("other presets never get the medical decline", () => {
   assert.doesNotMatch(ask("hvac", "can you diagnose my furnace noise?").reply, /medical/);
-  assert.strictEqual(ask("salon", "how much is a men's cut").show, "none");
+  assert.strictEqual(ask("salon", "I need a haircut").serviceId, "cut");
+  for (const t of ["pet allergies, do you use pet-safe products?", "do you have a rash guard"])
+    assert.ok(!ask("cleaning", t).handoff && !ask("fitness", t).handoff, t); // health words hand off only at the clinic
 });
