@@ -184,11 +184,14 @@ test("any sort failure is ignored and the demo answers as before", async () => {
   process.env.JEV_API_KEY = "jev-key";
   const errors = console.error; console.error = () => {};
   try {
-    for (const answer of [500, new Error("timeout"), { nothing: true }]) {
+    for (const answer of [500, new Error("timeout")]) {
       install({ claude: booking, jev: answer });
       const { code, out } = await call({ body: { prompt: PROMPT, latest: "x" } });
       assert.strictEqual(code, 200);
-      assert.deepStrictEqual(out.result, booking);
+      assert.deepStrictEqual(out, { result: booking }, "no sort in the answer");
     }
+    install({ claude: booking, jev: { nothing: true } }); // an empty answer sorts as "other" with no scores
+    const { out } = await call({ body: { prompt: PROMPT, latest: "x" } });
+    assert.deepStrictEqual(out, { result: booking, sort: { by: "jev", intent: "other", confidence: null, needsPerson: null } });
   } finally { console.error = errors; }
 });
