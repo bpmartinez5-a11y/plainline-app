@@ -71,7 +71,7 @@ function readBody(res) {
     const done = () => { res.destroy(); if (unzip) unzip.destroy(); resolve(Buffer.concat(chunks).toString("utf8")); };
     src.on("data", c => { if (n + c.length > MAX_BYTES) { chunks.push(c.subarray(0, MAX_BYTES - n)); n = MAX_BYTES; src.removeAllListeners("data"); return done(); } n += c.length; chunks.push(c); });
     src.on("end", done);
-    src.on("error", reject);
+    src.on("error", e => { res.destroy(); reject(e); });
     res.on("error", reject);
   });
 }
