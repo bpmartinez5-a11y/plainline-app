@@ -13,7 +13,7 @@ Plainline is an AI agency (Oct 30): it brings AI into how a company's team works
 
 ## Review gate (Ben turned it on 2026-10-18)
 Every PR here and to client sites gets a risk tier and a fresh-eyes review before it merges. The change sets the tier:
-- **Low** (copy, images, styles, docs): automated review and checks green. Ben still merges until he promotes low-tier to auto-merge.
+- **Low** (copy, images, styles, docs): automated review and checks green. Auto-merge (Ben, Oct 31): Jarvis's look-ahead merges a Low PR that touches only docs, copy or styles, adds no price, dollar amount, email address or client data, and has every check passed and no thread open (jarvis-app `agents/brain.md` section 7); anything else Low still waits for Ben.
 - **Medium** (pages, layout, demo behavior): Ben approves.
 - **High** (`api/`, forms, bookings, payments, keys, the AI disclosure, client domains): Ben approves and the-enforcer passes.
 
