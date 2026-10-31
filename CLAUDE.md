@@ -13,9 +13,11 @@ Plainline is an AI agency (Oct 30): it brings AI into how a company's team works
 
 ## Review gate (Ben turned it on 2026-10-18)
 Every PR here and to client sites gets a risk tier and a fresh-eyes review before it merges. The change sets the tier:
-- **Low** (copy, images, styles, docs): automated review and checks green. Auto-merge (Ben, Oct 31): Jarvis's look-ahead merges a Low PR that touches only docs, copy or styles, adds no price, dollar amount, email address or client data, and has every check passed and no thread open (jarvis-app `agents/brain.md` section 7); anything else Low still waits for Ben.
-- **Medium** (pages, layout, demo behavior): Ben approves.
+- **Low** (copy, images, styles, docs): automated review and checks green.
+- **Medium** (pages, layout, demo behavior): the review gate passes (`reviewer`, `refuter`, `test-gap-reviewer`).
 - **High** (`api/`, forms, bookings, payments, keys, the AI disclosure, client domains): Ben approves and the-enforcer passes.
+
+Auto-merge (Ben, Oct 31: "Just do high PRs, not medium"): Jarvis's look-ahead merges Low and Medium PRs once every check passed, the review gate ran, no thread is open and the diff adds no price, dollar amount, email address, client data or key (jarvis-app `agents/brain.md` section 7). A PR that touches anything on the High list is High, whatever its label. Only High PRs wait for Ben.
 
 Put the tier at the top of the PR body. A fresh agent that didn't write the change reviews the diff (`reviewer`), a second agent tries to prove each finding wrong (`refuter`), and only verified findings get fixed. Attach the evidence. Three review rounds at most, then rethink instead of patching. Every bug that ships, revert or crash here or on a client site becomes an incident eval case (Constellation star `evals`). Client sites also get a one-page explainer of how they work at handoff (Constellation star `sitereview`).
 
