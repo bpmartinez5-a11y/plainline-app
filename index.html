@@ -39,11 +39,11 @@
    light ink on the glass, Fraunces headings, blue pill buttons, sage and amber accents. */
 :root{
   --wall:#d9cebf; --wall-2:#c4b49f; --wood:#5b4535; --wood-2:#33261d; --floor:#a48b72; --screen:#1d1a19;
-  --bg:var(--wall-2); --glass:rgba(52,41,34,.62); --surface:rgba(18,14,12,.34); --sunk:rgba(255,255,255,.09);
+  --bg:var(--wall-2); --glass:rgba(52,41,34,.72); --surface:rgba(18,14,12,.34); --sunk:rgba(255,255,255,.09);
   --ink:#f7f2ea; --muted:rgba(247,242,234,.82); --line:rgba(255,255,255,.15); --line-hi:rgba(255,255,255,.28);
   --accent:#3f78ea; --accent-ink:#ffffff; --accent-soft:rgba(134,205,176,.16); --link:#b4ccff;
-  --blue:#4c8cf6; --blue-2:#2d63d8; --green:#86cdb0; --warn:#f2bd72; --ok:#86cdb0;
-  --rail:rgba(52,41,34,.62); --rail-ink:rgba(247,242,234,.72); --go-ink:#ffffff;
+  --blue:#3f78ea; --blue-2:#2d63d8; --green:#b7e6cf; --warn:#f2bd72; --ok:#86cdb0;
+  --rail:rgba(52,41,34,.72); --rail-ink:rgba(247,242,234,.72); --go-ink:#ffffff;
   --blur:blur(28px) saturate(140%);
   --shadow:inset 0 1px 0 rgba(255,255,255,.14),0 30px 60px -28px rgba(20,12,6,.65);
   --shadow-hi:inset 0 1px 0 rgba(255,255,255,.2),0 36px 70px -26px rgba(20,12,6,.8);
@@ -131,7 +131,7 @@ dt{font-weight:700} dd{margin:2px 0 0;color:var(--muted)}
 form{display:flex;flex-direction:column;gap:12px}
 label{display:flex;flex-direction:column;gap:4px;font-size:14px;font-weight:600;color:var(--muted)}
 input,textarea{min-height:44px;font:inherit;color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:10px 14px;background:var(--surface);font-weight:400;transition:border-color .2s,box-shadow .2s}
-input::placeholder,textarea::placeholder{color:rgba(247,242,234,.55)}
+input::placeholder,textarea::placeholder{color:rgba(247,242,234,.68)}
 input:focus,textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(76,140,246,.25)}
 textarea{min-height:120px;resize:vertical}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
@@ -141,7 +141,7 @@ textarea{min-height:120px;resize:vertical}
 footer{border:1px solid var(--line);background:var(--glass);border-radius:24px;margin-top:18px;padding:6px 22px;font-size:14px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
 /* Hero: one oversized wordmark against a tiny kicker; one button */
-.kicker{font:600 12.5px var(--f-body);letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+.kicker{font:600 12.5px var(--f-body);letter-spacing:.12em;text-transform:uppercase;color:var(--green);text-shadow:0 1px 2px rgba(0,0,0,.35)}
 .hero h1{display:flex;flex-direction:column;gap:10px}
 .hero h1 .mark{font-size:clamp(52px,13vw,132px);line-height:.88;letter-spacing:-.03em;color:var(--ink)}
 .hero h1 .line{font-size:clamp(24px,3.4vw,34px);letter-spacing:-.02em}
@@ -194,7 +194,7 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
 /* Motion: one orchestrated moment (the hero conversation) plus feedback on press. Springy ease, never on reduced motion. */
 :root{--spring:cubic-bezier(.34,1.56,.64,1);--ease-out:cubic-bezier(.22,1,.36,1)}
 .btn{transition:transform .35s var(--spring),box-shadow .25s var(--ease-out),background .2s,border-color .2s}
-.btn:hover{transform:translateY(-1px);background:linear-gradient(180deg,#5d98fa,var(--blue));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 22px -8px rgba(45,99,216,.8)}
+.btn:hover{transform:translateY(-1px);background:linear-gradient(180deg,#4c8cf6,var(--blue-2));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 22px -8px rgba(45,99,216,.8)}
 .btn.ghost:hover{background:rgba(255,255,255,.16);border-color:var(--line-hi);box-shadow:none}
 .btn:active{transform:scale(.96);transition-duration:.08s}
 .hero-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:18px;align-items:stretch}
@@ -235,7 +235,7 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
 .dock{display:none}
 @media (max-width:640px){
   .dock{display:flex;gap:8px;position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:10;padding:8px;border-radius:999px;background:var(--glass);border:1px solid var(--line);box-shadow:var(--shadow);transition:transform .45s var(--spring),opacity .3s,visibility 0s}
-  .dock .btn{flex:1;padding:10px 12px}
+  .dock .btn{flex:1;padding:10px 8px;font-size:15px;white-space:nowrap}
   .dock.away{transform:translateY(140%);opacity:0;visibility:hidden;transition-delay:0s,0s,.45s}
   body{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
   .hero p{font-size:17px}
