@@ -3,6 +3,7 @@
 // returns 501 and the site falls back to its built-in replies. It also falls back when a
 // visitor hits the per-IP limit (429) or the API call fails (502), e.g. when the key is out of credit.
 
+const errType = require("./_errtype");
 const MODEL = process.env.ANTHROPIC_MODEL || "claude-haiku-5-5";
 const MAX_PROMPT_CHARS = 12000; // the demo's prompt is ~3-6k characters
 const LIMIT = 30, WINDOW_MS = 60 * 60 * 1000; // AI replies per IP per hour
@@ -162,7 +163,7 @@ module.exports = async function handler(req, res) {
       signal: AbortSignal.timeout(20000)
     });
     if (!r.ok) {
-      console.error("anthropic error", r.status, await r.text());
+      console.error("anthropic error", r.status, await errType(r)); // status and error type only: the body may quote the visitor
       return res.status(502).json({ error: "AI request failed" });
     }
     const data = await r.json();
