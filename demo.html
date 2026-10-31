@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0d6b71">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d6b71'/%3E%3Cpath d='M9 22V10h7a4 4 0 0 1 0 8h-7' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#f5f3ee">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231f3a5f'/%3E%3Cpath d='M9 22V10h7a4 4 0 0 1 0 8h-7' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
 <meta name="description" content="Text a sample business as a customer and watch the front desk side live: answers, bookings and hand-offs to a person. No sign-up.">
 <title>Live demo · Plainline AI text assistant</title>
 <link rel="canonical" href="https://plainlineops.com/demo">
@@ -19,12 +19,13 @@
 <script defer src="/_vercel/insights/script.js"></script>
 <link rel="stylesheet" href="/fonts/plainline.css">
 <style>
-/* Layout: a working demo console. Customer's phone on the left, the business's front desk on the right; tabs on phones. */
+/* Colors match the homepage (navy and sage on off-white, Ben, Oct 31).
+   Layout: a working demo console. Customer's phone on the left, the business's front desk on the right; tabs on phones. */
 :root{
-  --bg:#eaeff1; --surface:#ffffff; --sunk:#f3f6f7; --ink:#12222b; --muted:#5b6d76; --line:#d3dce0;
-  --accent:#0d6b71; --accent-ink:#ffffff; --accent-soft:#dcefef;
-  --me:#0d6b71; --me-ink:#ffffff; --them:#e4ebed; --them-ink:#12222b;
-  --warn:#a6520a; --warn-bg:#fcefd9; --ok:#2b7a4b; --ok-bg:#def1e5; --staff:#6247b3; --staff-bg:#ece6fa;
+  --bg:#f5f3ee; --surface:#fffefb; --sunk:#efede6; --ink:#15233b; --muted:#5d6878; --line:#e2dfd6;
+  --accent:#1f3a5f; --accent-ink:#ffffff; --accent-soft:#e2ebe3;
+  --me:#1f3a5f; --me-ink:#ffffff; --them:#ebe8e0; --them-ink:#15233b;
+  --warn:#a6520a; --warn-bg:#fcefd9; --ok:#2f6e4f; --ok-bg:#e2ebe3; --staff:#6247b3; --staff-bg:#ece6fa;
   --phone:#0f1b20;
   --f-display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
   --f-body:"Figtree", "Segoe UI", system-ui, sans-serif;
@@ -32,16 +33,16 @@
   --r:14px;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0c1417; --surface:#132026; --sunk:#0f1a1f; --ink:#e2ebee; --muted:#8ea2aa; --line:#24353c;
-  --accent:#43b3b8; --accent-ink:#04201f; --accent-soft:#163437;
-  --me:#1d8086; --me-ink:#ffffff; --them:#1f2f35; --them-ink:#e2ebee;
-  --warn:#f1a64c; --warn-bg:#36260f; --ok:#6dc490; --ok-bg:#143021; --staff:#ab95f2; --staff-bg:#271f3f;
+  --bg:#0e141c; --surface:#161e29; --sunk:#121922; --ink:#e8ecf1; --muted:#95a1b0; --line:#253041;
+  --accent:#a9c2e0; --accent-ink:#0e1a2b; --accent-soft:#1c2b25;
+  --me:#2c4a72; --me-ink:#ffffff; --them:#1e2734; --them-ink:#e8ecf1;
+  --warn:#f1a64c; --warn-bg:#36260f; --ok:#7cc29a; --ok-bg:#16291f; --staff:#ab95f2; --staff-bg:#271f3f;
   --phone:#05090b; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0c1417; --surface:#132026; --sunk:#0f1a1f; --ink:#e2ebee; --muted:#8ea2aa; --line:#24353c;
-  --accent:#43b3b8; --accent-ink:#04201f; --accent-soft:#163437;
-  --me:#1d8086; --me-ink:#ffffff; --them:#1f2f35; --them-ink:#e2ebee;
-  --warn:#f1a64c; --warn-bg:#36260f; --ok:#6dc490; --ok-bg:#143021; --staff:#ab95f2; --staff-bg:#271f3f;
+  --bg:#0e141c; --surface:#161e29; --sunk:#121922; --ink:#e8ecf1; --muted:#95a1b0; --line:#253041;
+  --accent:#a9c2e0; --accent-ink:#0e1a2b; --accent-soft:#1c2b25;
+  --me:#2c4a72; --me-ink:#ffffff; --them:#1e2734; --them-ink:#e8ecf1;
+  --warn:#f1a64c; --warn-bg:#36260f; --ok:#7cc29a; --ok-bg:#16291f; --staff:#ab95f2; --staff-bg:#271f3f;
   --phone:#05090b; color-scheme:dark}
 *{box-sizing:border-box}
 html{color-scheme:light}
