@@ -3,9 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0d6b71">
+<meta name="theme-color" content="#c4b49f" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#3a3029" media="(prefers-color-scheme: dark)">
 <meta name="description" content="Plainline is an AI agency. We build the tools your business runs on and run the work behind it: every customer answered, every follow-up done, from one front desk to a whole back office.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d6b71'/%3E%3Cpath d='M9 22V10h7a4 4 0 0 1 0 8h-7' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232d63d8'/%3E%3Cpath d='M9 22V10h7a4 4 0 0 1 0 8h-7' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
 <title>Plainline · The AI agency that builds and runs your operations</title>
 <link rel="canonical" href="https://plainlineops.com/">
 <link rel="manifest" href="/manifest.webmanifest">
@@ -33,75 +34,120 @@
 <link rel="stylesheet" href="/fonts/voice-clean.css">
 <link rel="stylesheet" href="/fonts/voice-warm.css">
 <style>
-/* Same tokens as the demo (demo.html) so the site and the demo read as one product. */
+/* Same tokens as the demo (demo.html) so the site and the demo read as one product.
+   Look (Ben, Oct 31): Ben's Desk. Smoked warm glass over a blurred room drawn in CSS (no photos, no AI imagery),
+   light ink on the glass, Fraunces headings, blue pill buttons, sage and amber accents. */
 :root{
-  --bg:#eaeff1; --surface:#ffffff; --sunk:#f3f6f7; --ink:#12222b; --muted:#5b6d76; --line:#d3dce0;
-  --accent:#0d6b71; --accent-ink:#ffffff; --accent-soft:#dcefef; --warn:#a6520a; --ok:#2b7a4b;
-  --f-display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
-  --f-body:"Figtree", "Segoe UI", system-ui, sans-serif;
+  --wall:#d9cebf; --wall-2:#c4b49f; --wood:#5b4535; --wood-2:#33261d; --floor:#a48b72; --screen:#1d1a19;
+  --bg:var(--wall-2); --glass:rgba(52,41,34,.72); --surface:rgba(18,14,12,.34); --sunk:rgba(255,255,255,.09);
+  --ink:#f7f2ea; --muted:rgba(247,242,234,.82); --line:rgba(255,255,255,.15); --line-hi:rgba(255,255,255,.28);
+  --accent:#3f78ea; --accent-ink:#ffffff; --accent-soft:rgba(134,205,176,.16); --link:#b4ccff;
+  --blue:#3f78ea; --blue-2:#2d63d8; --green:#b7e6cf; --warn:#f2bd72; --ok:#86cdb0;
+  --rail:rgba(52,41,34,.72); --rail-ink:rgba(247,242,234,.72); --go-ink:#ffffff;
+  --blur:blur(28px) saturate(140%);
+  --shadow:inset 0 1px 0 rgba(255,255,255,.14),0 30px 60px -28px rgba(20,12,6,.65);
+  --shadow-hi:inset 0 1px 0 rgba(255,255,255,.2),0 36px 70px -26px rgba(20,12,6,.8);
+  --f-display:"Fraunces", Georgia, "Times New Roman", serif;
+  --f-body:"Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0c1417; --surface:#132026; --sunk:#0f1a1f; --ink:#e2ebee; --muted:#8ea2aa; --line:#24353c;
-  --accent:#43b3b8; --accent-ink:#04201f; --accent-soft:#163437; --warn:#f1a64c; --ok:#6dc490; color-scheme:dark}}
+  --wall:#4a4038; --wall-2:#3a3029; --wood:#2c211a; --wood-2:#17110d; --floor:#3b2f26; --screen:#0c0b0a;
+  --glass:rgba(22,18,16,.66); --surface:rgba(8,6,5,.4); --rail:rgba(22,18,16,.66); color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0c1417; --surface:#132026; --sunk:#0f1a1f; --ink:#e2ebee; --muted:#8ea2aa; --line:#24353c;
-  --accent:#43b3b8; --accent-ink:#04201f; --accent-soft:#163437; --warn:#f1a64c; --ok:#6dc490; color-scheme:dark}
+  --wall:#4a4038; --wall-2:#3a3029; --wood:#2c211a; --wood-2:#17110d; --floor:#3b2f26; --screen:#0c0b0a;
+  --glass:rgba(22,18,16,.66); --surface:rgba(8,6,5,.4); --rail:rgba(22,18,16,.66); color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;
-  padding:0 max(16px,env(safe-area-inset-left,0px)) 40px}
-a{color:var(--accent)}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.wrap{max-width:1040px;margin:0 auto}
-h1,h2,h3{font-family:var(--f-display);letter-spacing:-.02em;line-height:1.15;margin:0}
-nav{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:20px 0}
-nav b{font-family:var(--f-display);font-size:24px;letter-spacing:-.02em}
-nav div{display:flex;gap:18px;font-weight:600;font-size:15px}
-nav div a{color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
-.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;border:0;background:var(--accent);color:var(--accent-ink);font:inherit;font-weight:700;border-radius:12px;padding:12px 18px;text-decoration:none;cursor:pointer}
-.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  padding:18px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
+/* The room behind the glass: soft shapes, blurred, like Ben's Desk */
+.room{position:fixed;inset:-60px;z-index:-1;overflow:hidden;filter:blur(26px);pointer-events:none;background:linear-gradient(180deg,var(--wall) 0%,var(--wall-2) 62%,var(--floor) 62%,var(--floor) 100%)}
+.room i{position:absolute;display:block}
+.room .shelf-l{left:4%;top:12%;width:16%;height:56%;background:var(--wood);border-radius:6px}
+.room .shelf-r{right:3%;top:8%;width:20%;height:60%;background:var(--wood);border-radius:6px}
+.room .tv{left:26%;top:22%;width:44%;height:30%;background:var(--screen);border-radius:4px}
+.room .console{left:20%;top:56%;width:58%;height:10%;background:var(--wood-2);border-radius:4px}
+.room .lamp{left:46%;top:2%;width:12%;height:14%;background:#fff6e4;opacity:.55;border-radius:50%}
+.room .plant{right:8%;top:30%;width:12%;height:24%;background:#4e5a3e;border-radius:50%;opacity:.7}
+section,.hero,.thread,.rail,.dock,footer{-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur)}
+a{color:var(--link)}
+:focus-visible{outline:2px solid var(--link);outline-offset:2px}
+.app{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:64px minmax(0,1fr);gap:22px;align-items:start}
+.wrap{min-width:0}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;letter-spacing:-.01em;line-height:1.15;margin:0}
+/* Rail: a smoked-glass pill of section icons, sticky on the left; a row across the top on a phone */
+.rail{position:sticky;top:18px;z-index:5;background:var(--rail);border:1px solid var(--line);border-radius:999px;padding:14px 0;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:var(--shadow)}
+.rail a{width:44px;height:44px;flex:none;border-radius:12px;display:grid;place-items:center;color:var(--rail-ink);text-decoration:none;position:relative;transition:background-color .2s,color .2s}
+.rail a:hover,.rail a:focus-visible{color:var(--ink);background:rgba(255,255,255,.1)}
+.rail a.logo{color:var(--ink);font:500 18px var(--f-display);margin-bottom:6px}
+.rail a.go{color:var(--go-ink);background:linear-gradient(180deg,var(--blue),var(--blue-2));box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+.rail a:focus-visible{outline-color:#fff}
+.rail svg{width:20px;height:20px}
+.rail span{position:absolute;left:54px;white-space:nowrap;background:rgba(20,16,13,.92);color:var(--ink);font:600 12.5px var(--f-body);padding:5px 10px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .15s}
+.rail a:hover span,.rail a:focus-visible span{opacity:1}
+/* Short screens: the rail scrolls away with the page so its last icons stay reachable */
+@media (min-width:641px) and (max-height:560px){.rail{position:static}}
+@media (max-width:640px){
+  .app{grid-template-columns:minmax(0,1fr);gap:14px}
+  .rail{top:8px;flex-direction:row;justify-content:space-between;gap:2px;padding:6px 10px}
+  .rail a{width:40px;height:40px}
+  .rail a.logo{margin:0 4px 0 0}
+  .rail .wide,.rail span{display:none}
+  :root{--below-rail:72px}
+}
+@media (max-width:360px){.rail a{width:36px;height:36px}}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;border:1px solid rgba(255,255,255,.22);background:linear-gradient(180deg,var(--blue),var(--blue-2));color:#fff;font:inherit;font-weight:600;border-radius:999px;padding:12px 20px;text-decoration:none;cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 16px -6px rgba(45,99,216,.7)}
+.btn.ghost{background:rgba(255,255,255,.08);color:var(--ink);border-color:var(--line);box-shadow:none}
 .btn:disabled{opacity:.55;cursor:default}
-.hero{padding:48px 0 40px;display:flex;flex-direction:column;gap:18px;max-width:720px}
+.hero{padding:34px 32px 30px;display:flex;flex-direction:column;gap:18px;max-width:720px;border-radius:30px;box-shadow:var(--shadow);position:relative;overflow:hidden;border:1px solid var(--line);
+  background:radial-gradient(90% 120% at 0% 0%,rgba(255,244,222,.14),transparent 60%),var(--glass)}
 .hero p{font-size:19px;color:var(--muted);margin:0}
 .cta{display:flex;gap:12px;flex-wrap:wrap}
 .slots{font-size:14px;color:var(--muted)} .slots b{color:var(--ink)}
-section{padding:36px 0;border-top:1px solid var(--line)}
+/* Each section is one glass window, like the Desk's; cards inside are a darker pane */
+section{margin-top:18px;padding:26px 26px 28px;border-radius:30px;background:var(--glass);border:1px solid var(--line);box-shadow:var(--shadow);scroll-margin-top:var(--below-rail,18px)}
+@media (max-width:640px){section{padding:20px 16px 22px;border-radius:24px}}
 section > h2{font-size:30px;margin-bottom:20px}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
-.card h3{font-size:18px;margin-bottom:6px}
+.card,.panel{background:var(--surface);border-radius:20px;padding:18px;border:1px solid var(--line)}
+.card{transition:transform .25s,box-shadow .25s,border-color .25s}
+.card:hover{transform:translateY(-3px);border-color:var(--line-hi);background:rgba(255,255,255,.06)}
+.card h3{font-size:20px;font-weight:500;margin-bottom:6px}
 .soon{font:600 11px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-left:6px;white-space:nowrap}
 .tiers .tag{display:block;font:600 12px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.tiers .top{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)} .tiers .top .tag{color:var(--accent)}
+.tiers .top{border-color:var(--green);box-shadow:0 0 0 1px var(--green),var(--shadow)} .tiers .top .tag{color:var(--green)}
 .card p{margin:0;color:var(--muted);font-size:15px}
 .steps{counter-reset:s;list-style:none;padding:0;margin:0}
 .steps li{counter-increment:s;position:relative;padding:0 0 18px 48px}
-.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:700}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:32px;height:32px;border-radius:10px;background:var(--accent-soft);color:var(--green);display:grid;place-items:center;font-weight:700}
 .steps b{display:block}
 .steps span{color:var(--muted)}
 .who{display:flex;flex-wrap:wrap;gap:8px}
-.who span{background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:6px 14px;font-size:15px}
+.who span{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:15px}
 dl{margin:0;display:grid;gap:16px}
 dt{font-weight:700} dd{margin:2px 0 0;color:var(--muted)}
 .contact{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:28px;align-items:start}
 @media (max-width:760px){.contact{grid-template-columns:minmax(0,1fr)}}
 form{display:flex;flex-direction:column;gap:12px}
 label{display:flex;flex-direction:column;gap:4px;font-size:14px;font-weight:600;color:var(--muted)}
-input,textarea{min-height:44px;font:inherit;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface);font-weight:400}
+input,textarea{min-height:44px;font:inherit;color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:10px 14px;background:var(--surface);font-weight:400;transition:border-color .2s,box-shadow .2s}
+input::placeholder,textarea::placeholder{color:rgba(247,242,234,.68)}
+input:focus,textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(76,140,246,.25)}
 textarea{min-height:120px;resize:vertical}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 #formMsg{font-size:15px;min-height:1.5em;margin:0}
 #formMsg.ok{color:var(--ok)} #formMsg.err{color:var(--warn)}
 .fine{font-size:13px;color:var(--muted);margin:0}
-footer{border-top:1px solid var(--line);padding:24px 0 0;font-size:14px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+footer{border:1px solid var(--line);background:var(--glass);border-radius:24px;margin-top:18px;padding:6px 22px;font-size:14px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
 /* Hero: one oversized wordmark against a tiny kicker; one button */
-.kicker{font:600 12.5px var(--f-body);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.kicker{font:600 12.5px var(--f-body);letter-spacing:.12em;text-transform:uppercase;color:var(--green);text-shadow:0 1px 2px rgba(0,0,0,.35)}
 .hero h1{display:flex;flex-direction:column;gap:10px}
-.hero h1 .mark{font-size:clamp(52px,13vw,132px);line-height:.88;letter-spacing:-.05em;color:var(--accent)}
+.hero h1 .mark{font-size:clamp(52px,13vw,132px);line-height:.88;letter-spacing:-.03em;color:var(--ink)}
 .hero h1 .line{font-size:clamp(24px,3.4vw,34px);letter-spacing:-.02em}
-.btn.big{min-height:52px;padding:14px 26px;font-size:17px;border-radius:14px}
+.btn.big{min-height:52px;padding:14px 28px;font-size:17px}
 .quiet{display:inline-flex;align-items:center;min-height:44px;font-weight:600;color:var(--ink);text-decoration:none}
-.quiet:hover{color:var(--accent)}
+.quiet:hover{color:var(--link)}
 .lede{color:var(--muted);margin:-8px 0 22px;max-width:640px}
 /* Example client sites: three phones, three different looks */
 .phones{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:start}
@@ -109,7 +155,7 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
 .phone{margin:0;display:flex;flex-direction:column;gap:12px}
 .phone figcaption{font-size:15px;font-weight:600;line-height:1.4}
 .screen{height:420px;border-radius:30px;padding:26px 18px 18px;display:flex;flex-direction:column;gap:12px;overflow:hidden;
-  border:6px solid color-mix(in srgb,var(--ink) 88%,transparent);box-shadow:0 22px 50px -26px color-mix(in srgb,var(--ink) 50%,transparent)}
+  border:6px solid #1d1a19;box-shadow:var(--shadow)}
 .p-top{font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.7}
 .p-mark{font-weight:400;line-height:.9}
 .p-list{list-style:none;margin:0;padding:0;font-size:13px;display:flex;flex-direction:column}
@@ -131,10 +177,10 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
 .desk{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:32px;align-items:center}
 @media (max-width:760px){.desk{grid-template-columns:minmax(0,1fr)}}
 .desk h2{font-size:30px;margin-bottom:20px}
-.board{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.board{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:10px}
 .b-tabs{display:flex;gap:6px;flex-wrap:wrap;font-size:13.5px;font-weight:600}
-.b-tabs span{padding:6px 12px;border-radius:99px;background:var(--sunk);color:var(--muted)}
-.b-tabs span.on{background:var(--accent-soft);color:var(--accent)}
+.b-tabs span{padding:6px 12px;border-radius:99px;background:var(--sunk);color:var(--muted);border:1px solid var(--line)}
+.b-tabs span.on{background:var(--accent-soft);color:var(--green)}
 .b-tabs span.alert{color:var(--warn)}
 .board ul{list-style:none;margin:0;padding:0}
 .board li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 4px;border-top:1px solid var(--line)}
@@ -147,32 +193,33 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
 @media (max-width:420px){.board li{grid-template-columns:auto minmax(0,1fr)}.board li em{grid-column:2;text-align:left}}
 /* Motion: one orchestrated moment (the hero conversation) plus feedback on press. Springy ease, never on reduced motion. */
 :root{--spring:cubic-bezier(.34,1.56,.64,1);--ease-out:cubic-bezier(.22,1,.36,1)}
-.btn{transition:transform .35s var(--spring),box-shadow .25s var(--ease-out),background-color .2s}
-.btn:hover{box-shadow:0 6px 18px color-mix(in srgb,var(--accent) 28%,transparent)}
-.btn.ghost:hover{box-shadow:none;border-color:var(--accent)}
+.btn{transition:transform .35s var(--spring),box-shadow .25s var(--ease-out),background .2s,border-color .2s}
+.btn:hover{transform:translateY(-1px);background:linear-gradient(180deg,#4c8cf6,var(--blue-2));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 22px -8px rgba(45,99,216,.8)}
+.btn.ghost:hover{background:rgba(255,255,255,.16);border-color:var(--line-hi);box-shadow:none}
 .btn:active{transform:scale(.96);transition-duration:.08s}
-.hero-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:40px;align-items:center}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:18px;align-items:stretch}
 .hero-grid .hero{max-width:none}
-@media (max-width:860px){.hero-grid{grid-template-columns:minmax(0,1fr);gap:8px}.hero-grid .hero{padding-bottom:12px}}
+@media (max-width:860px){.hero-grid{grid-template-columns:minmax(0,1fr);gap:14px}}
+@media (max-width:640px){.hero{padding:24px 20px 22px}}
 .hero .kicker,.hero h1,.hero > p,.hero .cta{animation:rise .8s var(--ease-out) both}
 .hero > p{animation-delay:.08s}.hero .cta{animation-delay:.16s}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}}
-.thread{background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:16px 14px 14px;box-shadow:0 24px 60px -28px color-mix(in srgb,var(--ink) 45%,transparent);display:flex;flex-direction:column;gap:8px;min-height:380px;margin:0 0 40px}
+.thread{background:var(--glass);border:1px solid var(--line);border-radius:30px;padding:16px 14px 14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;min-height:380px;margin:0}
 #msgs{display:contents}
 .thread-top{display:flex;align-items:center;gap:10px;padding:0 4px 10px;border-bottom:1px solid var(--line);margin-bottom:4px}
-.thread-top i{width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font:700 15px var(--f-display);font-style:normal}
+.thread-top i{width:34px;height:34px;border-radius:50%;background:linear-gradient(140deg,rgba(255,255,255,.28),rgba(255,255,255,.06));border:1px solid var(--line-hi);color:var(--ink);display:grid;place-items:center;font:500 16px var(--f-display);font-style:normal}
 .thread-top b{display:block;font-size:15px;line-height:1.2}
 .thread-top small{color:var(--muted);font-size:12.5px}
 .thread-top button{margin-left:auto;min-height:44px;min-width:44px;border:0;background:none;color:var(--muted);font:inherit;font-size:13px;cursor:pointer;border-radius:10px}
-.thread-top button:hover{color:var(--accent)}
+.thread-top button:hover{color:var(--ink)}
 .msg{max-width:82%;padding:9px 13px;border-radius:18px;font-size:15px;line-height:1.4;transform-origin:var(--o,0 100%)}
 .msg.in{align-self:flex-start;background:var(--sunk);border-bottom-left-radius:6px}
-.msg.out{align-self:flex-end;background:var(--accent);color:var(--accent-ink);border-bottom-right-radius:6px;--o:100% 100%}
+.msg.out{align-self:flex-end;background:linear-gradient(180deg,var(--blue),var(--blue-2));color:#fff;border-bottom-right-radius:6px;--o:100% 100%}
 .msg.typing{display:flex;gap:4px;padding:12px 14px}
 .msg.typing span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:dot 1s infinite}
 .msg.typing span:nth-child(2){animation-delay:.15s}.msg.typing span:nth-child(3){animation-delay:.3s}
 @keyframes dot{0%,60%,100%{opacity:.3;transform:none}30%{opacity:1;transform:translateY(-3px)}}
-.booked{align-self:flex-end;display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,transparent);border-radius:99px;padding:6px 12px 6px 8px}
+.booked{align-self:flex-end;display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:var(--ok);background:rgba(134,205,176,.14);border-radius:999px;padding:6px 12px 6px 8px}
 .booked svg{width:18px;height:18px}
 .pop{animation:pop .55s var(--spring) both}
 @keyframes pop{from{opacity:0;transform:scale(.6) translateY(8px)}}
@@ -187,8 +234,8 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
 /* Phone: a small sticky bar keeps the two actions in reach */
 .dock{display:none}
 @media (max-width:640px){
-  .dock{display:flex;gap:8px;position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:10;padding:8px;border-radius:18px;background:color-mix(in srgb,var(--surface) 88%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--line);box-shadow:0 10px 30px -12px color-mix(in srgb,var(--ink) 40%,transparent);transition:transform .45s var(--spring),opacity .3s,visibility 0s}
-  .dock .btn{flex:1;padding:10px 12px}
+  .dock{display:flex;gap:8px;position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:10;padding:8px;border-radius:999px;background:var(--glass);border:1px solid var(--line);box-shadow:var(--shadow);transition:transform .45s var(--spring),opacity .3s,visibility 0s}
+  .dock .btn{flex:1;padding:10px 8px;font-size:15px;white-space:nowrap}
   .dock.away{transform:translateY(140%);opacity:0;visibility:hidden;transition-delay:0s,0s,.45s}
   body{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
   .hero p{font-size:17px}
@@ -197,8 +244,20 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <nav><b>Plainline</b><div><a href="/demo">Live demo</a><a href="#contact">Contact</a></div></nav>
+<div class="room" aria-hidden="true"><i class="shelf-l"></i><i class="shelf-r"></i><i class="tv"></i><i class="console"></i><i class="lamp"></i><i class="plant"></i></div>
+<div class="app">
+  <nav class="rail" aria-label="Sections">
+    <a class="logo" href="#top" aria-label="Plainline, back to top">P/</a>
+    <a href="#plans" aria-label="Plans"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span aria-hidden="true">Plans</span></a>
+    <a href="#build" aria-label="What we build"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg><span aria-hidden="true">What we build</span></a>
+    <a href="#looks" class="wide" aria-label="Your own voice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg><span aria-hidden="true">Your own voice</span></a>
+    <a href="#desk" aria-label="Your front desk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span aria-hidden="true">Your front desk</span></a>
+    <a href="#how" class="wide" aria-label="How it works"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg><span aria-hidden="true">How it works</span></a>
+    <a href="#faq" aria-label="Questions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></svg><span aria-hidden="true">Questions</span></a>
+    <a href="/demo" aria-label="Live demo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg><span aria-hidden="true">Live demo</span></a>
+    <a href="#contact" class="go" aria-label="Book a walkthrough"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/></svg><span aria-hidden="true">Book a walkthrough</span></a>
+  </nav>
+<div class="wrap" id="top">
 
   <div class="hero-grid">
   <header class="hero">
@@ -237,7 +296,7 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
     </div>
   </section>
 
-  <section class="looks">
+  <section class="looks" id="looks">
     <h2>Every business gets its own voice</h2>
     <p class="lede">A plumber shouldn't sound like a pilates studio. Each setup starts from the business's own name, services and voice, with one clear next step for the customer.</p>
     <div class="phones">
@@ -273,7 +332,7 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
     <p class="fine">Made-up businesses · values illustrative</p>
   </section>
 
-  <section class="desk">
+  <section class="desk" id="desk">
     <div>
       <h2>One front desk, in your pocket</h2>
       <p class="lede">Every chat and booking in one place. When a customer needs a person, you get a heads-up right away and take over with one tap.</p>
@@ -299,9 +358,9 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
     </div>
   </section>
 
-  <section>
+  <section id="how">
     <h2>How it works</h2>
-    <ol class="steps">
+    <ol class="steps panel">
       <li><b>A walkthrough</b><span>We learn how your business runs today: your services, hours, rules, systems and how you talk to customers.</span></li>
       <li><b>We build it and test it</b><span>Everything is set up with your details. You try it yourself before any customer sees it.</span></li>
       <li><b>We run it</b><span>We go live, watch how it does and tune it with you every month.</span></li>
@@ -314,9 +373,9 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
     <div class="who"><span>Companies with a busy customer operation</span><span>Multi-location service brands</span><span>Home services</span><span>Salons, studios and gyms</span><span>Auto and detailing</span></div>
   </section>
 
-  <section>
+  <section id="faq">
     <h2>Questions</h2>
-    <dl>
+    <dl class="panel">
       <div><dt>What is Plainline?</dt><dd>Plainline is an AI agency. We bring AI into how your team works and build AI tools for it, and websites and apps are coming next. We also run the work behind your business: for one location, an AI front desk that answers customers by text and website chat and books them into open times; for a large company, a back-office team that Plainline staffs and runs.</dd></div>
       <div><dt>Can you help our team use AI like Claude at work?</dt><dd>Yes. We research your industry and your company, pick the AI model that fits your work and your rules (Claude or another enterprise model), and set it up with your team's own tools, playbooks and skills. Then we train your people and keep it current.</dd></div>
       <div><dt>Can someone run our back office for us?</dt><dd>Yes. On the Back Office plan, Plainline runs the work for you: answering customers, scheduling, following up on leads and quotes, keeping records current and reporting to your managers. AI handles the volume, Plainline's operators handle the judgment calls, and your managers can see the work. What we run is scoped in your walkthrough.</dd></div>
@@ -348,6 +407,7 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
   <div class="dock away" id="dock"><a class="btn ghost" href="/demo">Live demo</a><a class="btn" href="#contact">Book walkthrough</a></div>
 
   <footer><span>© 2026 Plainlineops LLC</span><span><a href="/demo">Live demo</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></span></footer>
+</div>
 </div>
 
 <script>

@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0d6b71">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d6b71'/%3E%3Cpath d='M9 22V10h7a4 4 0 0 1 0 8h-7' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#e6ddd0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#17110d" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232d63d8'/%3E%3Cpath d='M9 22V10h7a4 4 0 0 1 0 8h-7' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
 <meta name="description" content="Text a sample business as a customer and watch the front desk side live: answers, bookings and hand-offs to a person. No sign-up.">
 <title>Live demo · Plainline AI text assistant</title>
 <link rel="canonical" href="https://plainlineops.com/demo">
@@ -19,29 +20,30 @@
 <script defer src="/_vercel/insights/script.js"></script>
 <link rel="stylesheet" href="/fonts/plainline.css">
 <style>
-/* Layout: a working demo console. Customer's phone on the left, the business's front desk on the right; tabs on phones. */
+/* Colors match the homepage and Ben's Desk (warm room tones, blue actions, Ben, Oct 31).
+   Layout: a working demo console. Customer's phone on the left, the business's front desk on the right; tabs on phones. */
 :root{
-  --bg:#eaeff1; --surface:#ffffff; --sunk:#f3f6f7; --ink:#12222b; --muted:#5b6d76; --line:#d3dce0;
-  --accent:#0d6b71; --accent-ink:#ffffff; --accent-soft:#dcefef;
-  --me:#0d6b71; --me-ink:#ffffff; --them:#e4ebed; --them-ink:#12222b;
-  --warn:#a6520a; --warn-bg:#fcefd9; --ok:#2b7a4b; --ok-bg:#def1e5; --staff:#6247b3; --staff-bg:#ece6fa;
+  --bg:#e6ddd0; --surface:#fbf8f3; --sunk:#f2ece3; --ink:#2a211b; --muted:#6b5d50; --line:#ddd2c3;
+  --accent:#2d63d8; --accent-ink:#ffffff; --accent-soft:#e3ebfb;
+  --me:#2d63d8; --me-ink:#ffffff; --them:#ece4d8; --them-ink:#2a211b;
+  --warn:#a6520a; --warn-bg:#fcefd9; --ok:#2a7053; --ok-bg:#e0eee7; --staff:#6247b3; --staff-bg:#ece6fa;
   --phone:#0f1b20;
-  --f-display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
-  --f-body:"Figtree", "Segoe UI", system-ui, sans-serif;
+  --f-display:"Fraunces", Georgia, "Times New Roman", serif;
+  --f-body:"Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
   --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
   --r:14px;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0c1417; --surface:#132026; --sunk:#0f1a1f; --ink:#e2ebee; --muted:#8ea2aa; --line:#24353c;
-  --accent:#43b3b8; --accent-ink:#04201f; --accent-soft:#163437;
-  --me:#1d8086; --me-ink:#ffffff; --them:#1f2f35; --them-ink:#e2ebee;
-  --warn:#f1a64c; --warn-bg:#36260f; --ok:#6dc490; --ok-bg:#143021; --staff:#ab95f2; --staff-bg:#271f3f;
+  --bg:#17110d; --surface:#231b16; --sunk:#1c1511; --ink:#f7f2ea; --muted:#b3a597; --line:#3a2e26;
+  --accent:#7aa6f8; --accent-ink:#0d1a33; --accent-soft:#1d2840;
+  --me:#2d63d8; --me-ink:#ffffff; --them:#2e241d; --them-ink:#f7f2ea;
+  --warn:#f2bd72; --warn-bg:#36260f; --ok:#86cdb0; --ok-bg:#16291f; --staff:#ab95f2; --staff-bg:#271f3f;
   --phone:#05090b; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0c1417; --surface:#132026; --sunk:#0f1a1f; --ink:#e2ebee; --muted:#8ea2aa; --line:#24353c;
-  --accent:#43b3b8; --accent-ink:#04201f; --accent-soft:#163437;
-  --me:#1d8086; --me-ink:#ffffff; --them:#1f2f35; --them-ink:#e2ebee;
-  --warn:#f1a64c; --warn-bg:#36260f; --ok:#6dc490; --ok-bg:#143021; --staff:#ab95f2; --staff-bg:#271f3f;
+  --bg:#17110d; --surface:#231b16; --sunk:#1c1511; --ink:#f7f2ea; --muted:#b3a597; --line:#3a2e26;
+  --accent:#7aa6f8; --accent-ink:#0d1a33; --accent-soft:#1d2840;
+  --me:#2d63d8; --me-ink:#ffffff; --them:#2e241d; --them-ink:#f7f2ea;
+  --warn:#f2bd72; --warn-bg:#36260f; --ok:#86cdb0; --ok-bg:#16291f; --staff:#ab95f2; --staff-bg:#271f3f;
   --phone:#05090b; color-scheme:dark}
 *{box-sizing:border-box}
 html{color-scheme:light}
@@ -339,9 +341,18 @@ const PRESETS = {
       {id:"move",name:"Move-in / move-out clean",minutes:300,price:320,deposit:75},
       {id:"walk",name:"Free walkthrough for larger homes",minutes:20,price:0,deposit:0}],
     hours:{0:null,1:[8,18],2:[8,18],3:[8,18],4:[8,18],5:[8,18],6:[9,15]},
-    policies:"Prices are for a 2 bed, 2 bath home; each extra bedroom or bathroom adds $25.\nWeekly or every-other-week service saves 15% from the second visit.\nStandard: kitchen, bathrooms, dusting, floors. Deep adds baseboards, inside the microwave and window sills.\nInside the fridge or oven is $30 each.\nCancel 24 hours ahead or the deposit is kept.\nWe bring our own supplies; tell us about pets before the visit.\nDamage, a complaint or a refund question: hand off to the owner right away."}
+    policies:"Prices are for a 2 bed, 2 bath home; each extra bedroom or bathroom adds $25.\nWeekly or every-other-week service saves 15% from the second visit.\nStandard: kitchen, bathrooms, dusting, floors. Deep adds baseboards, inside the microwave and window sills.\nInside the fridge or oven is $30 each.\nCancel 24 hours ahead or the deposit is kept.\nWe bring our own supplies; tell us about pets before the visit.\nDamage, a complaint or a refund question: hand off to the owner right away."},
+  clinic:{ preset:"clinic", name:"Cedar Path Wellness", color:"#5a6f9e", staffName:"Riley",
+    tone:"Calm, kind and clear, like a front desk that respects people's privacy.",
+    services:[
+      {id:"consult",name:"Intro phone consult",minutes:15,price:0,deposit:0},
+      {id:"newpt",name:"First visit (new patients)",minutes:60,price:195,deposit:50},
+      {id:"labs",name:"Bloodwork (lab draw)",minutes:20,price:65,deposit:0},
+      {id:"followup",name:"Follow-up visit",minutes:30,price:95,deposit:0}],
+    hours:{0:null,1:[8,17],2:[8,17],3:[10,19],4:[8,17],5:[8,13],6:null},
+    policies:"The assistant books visits and answers questions about the clinic. It can't give medical advice: questions about symptoms, doses or results go to your provider at your visit.\nPlease don't text health details here; share them at your visit.\nA reaction or side effect after a treatment: hand off to staff right away. If it's severe, call 911.\nNew patients bring a photo ID and a list of current medications.\nWe don't bill insurance; HSA and FSA cards are accepted.\nCancel at least 24 hours ahead or the deposit is kept."}
 };
-const PRESET_LABEL = {salon:"Hair salon",detail:"Auto detailing",hvac:"Heating & air (home services)",fitness:"Gym / fitness studio",cleaning:"Home cleaning",custom:"Custom"};
+const PRESET_LABEL = {salon:"Hair salon",detail:"Auto detailing",hvac:"Heating & air (home services)",fitness:"Gym / fitness studio",cleaning:"Home cleaning",clinic:"Wellness clinic",custom:"Custom"};
 const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 
 /* ---------- helpers ---------- */
@@ -476,9 +487,12 @@ function rulesAgent(c){
   const cfg = C(), t = (lastMsg(c)?.text || "").toLowerCase();
   const svc = cfg.services.find(s => t.includes(s.name.toLowerCase().split(/[ &-]/)[0]) || t.includes(s.id));
   const nextDay = openDays(1)[0];
-  const danger = /\b(emergenc\w*|gas (leak|smell)|smell\w* gas|carbon monoxide|fire|smoke|can'?t breathe|bleeding|injur\w*)\b/.test(t);
-  if (danger || /\b(hurt|hurts|pain|painful|urgent|refund\w*|complain\w*|angry|manager|human|real person|someone)\b/.test(t))
+  const danger = /\b(emergenc\w*|gas (leak|smell)|smell\w* gas|carbon monoxide|fire|smoke|can'?t breathe|bleeding|injur\w*|anaphyla\w*|overdos\w*)\b/.test(t);
+  const health = cfg.preset === "clinic" && /\b(side effects?|reactions?|allerg\w*|swell\w*|swollen|rash\w*|hives|dizz\w*|nause\w*|infect\w*)\b/.test(t);
+  if (danger || health || /\b(hurt|hurts|pain|painful|urgent|refund\w*|complain\w*|angry|manager|human|real person|(talk|speak) to a person|someone)\b/.test(t))
     return {reply:danger ? `If anyone is in danger, call 911 now. I'm also bringing in ${cfg.staffName} from our team.` : `Got it. I'm bringing in ${cfg.staffName} from our team, they'll reply here shortly.`, show:"none", handoff:true, handoffReason:"Customer asked for help the assistant can't give"};
+  if (cfg.preset === "clinic" && /\b(dos(e|es|age|ing)|symptoms?|diagnos\w*|prescri\w*|results?)\b/.test(t))
+    return {reply:"I can't give medical advice by text. Your provider can go over that at your visit. Want me to find you a time?", show:"none", chips:["Book a visit","Talk to a person"]};
   if (svc && /price|cost|how much/.test(t)) return {reply:`${svc.name} is ${money(svc.price)} and takes about ${svc.minutes} minutes. Want to grab a time?`, show:"none", chips:["Yes, book it","What else do you offer?"]};
   if (svc) return {reply:`Great choice. Here's what's open for ${svc.name}:`, show:"slots", serviceId:svc.id};
   if (/price|cost|how much|menu|offer/.test(t)) return {reply: cfg.services.map(s => `${s.name} ${money(s.price)}`).join(" · "), show:"services"};
@@ -603,7 +617,7 @@ function renderPhone(){
   if (!c || !c.msgs.length){
     const day = openDays(1)[0], first = cfg.services[0];
     const starters = [day ? `Any openings ${DAYS[day.getDay()] === DAYS[new Date().getDay()] ? "today" : new Date(day).toLocaleDateString([], {weekday:"long"})}?` : "Any openings this week?",
-      first ? `How much is a ${first.name.toLowerCase()}?` : "What do you offer?", "What are your hours?"];
+      first ? `How much is ${/^[aeiou]/i.test(first.name) ? "an" : "a"} ${first.name.toLowerCase()}?` : "What do you offer?", "What are your hours?"];
     th.innerHTML = `<div class="empty-chat">${logoHTML(cfg,56)}<div><b style="color:var(--ink)">Text ${esc(cfg.name)}</b><br>You're texting an automated assistant. Book a visit, ask about prices, or ask for a person anytime. Try one:</div>
       <div class="chips">${starters.map(s => `<button class="chip" data-act="chip" data-text="${esc(s)}">${esc(s)}</button>`).join("")}</div></div>`;
     return;
