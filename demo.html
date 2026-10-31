@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f5f3ee" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0e141c" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231f3a5f'/%3E%3Cpath d='M9 22V10h7a4 4 0 0 1 0 8h-7' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#e6ddd0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#17110d" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232d63d8'/%3E%3Cpath d='M9 22V10h7a4 4 0 0 1 0 8h-7' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
 <meta name="description" content="Text a sample business as a customer and watch the front desk side live: answers, bookings and hand-offs to a person. No sign-up.">
 <title>Live demo · Plainline AI text assistant</title>
 <link rel="canonical" href="https://plainlineops.com/demo">
@@ -20,30 +20,30 @@
 <script defer src="/_vercel/insights/script.js"></script>
 <link rel="stylesheet" href="/fonts/plainline.css">
 <style>
-/* Colors match the homepage (navy and sage on off-white, Ben, Oct 31).
+/* Colors match the homepage and Ben's Desk (warm room tones, blue actions, Ben, Oct 31).
    Layout: a working demo console. Customer's phone on the left, the business's front desk on the right; tabs on phones. */
 :root{
-  --bg:#f5f3ee; --surface:#fffefb; --sunk:#efede6; --ink:#15233b; --muted:#5d6878; --line:#e2dfd6;
-  --accent:#1f3a5f; --accent-ink:#ffffff; --accent-soft:#e2ebe3;
-  --me:#1f3a5f; --me-ink:#ffffff; --them:#ebe8e0; --them-ink:#15233b;
-  --warn:#a6520a; --warn-bg:#fcefd9; --ok:#2f6e4f; --ok-bg:#e2ebe3; --staff:#6247b3; --staff-bg:#ece6fa;
+  --bg:#e6ddd0; --surface:#fbf8f3; --sunk:#f2ece3; --ink:#2a211b; --muted:#6b5d50; --line:#ddd2c3;
+  --accent:#2d63d8; --accent-ink:#ffffff; --accent-soft:#e3ebfb;
+  --me:#2d63d8; --me-ink:#ffffff; --them:#ece4d8; --them-ink:#2a211b;
+  --warn:#a6520a; --warn-bg:#fcefd9; --ok:#2f7a5c; --ok-bg:#e0eee7; --staff:#6247b3; --staff-bg:#ece6fa;
   --phone:#0f1b20;
-  --f-display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
-  --f-body:"Figtree", "Segoe UI", system-ui, sans-serif;
+  --f-display:"Fraunces", Georgia, "Times New Roman", serif;
+  --f-body:"Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
   --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
   --r:14px;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0e141c; --surface:#161e29; --sunk:#121922; --ink:#e8ecf1; --muted:#95a1b0; --line:#253041;
-  --accent:#a9c2e0; --accent-ink:#0e1a2b; --accent-soft:#1c2b25;
-  --me:#2c4a72; --me-ink:#ffffff; --them:#1e2734; --them-ink:#e8ecf1;
-  --warn:#f1a64c; --warn-bg:#36260f; --ok:#7cc29a; --ok-bg:#16291f; --staff:#ab95f2; --staff-bg:#271f3f;
+  --bg:#17110d; --surface:#231b16; --sunk:#1c1511; --ink:#f7f2ea; --muted:#b3a597; --line:#3a2e26;
+  --accent:#7aa6f8; --accent-ink:#0d1a33; --accent-soft:#1d2840;
+  --me:#2d63d8; --me-ink:#ffffff; --them:#2e241d; --them-ink:#f7f2ea;
+  --warn:#f2bd72; --warn-bg:#36260f; --ok:#86cdb0; --ok-bg:#16291f; --staff:#ab95f2; --staff-bg:#271f3f;
   --phone:#05090b; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0e141c; --surface:#161e29; --sunk:#121922; --ink:#e8ecf1; --muted:#95a1b0; --line:#253041;
-  --accent:#a9c2e0; --accent-ink:#0e1a2b; --accent-soft:#1c2b25;
-  --me:#2c4a72; --me-ink:#ffffff; --them:#1e2734; --them-ink:#e8ecf1;
-  --warn:#f1a64c; --warn-bg:#36260f; --ok:#7cc29a; --ok-bg:#16291f; --staff:#ab95f2; --staff-bg:#271f3f;
+  --bg:#17110d; --surface:#231b16; --sunk:#1c1511; --ink:#f7f2ea; --muted:#b3a597; --line:#3a2e26;
+  --accent:#7aa6f8; --accent-ink:#0d1a33; --accent-soft:#1d2840;
+  --me:#2d63d8; --me-ink:#ffffff; --them:#2e241d; --them-ink:#f7f2ea;
+  --warn:#f2bd72; --warn-bg:#36260f; --ok:#86cdb0; --ok-bg:#16291f; --staff:#ab95f2; --staff-bg:#271f3f;
   --phone:#05090b; color-scheme:dark}
 *{box-sizing:border-box}
 html{color-scheme:light}

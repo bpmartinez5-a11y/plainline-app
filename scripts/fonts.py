@@ -5,7 +5,7 @@ changing a font: python3 scripts/fonts.py. The fonts are OFL-licensed, which all
 import hashlib, os, re, urllib.request
 
 SETS = {
-    "plainline": "family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500",
+    "plainline": "family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500",
     # Studio client sites: must match VOICES in studio-engine.js
     "voice-bold": "family=Big+Shoulders+Display:wght@800;900&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500",
     "voice-clean": "family=Schibsted+Grotesk:wght@700;800&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500",
