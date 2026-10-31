@@ -14,15 +14,16 @@ const BLOCKED = new net.BlockList();
 for (const [a, n] of [["0.0.0.0", 8], ["10.0.0.0", 8], ["100.64.0.0", 10], ["127.0.0.0", 8], ["169.254.0.0", 16], ["172.16.0.0", 12],
   ["192.0.0.0", 24], ["192.0.2.0", 24], ["192.168.0.0", 16], ["198.18.0.0", 15], ["198.51.100.0", 24], ["203.0.113.0", 24], ["224.0.0.0", 3]]) BLOCKED.addSubnet(a, n, "ipv4");
 for (const [a, n] of [["::", 96], ["64:ff9b::", 96], ["64:ff9b:1::", 48], ["100::", 64], ["2001::", 32], ["2001:db8::", 32], ["2002::", 16],
-  ["fc00::", 7], ["fe80::", 10], ["fec0::", 10], ["ff00::", 8]]) BLOCKED.addSubnet(a, n, "ipv6");
+  ["::ffff:0:0:0", 96], ["fc00::", 7], ["fe80::", 10], ["fec0::", 10], ["ff00::", 8]]) BLOCKED.addSubnet(a, n, "ipv6");
 const privateIp = ip => { const v = net.isIP(ip); return !v || BLOCKED.check(ip, v === 4 ? "ipv4" : "ipv6"); };
+const fail = m => Object.assign(new Error(m), { scan: true }); // our own messages; anything else is shown as a plain "couldn't read"
 const allowPrivate = () => process.env.NODE_ENV === "test" && process.env.STUDIO_ALLOW_PRIVATE === "1"; // local tests only
 
 // The connection's own DNS lookup, so the address that was checked is the address that is used (no second lookup).
 function safeLookup(host, opts, cb) {
   dns.lookup(host, { all: true }, (err, addrs) => {
-    if (err || !addrs.length) return cb(new Error("Couldn't find that website"));
-    if (!allowPrivate() && addrs.some(a => privateIp(a.address))) return cb(new Error("That address isn't a public website"));
+    if (err || !addrs.length) return cb(fail("Couldn't find that website"));
+    if (!allowPrivate() && addrs.some(a => privateIp(a.address))) return cb(fail("That address isn't a public website"));
     if (opts && opts.all) return cb(null, addrs);
     cb(null, addrs[0].address, addrs[0].family);
   });
@@ -31,10 +32,11 @@ function safeLookup(host, opts, cb) {
 // Public http(s) addresses only, so the Studio can't be used to reach private networks.
 function checkUrl(raw) {
   let u;
-  try { u = new URL(/^[a-z][a-z0-9+.-]*:\/\//i.test(raw) ? raw : "https://" + raw); } catch { throw new Error("That doesn't look like a web address"); }
-  if (!/^https?:$/.test(u.protocol)) throw new Error("Only http and https addresses");
+  try { u = new URL(/^[a-z][a-z0-9+.-]*:\/\//i.test(raw) ? raw : "https://" + raw); } catch { throw fail("That doesn't look like a web address"); }
+  if (!/^https?:$/.test(u.protocol)) throw fail("Only http and https addresses");
+  if (u.username || u.password) throw fail("Leave the sign-in out of the address");
   const literal = u.hostname.replace(/^\[|\]$/g, ""); // an IP in the address skips DNS, so check it here
-  if (net.isIP(literal) && !allowPrivate() && privateIp(literal)) throw new Error("That address isn't a public website");
+  if (net.isIP(literal) && !allowPrivate() && privateIp(literal)) throw fail("That address isn't a public website");
   return u;
 }
 
@@ -42,7 +44,7 @@ function request(u) {
   return new Promise((resolve, reject) => {
     const req = (u.protocol === "https:" ? https : http).request(u, {
       lookup: safeLookup, signal: AbortSignal.timeout(TIMEOUT_MS),
-      headers: { "user-agent": UA, accept: "text/html", "accept-encoding": "gzip, deflate, br" }
+      headers: { "user-agent": UA, accept: "text/html", "accept-encoding": "gzip, br" }
     }, resolve);
     req.on("error", reject);
     req.end();
@@ -50,9 +52,19 @@ function request(u) {
 }
 
 // Reads at most MAX_BYTES after decompression, so a small compressed page can't expand without limit.
+// Tolerant like browsers: a cut-off compressed page keeps what arrived.
+const Z = zlib.constants;
+function decoder(header) {
+  const enc = String(header || "").toLowerCase().split(",").map(e => e.trim()).filter(e => e && e !== "identity");
+  if (!enc.length) return null;
+  if (enc.length === 1 && (enc[0] === "gzip" || enc[0] === "x-gzip")) return zlib.createGunzip({ finishFlush: Z.Z_SYNC_FLUSH });
+  if (enc.length === 1 && enc[0] === "deflate") return zlib.createUnzip({ finishFlush: Z.Z_SYNC_FLUSH });
+  if (enc.length === 1 && enc[0] === "br") return zlib.createBrotliDecompress({ finishFlush: Z.BROTLI_OPERATION_FLUSH });
+  throw fail("That site sent the page in a format the Studio can't read");
+}
 function readBody(res) {
-  const enc = String(res.headers["content-encoding"] || "").toLowerCase();
-  const unzip = enc === "gzip" ? zlib.createGunzip() : enc === "deflate" ? zlib.createInflate() : enc === "br" ? zlib.createBrotliDecompress() : null;
+  let unzip;
+  try { unzip = decoder(res.headers["content-encoding"]); } catch (e) { res.resume(); return Promise.reject(e); }
   const src = unzip ? res.pipe(unzip) : res;
   return new Promise((resolve, reject) => {
     const chunks = []; let n = 0;
@@ -65,15 +77,22 @@ function readBody(res) {
 }
 
 async function get(raw) {
+  try { return await fetchPage(raw); } catch (e) {
+    if (e.scan) throw e;
+    throw fail(e.name === "TimeoutError" || e.name === "AbortError" ? "That site took too long to answer" : "Couldn't read that site"); // no raw socket errors (they name IPs)
+  }
+}
+
+async function fetchPage(raw) {
   let u = checkUrl(raw);
   for (let i = 0; i <= MAX_REDIRECTS; i++) {
     const r = await request(u);
     if (r.statusCode >= 300 && r.statusCode < 400 && r.headers.location) { r.resume(); u = checkUrl(new URL(r.headers.location, u).href); continue; }
-    if (r.statusCode < 200 || r.statusCode > 299) { r.resume(); throw new Error(`The site answered ${r.statusCode}`); }
-    if (!/html/i.test(r.headers["content-type"] || "")) { r.resume(); throw new Error("That page isn't a web page"); }
+    if (r.statusCode < 200 || r.statusCode > 299) { r.resume(); throw fail(`The site answered ${r.statusCode}`); }
+    if (!/html/i.test(r.headers["content-type"] || "")) { r.resume(); throw fail("That page isn't a web page"); }
     return { url: u.href, html: await readBody(r) };
   }
-  throw new Error("Too many redirects");
+  throw fail("Too many redirects");
 }
 
 const decode = s => s.replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#(\d+);/g, (_, d) => String.fromCharCode(+d));
