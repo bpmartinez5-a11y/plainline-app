@@ -1,6 +1,7 @@
 // Studio step 2: write a production-ready one-page website for a business from its real facts.
 // Streams the HTML back as Claude writes it, so long builds don't hit the function's time limit.
 const { authorized, body } = require("./_studio");
+const errType = require("./_errtype");
 const STYLES = require("../studio-styles.json");
 
 const MODEL = process.env.STUDIO_MODEL || "claude-sonnet-5-5";
@@ -65,7 +66,7 @@ module.exports = async function handler(req, res) {
       signal: AbortSignal.timeout(280_000)
     });
   } catch (e) { return res.status(502).json({ error: "Couldn't reach Claude: " + e.message }); }
-  if (!r.ok) { const t = await r.text(); console.error("anthropic", r.status, t); return res.status(502).json({ error: `Claude said ${r.status}` }); }
+  if (!r.ok) { console.error("anthropic", r.status, await errType(r)); return res.status(502).json({ error: `Claude said ${r.status}` }); }
 
   res.status(200);
   res.setHeader("Content-Type", "text/plain; charset=utf-8");

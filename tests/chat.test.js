@@ -195,3 +195,14 @@ test("any sort failure is ignored and the demo answers as before", async () => {
     assert.deepStrictEqual(out, { result: booking, sort: { by: "jev", intent: "other", confidence: null, needsPerson: null } });
   } finally { console.error = errors; }
 });
+
+test("a Claude error logs only its status and error type, never the body", async () => {
+  globalThis.fetch = async () => Response.json({ type: "error", error: { type: "invalid_request_error", message: "prompt quoted: Customer: my card is 4242" } }, { status: 400 });
+  const logged = [], errors = console.error; console.error = (...a) => logged.push(a.join(" "));
+  try { assert.strictEqual((await call()).code, 502); } finally { console.error = errors; }
+  assert.deepStrictEqual(logged, ["anthropic error 400 invalid_request_error"]);
+  globalThis.fetch = async () => new Response("<html>Customer: my card is 4242</html>", { status: 500 });
+  logged.length = 0; console.error = (...a) => logged.push(a.join(" "));
+  try { await call(); } finally { console.error = errors; }
+  assert.deepStrictEqual(logged, ["anthropic error 500 unknown"]);
+});
