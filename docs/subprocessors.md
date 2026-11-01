@@ -8,6 +8,7 @@ The client agreement (§§7.7, 7.10, 7.12, 7.15) promises clients a current list
 | Supabase | Database (leads, bookings, conversations) | Confirm project region | Yes (we delete rows) | No | Confirm |
 | Anthropic | AI model that writes replies | Confirm current API terms | Confirm current API retention terms | Confirm current API terms | Confirm |
 | TypeSafe AI (Jev) | Sorting incoming messages (booking, urgent, needs a person); off until `JEV_API_KEY` is set | Confirm current API terms | Confirm current API retention terms | Confirm current API terms | Not for PHI until confirmed |
+| Stripe | Client invoices and payments (cards and ACH); live since Nov 2026 | Confirm | Confirm current retention terms | No (payments) | Not for PHI |
 | SMS provider | Text messaging and hand-off notices | Not chosen yet | — | — | — |
 | Claude (Claude Code and Claude app sessions) | Agents that build, review and run reports | Confirm current terms | Confirm | Confirm current terms per plan | Confirm |
 | GitHub | Client site code repos | Confirm | Yes | Confirm | Not for PHI |

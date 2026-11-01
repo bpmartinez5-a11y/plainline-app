@@ -422,6 +422,8 @@ const SUPABASE_URL = "https://mtpaaizladkfjtpnkdao.supabase.co";
 const SUPABASE_KEY = "sb_publishable_JPkZK7XX94_KVaRBnFYpwQ_-1w3TY24";
 const form = document.getElementById("leadForm"), msg = document.getElementById("formMsg"), btn = document.getElementById("sendBtn");
 const say = (text, cls) => { msg.textContent = text; msg.className = cls; };
+/* Where the visitor came from, so walkthrough rates can be counted per campaign: "website", or "website · <utm_source>/<utm_campaign>", at most 50 characters (the table's limit). */
+const leadSource = () => { const q = new URLSearchParams(location.search), tag = [q.get("utm_source"), q.get("utm_campaign")].filter(Boolean).join("/").replace(/[^\w.\/-]/g, "").slice(0, 40); return tag ? "website · " + tag : "website"; }; // the leads table caps source at 50 characters
 
 form.addEventListener("submit", async e => {
   e.preventDefault();
@@ -436,7 +438,7 @@ form.addEventListener("submit", async e => {
     const r = await fetch(SUPABASE_URL + "/rest/v1/leads", {
       method: "POST",
       headers: {apikey: SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=minimal"},
-      body: JSON.stringify({name, email, message: message || null, source: "website"}),
+      body: JSON.stringify({name, email, message: message || null, source: leadSource()}),
       signal: AbortSignal.timeout(15000)
     });
     if (!r.ok) throw new Error("HTTP " + r.status);
