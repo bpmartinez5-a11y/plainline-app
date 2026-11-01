@@ -8,6 +8,7 @@ Plainline is an AI agency (Oct 30): it brings AI into how a company's team works
 
 ## Hard rules
 - Never show a Plainline price, plan price, unit rate or dollar amount on the website or anything client-facing, ever (Ben, Oct 30). Every engagement is quoted after qualification, research and a walkthrough. The price ladder lives only in Ben's private plan page. Calls to action say "Book a walkthrough".
+- Pricing rule (Ben, Nov 1): setup is the total of the build list, and the monthly maintenance is 10% of that setup. Check every row of any quote, tier or price table against it before Ben sees it. Prices themselves stay out of this repo.
 - No AI-looking imagery: no generated faces, robots or glowing-brain art. Visuals are real-looking UI cards built from the client's own data, over documentary photos from Higgsfield.
 - Example businesses and numbers are labeled "values illustrative" until real client data replaces them.
 - Instructions and client documents follow the writing standard in `docs/claude/writing-standard.md` (rules based on ASD-STE100 Simplified Technical English). Never copy the STE dictionary, and never call a document "STE compliant".
