@@ -27,6 +27,7 @@
 {"@type":"Question","name":"How do we stop missing customer messages after hours?","acceptedAnswer":{"@type":"Answer","text":"Plainline is set up to answer texts and website chats right away, day or night, from your own services, hours and policies. It tells customers it's an automated assistant. Anything it can't answer goes to a person, so customers aren't left waiting."}},
 {"@type":"Question","name":"Who follows up on every lead and quote?","acceptedAnswer":{"@type":"Answer","text":"From the Front Office plan up, Plainline does. New inquiries and open quotes get a follow-up on a schedule you approve."}},
 {"@type":"Question","name":"What does it cost?","acceptedAnswer":{"@type":"Answer","text":"Every engagement is quoted for your company after a walkthrough and our research on your business. We don't publish prices."}},
+{"@type":"Question","name":"How fast do you reply?","acceptedAnswer":{"@type":"Answer","text":"We reply to every message within 24 hours, and often sooner. We answer you by email."}},
 {"@type":"Question","name":"Can I step in on a conversation?","acceptedAnswer":{"@type":"Answer","text":"Yes. You can read every conversation and take over any of them. Plainline is also set up to hand off on its own when a customer needs a person."}},
 {"@type":"Question","name":"Can I see it working first?","acceptedAnswer":{"@type":"Answer","text":"Yes. The live demo at plainlineops.com/demo lets you text as a customer and watch the front desk side at the same time."}}]}</script>
 <link rel="stylesheet" href="/fonts/plainline.css">
@@ -392,6 +393,7 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
       <details><summary>How do we stop missing customer messages after hours?</summary><p>Plainline is set up to answer texts and website chats right away, day or night, from your own services, hours and policies. It tells customers it's an automated assistant. Anything it can't answer goes to a person, so customers aren't left waiting.</p></details>
       <details><summary>Who follows up on every lead and quote?</summary><p>From the Front Office plan up, Plainline does. New inquiries and open quotes get a follow-up on a schedule you approve.</p></details>
       <details><summary>What does it cost?</summary><p>Every engagement is quoted for your company after a walkthrough and our research on your business. We don't publish prices.</p></details>
+      <details><summary>How fast do you reply?</summary><p>We reply to every message within 24 hours, and often sooner. <a href="#contact">Book a walkthrough</a>, and we answer you by email.</p></details>
       <details><summary>Can I step in on a conversation?</summary><p>Yes. You can read every conversation and take over any of them. Plainline is also set up to hand off on its own when a customer needs a person.</p></details>
       <details><summary>Can I see it working first?</summary><p>Yes. <a href="/demo">The live demo</a> lets you text as a customer and watch the front desk side at the same time.</p></details>
     </div>
@@ -400,7 +402,7 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
   <section id="contact" class="contact">
     <div>
       <h2 style="font-size:28px;margin-bottom:12px">Book a walkthrough</h2>
-      <p style="color:var(--muted);margin:0">Tell us a little about your business. We'll reply by email, usually within two business days.</p>
+      <p style="color:var(--muted);margin:0">Tell us a little about your business. We reply by email within 24 hours.</p>
       <p class="billing">After you approve a quote, you pay by invoice through Stripe. <a href="https://stripe.com/@plainline" target="_blank" rel="noopener">Plainline on Stripe ↗</a></p>
     </div>
     <form id="leadForm" novalidate>
@@ -445,7 +447,7 @@ form.addEventListener("submit", async e => {
       signal: AbortSignal.timeout(15000)
     });
     if (!r.ok) throw new Error("HTTP " + r.status);
-    form.reset(); say("Thanks! Your message is in. We'll reply by email.", "ok");
+    form.reset(); say("Thanks! Your message is in. We reply by email within 24 hours.", "ok");
   } catch (err) {
     console.error("lead submit failed", err);
     say("Sorry, that didn't send. Please check your connection and try again.", "err");
