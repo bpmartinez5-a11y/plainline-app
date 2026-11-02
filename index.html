@@ -125,8 +125,13 @@ section > h2{font-size:28px;margin-bottom:20px}
 .steps span{color:var(--muted)}
 .who{display:flex;flex-wrap:wrap;gap:8px}
 .who span{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:15px}
-dl{margin:0;display:grid;gap:16px}
-dt{font-weight:700} dd{margin:2px 0 0;color:var(--muted)}
+.faq{display:grid;padding-block:4px}
+.faq details+details{border-top:1px solid var(--line)}
+.faq summary{font-weight:700;min-height:44px;padding:12px 0;cursor:pointer;display:flex;align-items:center;gap:12px;list-style:none}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";margin-left:auto;font-weight:400;font-size:20px;color:var(--muted)}
+.faq details[open] summary::after{content:"\2212"}
+.faq details p{margin:0 0 14px;color:var(--muted)}
 .contact{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:28px;align-items:start}
 @media (max-width:760px){.contact{grid-template-columns:minmax(0,1fr)}}
 form{display:flex;flex-direction:column;gap:12px}
@@ -280,7 +285,7 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
 
   <section id="plans">
     <h2>How much do you want us to run?</h2>
-    <p class="lede">Four levels. Every one is set up and run by Plainline, and every one starts with a walkthrough.</p>
+    <p class="lede">Four levels. Every one is set up and run by Plainline. You don't have to pick one now: we recommend a level after your walkthrough.</p>
     <div class="cards tiers">
       <div class="card top"><span class="tag">For large companies</span><h3>Back Office</h3><p>Plainline staffs and runs the work behind your customer operation: messages, scheduling, follow-up, record keeping and reporting. AI takes the volume, our operators take the judgment calls, and your managers can see the work. Scoped in your walkthrough.</p></div>
       <div class="card"><span class="tag">For multi-location teams</span><h3>Operations</h3><p>One system across every location, set up for intake, scheduling, follow-up and a weekly report, with a Plainline lead who keeps it running. Scoped in your walkthrough.</p></div>
@@ -380,16 +385,16 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
 
   <section id="faq">
     <h2>Questions</h2>
-    <dl class="panel">
-      <div><dt>What is Plainline?</dt><dd>Plainline is an AI agency. We bring AI into how your team works and build AI tools for it, and websites and apps are coming next. We also run the work behind your business: for one location, an AI front desk that answers customers by text and website chat and books them into open times; for a large company, a back-office team that Plainline staffs and runs.</dd></div>
-      <div><dt>Can you help our team use AI like Claude at work?</dt><dd>Yes. We research your industry and your company, pick the AI model that fits your work and your rules (Claude or another enterprise model), and set it up with your team's own tools, playbooks and skills. Then we train your people and keep it current.</dd></div>
-      <div><dt>Can someone run our back office for us?</dt><dd>Yes. On the Back Office plan, Plainline runs the work for you: answering customers, scheduling, following up on leads and quotes, keeping records current and reporting to your managers. AI handles the volume, Plainline's operators handle the judgment calls, and your managers can see the work. What we run is scoped in your walkthrough.</dd></div>
-      <div><dt>How do we stop missing customer messages after hours?</dt><dd>Plainline is set up to answer texts and website chats right away, day or night, from your own services, hours and policies. It tells customers it's an automated assistant. Anything it can't answer goes to a person, so customers aren't left waiting.</dd></div>
-      <div><dt>Who follows up on every lead and quote?</dt><dd>From the Front Office plan up, Plainline does. New inquiries and open quotes get a follow-up on a schedule you approve.</dd></div>
-      <div><dt>What does it cost?</dt><dd>Every engagement is quoted for your company after a walkthrough and our research on your business. We don't publish prices.</dd></div>
-      <div><dt>Can I step in on a conversation?</dt><dd>Yes. You can read every conversation and take over any of them. Plainline is also set up to hand off on its own when a customer needs a person.</dd></div>
-      <div><dt>Can I see it working first?</dt><dd>Yes. <a href="/demo">The live demo</a> lets you text as a customer and watch the front desk side at the same time.</dd></div>
-    </dl>
+    <div class="faq panel">
+      <details><summary>What is Plainline?</summary><p>Plainline is an AI agency. We bring AI into how your team works and build AI tools for it, and websites and apps are coming next. We also run the work behind your business: for one location, an AI front desk that answers customers by text and website chat and books them into open times; for a large company, a back-office team that Plainline staffs and runs.</p></details>
+      <details><summary>Can you help our team use AI like Claude at work?</summary><p>Yes. We research your industry and your company, pick the AI model that fits your work and your rules (Claude or another enterprise model), and set it up with your team's own tools, playbooks and skills. Then we train your people and keep it current.</p></details>
+      <details><summary>Can someone run our back office for us?</summary><p>Yes. On the Back Office plan, Plainline runs the work for you: answering customers, scheduling, following up on leads and quotes, keeping records current and reporting to your managers. AI handles the volume, Plainline's operators handle the judgment calls, and your managers can see the work. What we run is scoped in your walkthrough.</p></details>
+      <details><summary>How do we stop missing customer messages after hours?</summary><p>Plainline is set up to answer texts and website chats right away, day or night, from your own services, hours and policies. It tells customers it's an automated assistant. Anything it can't answer goes to a person, so customers aren't left waiting.</p></details>
+      <details><summary>Who follows up on every lead and quote?</summary><p>From the Front Office plan up, Plainline does. New inquiries and open quotes get a follow-up on a schedule you approve.</p></details>
+      <details><summary>What does it cost?</summary><p>Every engagement is quoted for your company after a walkthrough and our research on your business. We don't publish prices.</p></details>
+      <details><summary>Can I step in on a conversation?</summary><p>Yes. You can read every conversation and take over any of them. Plainline is also set up to hand off on its own when a customer needs a person.</p></details>
+      <details><summary>Can I see it working first?</summary><p>Yes. <a href="/demo">The live demo</a> lets you text as a customer and watch the front desk side at the same time.</p></details>
+    </div>
   </section>
 
   <section id="contact" class="contact">
