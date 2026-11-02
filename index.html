@@ -524,6 +524,8 @@ form.addEventListener("submit", async e => {
     });
   });
   box.addEventListener('mouseleave', () => move(on));
+  // The link names the level in an empty message box, so the walkthrough request carries it.
+  go.addEventListener('click', () => { const m = document.querySelector('#contact textarea[name=message]'); if (m && !m.value.trim()) m.value = `We're interested in ${on.querySelector('h3').textContent}.`; });
   new ResizeObserver(() => move(on)).observe(box);
 })();
 </script>
