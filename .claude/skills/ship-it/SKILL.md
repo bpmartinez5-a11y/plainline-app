@@ -7,7 +7,7 @@ description: "DevOps and deployment for Plainline on Vercel. Covers the review g
 Plainline runs on Vercel: static pages plus serverless functions in `api/`. Vercel handles servers and scaling, so there's no Docker or Kubernetes here. Add containers only if a workload ever can't run as a Vercel function.
 
 **How deploys work**
-- Every pull request gets a Vercel Preview deployment. Test there.
+- Preview deployments are off on every Plainline Vercel project (Ben, Nov 2: the free plan's 100 deploys a day went mostly to previews). Only a merge to `main` deploys. Test a PR locally with Playwright, then check production right after the merge. To turn previews on again for one project, set `previewDeploymentsDisabled` to false in its Vercel settings.
 - Open PRs against `main`, not the GitHub default branch (check with `git ls-remote --symref origin HEAD`; if it isn't `main`, still target `main` unless Ben says otherwise). Confirm the production branch in Vercel → Project → Settings → Git before the first merge.
 - Rollback: Vercel → Deployments → pick the last good one → Promote (or `vercel rollback`). It's instant, so prefer it to a hotfix under pressure.
 
@@ -22,7 +22,7 @@ Plainline runs on Vercel: static pages plus serverless functions in `api/`. Verc
 
 **Pre-merge checklist**
 1. `node --check` passes for every file in `api/`.
-2. On the Preview:
+2. Locally before the merge, and on production right after it:
    - The home page, demo and Studio load at 400px and on desktop.
    - The demo replies, and fallback works (replies still come with AI off).
    - Studio rejects a wrong key with 401.

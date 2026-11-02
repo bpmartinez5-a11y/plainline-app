@@ -4,7 +4,7 @@ description: "Performance pass on the site, demo and API. Measures first, then f
 ---
 # Performance pass
 
-1. **Measure.** Run the `perf-engineer` subagent. Include the Vercel preview URL if there is one.
+1. **Measure.** Run the `perf-engineer` subagent. Measure the production site; there are no preview URLs (previews are off).
 2. **Pick the work.** Choose the top 3 wins by visitor impact per minute of work. Skip anything under 5% gain, or anything that needs a bundler or framework, unless Ben asks for it.
 3. **Apply each win as its own small diff**: image dimensions and lazy loading, `defer` on scripts, passive listeners, clearing intervals, cache headers in `vercel.json`, a smaller `max_tokens` or prompt in the API.
 4. **Verify behavior is unchanged.** Pages look the same at 400px and desktop, the demo still replies, and `node --check` passes. Re-measure sizes and compare before and after.

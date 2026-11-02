@@ -10,7 +10,7 @@ Measure first:
 - Sizes: `wc -c *.html og.png icons/*.png api/*.js`. Count inline `<script>` and `<style>` blocks with Grep.
 - Grep for render-blocking `<link>`/`<script>` in `<head>`, images without `width`/`height` or `loading="lazy"`, web fonts without `display=swap`, scroll/resize listeners without `passive`, `setInterval` that never clears, listeners added inside loops, and layout reads mixed with writes.
 - API: model, `max_tokens`, timeout, prompt size (`MAX_PROMPT_CHARS`) and how often the demo calls it (Grep `fetch("/api/chat"`).
-- If a preview URL is given, fetch it and note response headers (cache-control, content-encoding).
+- If a URL is given, fetch it and note response headers (cache-control, content-encoding).
 
 Return:
 1. **Issues**: a table with columns `file:line`, `issue`, `measured cost`, `fix`, `effort`.
