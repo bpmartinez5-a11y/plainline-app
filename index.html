@@ -27,6 +27,7 @@
 {"@type":"Question","name":"How do we stop missing customer messages after hours?","acceptedAnswer":{"@type":"Answer","text":"Plainline is set up to answer texts and website chats right away, day or night, from your own services, hours and policies. It tells customers it's an automated assistant. Anything it can't answer goes to a person, so customers aren't left waiting."}},
 {"@type":"Question","name":"Who follows up on every lead and quote?","acceptedAnswer":{"@type":"Answer","text":"From the Front Office plan up, Plainline does. New inquiries and open quotes get a follow-up on a schedule you approve."}},
 {"@type":"Question","name":"What does it cost?","acceptedAnswer":{"@type":"Answer","text":"Every engagement is quoted for your company after a walkthrough and our research on your business. We don't publish prices."}},
+{"@type":"Question","name":"How fast do you reply?","acceptedAnswer":{"@type":"Answer","text":"We reply to every message within 24 hours, and often sooner. We answer you by email."}},
 {"@type":"Question","name":"Can I step in on a conversation?","acceptedAnswer":{"@type":"Answer","text":"Yes. You can read every conversation and take over any of them. Plainline is also set up to hand off on its own when a customer needs a person."}},
 {"@type":"Question","name":"Can I see it working first?","acceptedAnswer":{"@type":"Answer","text":"Yes. The live demo at plainlineops.com/demo lets you text as a customer and watch the front desk side at the same time."}}]}</script>
 <link rel="stylesheet" href="/fonts/plainline.css">
@@ -116,7 +117,14 @@ section > h2{font-size:28px;margin-bottom:20px}
 .card h3{font-size:20px;font-weight:500;margin-bottom:6px}
 .soon{font:600 12px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-left:6px;white-space:nowrap}
 .tiers .tag{display:block;font:600 12px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.tiers .top{border-color:var(--green);box-shadow:0 0 0 1px var(--green),var(--shadow)} .tiers .top .tag{color:var(--green)}
+/* Level picker: one green ring glides to the level a visitor taps, hovers or arrows to */
+.tiers{position:relative}
+.tiers .card{cursor:pointer}
+.tiers .card:hover{transform:none}
+.tiers .on .tag{color:var(--green)}
+.tiers .ring{position:absolute;left:0;top:0;border-radius:20px;border:1px solid var(--green);box-shadow:0 0 0 1px var(--green),0 0 24px rgba(183,230,207,.25),var(--shadow);pointer-events:none;z-index:1;transition:transform var(--t-panel) var(--spring),width var(--t-panel) var(--spring),height var(--t-panel) var(--spring)}
+.tiers .card:focus-visible{outline:2px solid var(--green);outline-offset:3px}
+.pick{margin:16px 0 0} .pick .quiet{display:inline-block;padding:10px 0}
 .card p{margin:0;color:var(--muted);font-size:15px}
 .steps{counter-reset:s;list-style:none;padding:0;margin:0}
 .steps li{counter-increment:s;position:relative;padding:0 0 18px 48px}
@@ -258,11 +266,11 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
   <nav class="rail" aria-label="Sections">
     <a class="logo" href="#top" aria-label="Plainline, back to top">P/</a>
     <a href="#plans" aria-label="Plans"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span aria-hidden="true">Plans</span></a>
+    <a href="#faq" aria-label="Questions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></svg><span aria-hidden="true">Questions</span></a>
     <a href="#build" aria-label="What we build"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg><span aria-hidden="true">What we build</span></a>
     <a href="#looks" class="wide" aria-label="Your own voice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg><span aria-hidden="true">Your own voice</span></a>
     <a href="#desk" aria-label="Your front desk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span aria-hidden="true">Your front desk</span></a>
     <a href="#how" class="wide" aria-label="How it works"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg><span aria-hidden="true">How it works</span></a>
-    <a href="#faq" aria-label="Questions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></svg><span aria-hidden="true">Questions</span></a>
     <a href="/demo" aria-label="Live demo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg><span aria-hidden="true">Live demo</span></a>
     <a href="#contact" class="go" aria-label="Book a walkthrough"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/></svg><span aria-hidden="true">Book a walkthrough</span></a>
   </nav>
@@ -286,11 +294,28 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
   <section id="plans">
     <h2>How much do you want us to run?</h2>
     <p class="lede">Four levels. Every one is set up and run by Plainline. You don't have to pick one now: we recommend a level after your walkthrough.</p>
-    <div class="cards tiers">
-      <div class="card top"><span class="tag">For large companies</span><h3>Back Office</h3><p>Plainline staffs and runs the work behind your customer operation: messages, scheduling, follow-up, record keeping and reporting. AI takes the volume, our operators take the judgment calls, and your managers can see the work. Scoped in your walkthrough.</p></div>
-      <div class="card"><span class="tag">For multi-location teams</span><h3>Operations</h3><p>One system across every location, set up for intake, scheduling, follow-up and a weekly report, with a Plainline lead who keeps it running. Scoped in your walkthrough.</p></div>
-      <div class="card"><span class="tag">For growing teams</span><h3>Front Office</h3><p>The front desk plus follow-up on inquiries and open quotes, set up on a schedule you approve. Scoped in your walkthrough.</p></div>
-      <div class="card"><span class="tag">For one location</span><h3>Front Desk</h3><p>An AI text assistant that answers customers by text and website chat, books open times and hands anything tricky to you. It tells customers it's automated.</p></div>
+    <div class="cards tiers" role="radiogroup" aria-label="Pick a level">
+      <i class="ring" aria-hidden="true"></i>
+      <div class="card on" role="radio" tabindex="0" aria-checked="true"><span class="tag">For large companies</span><h3>Back Office</h3><p>Plainline staffs and runs the work behind your customer operation: messages, scheduling, follow-up, record keeping and reporting. AI takes the volume, our operators take the judgment calls, and your managers can see the work. Scoped in your walkthrough.</p></div>
+      <div class="card" role="radio" tabindex="-1" aria-checked="false"><span class="tag">For multi-location teams</span><h3>Operations</h3><p>One system across every location, set up for intake, scheduling, follow-up and a weekly report, with a Plainline lead who keeps it running. Scoped in your walkthrough.</p></div>
+      <div class="card" role="radio" tabindex="-1" aria-checked="false"><span class="tag">For growing teams</span><h3>Front Office</h3><p>The front desk plus follow-up on inquiries and open quotes, set up on a schedule you approve. Scoped in your walkthrough.</p></div>
+      <div class="card" role="radio" tabindex="-1" aria-checked="false"><span class="tag">For one location</span><h3>Front Desk</h3><p>An AI text assistant that answers customers by text and website chat, books open times and hands anything tricky to you. It tells customers it's automated.</p></div>
+    </div>
+    <p class="pick"><a class="quiet" href="#contact" id="pickGo">Book a walkthrough about <b>Back Office</b>&nbsp;→</a></p>
+  </section>
+
+  <section id="faq">
+    <h2>Questions</h2>
+    <div class="faq panel">
+      <details><summary>What is Plainline?</summary><p>Plainline is an AI agency. We bring AI into how your team works and build AI tools for it, and websites and apps are coming next. We also run the work behind your business: for one location, an AI front desk that answers customers by text and website chat and books them into open times; for a large company, a back-office team that Plainline staffs and runs.</p></details>
+      <details><summary>Can you help our team use AI like Claude at work?</summary><p>Yes. We research your industry and your company, pick the AI model that fits your work and your rules (Claude or another enterprise model), and set it up with your team's own tools, playbooks and skills. Then we train your people and keep it current.</p></details>
+      <details><summary>Can someone run our back office for us?</summary><p>Yes. On the Back Office plan, Plainline runs the work for you: answering customers, scheduling, following up on leads and quotes, keeping records current and reporting to your managers. AI handles the volume, Plainline's operators handle the judgment calls, and your managers can see the work. What we run is scoped in your walkthrough.</p></details>
+      <details><summary>How do we stop missing customer messages after hours?</summary><p>Plainline is set up to answer texts and website chats right away, day or night, from your own services, hours and policies. It tells customers it's an automated assistant. Anything it can't answer goes to a person, so customers aren't left waiting.</p></details>
+      <details><summary>Who follows up on every lead and quote?</summary><p>From the Front Office plan up, Plainline does. New inquiries and open quotes get a follow-up on a schedule you approve.</p></details>
+      <details><summary>What does it cost?</summary><p>Every engagement is quoted for your company after a walkthrough and our research on your business. We don't publish prices.</p></details>
+      <details><summary>How fast do you reply?</summary><p>We reply to every message within 24 hours, and often sooner. <a href="#contact">Book a walkthrough</a>, and we answer you by email.</p></details>
+      <details><summary>Can I step in on a conversation?</summary><p>Yes. You can read every conversation and take over any of them. Plainline is also set up to hand off on its own when a customer needs a person.</p></details>
+      <details><summary>Can I see it working first?</summary><p>Yes. <a href="/demo">The live demo</a> lets you text as a customer and watch the front desk side at the same time.</p></details>
     </div>
   </section>
 
@@ -383,24 +408,10 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
     <div class="who"><span>Companies with a busy customer operation</span><span>Multi-location service brands</span><span>Home services</span><span>Salons, studios and gyms</span><span>Auto and detailing</span></div>
   </section>
 
-  <section id="faq">
-    <h2>Questions</h2>
-    <div class="faq panel">
-      <details><summary>What is Plainline?</summary><p>Plainline is an AI agency. We bring AI into how your team works and build AI tools for it, and websites and apps are coming next. We also run the work behind your business: for one location, an AI front desk that answers customers by text and website chat and books them into open times; for a large company, a back-office team that Plainline staffs and runs.</p></details>
-      <details><summary>Can you help our team use AI like Claude at work?</summary><p>Yes. We research your industry and your company, pick the AI model that fits your work and your rules (Claude or another enterprise model), and set it up with your team's own tools, playbooks and skills. Then we train your people and keep it current.</p></details>
-      <details><summary>Can someone run our back office for us?</summary><p>Yes. On the Back Office plan, Plainline runs the work for you: answering customers, scheduling, following up on leads and quotes, keeping records current and reporting to your managers. AI handles the volume, Plainline's operators handle the judgment calls, and your managers can see the work. What we run is scoped in your walkthrough.</p></details>
-      <details><summary>How do we stop missing customer messages after hours?</summary><p>Plainline is set up to answer texts and website chats right away, day or night, from your own services, hours and policies. It tells customers it's an automated assistant. Anything it can't answer goes to a person, so customers aren't left waiting.</p></details>
-      <details><summary>Who follows up on every lead and quote?</summary><p>From the Front Office plan up, Plainline does. New inquiries and open quotes get a follow-up on a schedule you approve.</p></details>
-      <details><summary>What does it cost?</summary><p>Every engagement is quoted for your company after a walkthrough and our research on your business. We don't publish prices.</p></details>
-      <details><summary>Can I step in on a conversation?</summary><p>Yes. You can read every conversation and take over any of them. Plainline is also set up to hand off on its own when a customer needs a person.</p></details>
-      <details><summary>Can I see it working first?</summary><p>Yes. <a href="/demo">The live demo</a> lets you text as a customer and watch the front desk side at the same time.</p></details>
-    </div>
-  </section>
-
   <section id="contact" class="contact">
     <div>
       <h2 style="font-size:28px;margin-bottom:12px">Book a walkthrough</h2>
-      <p style="color:var(--muted);margin:0">Tell us a little about your business. We'll reply by email, usually within two business days.</p>
+      <p style="color:var(--muted);margin:0">Tell us a little about your business. We reply by email within 24 hours.</p>
       <p class="billing">After you approve a quote, you pay by invoice through Stripe. <a href="https://stripe.com/@plainline" target="_blank" rel="noopener">Plainline on Stripe ↗</a></p>
     </div>
     <form id="leadForm" novalidate>
@@ -445,7 +456,7 @@ form.addEventListener("submit", async e => {
       signal: AbortSignal.timeout(15000)
     });
     if (!r.ok) throw new Error("HTTP " + r.status);
-    form.reset(); say("Thanks! Your message is in. We'll reply by email.", "ok");
+    form.reset(); say("Thanks! Your message is in. We reply by email within 24 hours.", "ok");
   } catch (err) {
     console.error("lead submit failed", err);
     say("Sorry, that didn't send. Please check your connection and try again.", "err");
@@ -489,6 +500,33 @@ form.addEventListener("submit", async e => {
   const dock = document.getElementById("dock"), seen = new Set();
   const io = new IntersectionObserver(es => { es.forEach(e => e.isIntersecting ? seen.add(e.target) : seen.delete(e.target)); dock.classList.toggle("away", seen.size > 0); });
   io.observe(document.querySelector(".hero .cta")); io.observe(document.getElementById("contact"));
+})();
+</script>
+<script>
+// Level picker: the green ring follows hover and focus, and stays on the level picked.
+(() => {
+  const box = document.querySelector('.tiers'), ring = box.querySelector('.ring'), cards = [...box.querySelectorAll('[role=radio]')], go = document.getElementById('pickGo');
+  let on = cards[0];
+  const move = c => { ring.style.transform = `translate(${c.offsetLeft}px,${c.offsetTop}px)`; ring.style.width = c.offsetWidth + 'px'; ring.style.height = c.offsetHeight + 'px'; };
+  const pick = c => {
+    on = c;
+    cards.forEach(x => { const y = x === c; x.classList.toggle('on', y); x.setAttribute('aria-checked', y); x.tabIndex = y ? 0 : -1; });
+    go.querySelector('b').textContent = c.querySelector('h3').textContent;
+    move(c);
+  };
+  cards.forEach((c, i) => {
+    c.addEventListener('click', () => pick(c));
+    c.addEventListener('mouseenter', () => move(c));
+    c.addEventListener('keydown', e => {
+      const n = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+      if (n) { e.preventDefault(); const t = cards[(i + n + cards.length) % cards.length]; pick(t); t.focus(); }
+      else if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); pick(c); }
+    });
+  });
+  box.addEventListener('mouseleave', () => move(on));
+  // The link names the level in an empty message box, so the walkthrough request carries it.
+  go.addEventListener('click', () => { const m = document.querySelector('#contact textarea[name=message]'); if (m && !m.value.trim()) m.value = `We're interested in ${on.querySelector('h3').textContent}.`; });
+  new ResizeObserver(() => move(on)).observe(box);
 })();
 </script>
 </body>
