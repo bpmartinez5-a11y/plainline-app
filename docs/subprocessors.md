@@ -8,7 +8,7 @@ The client agreement (§§7.7, 7.10, 7.12, 7.15) promises clients a current list
 | Supabase | Database (leads, bookings, conversations) | Confirm project region | Yes (we delete rows) | No | Confirm |
 | Anthropic | AI model that writes replies | Confirm current API terms | Confirm current API retention terms | Confirm current API terms | Confirm |
 | TypeSafe AI (Jev) | Sorting incoming messages (booking, urgent, needs a person); off until `JEV_API_KEY` is set | Confirm current API terms | Confirm current API retention terms | Confirm current API terms | Not for PHI until confirmed |
-| SMS provider | Text messaging and hand-off notices | Not chosen yet | — | — | — |
+| Twilio (chosen Nov 2, 2026) | Text messages: The Engine's texts to leads who asked for them; later, client hand-off notices | Confirm (US carrier traffic; check where message logs are kept) | Confirm (message log retention setting) | Confirm current terms | Not for PHI until a Twilio BAA is signed |
 | Claude (Claude Code and Claude app sessions) | Agents that build, review and run reports | Confirm current terms | Confirm | Confirm current terms per plan | Confirm |
 | GitHub | Client site code repos | Confirm | Yes | Confirm | Not for PHI |
 | Google Workspace | ben@plainlineops.com: client requests, opt-outs, notices | Confirm | Yes | Confirm | Confirm |
