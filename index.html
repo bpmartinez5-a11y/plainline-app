@@ -491,9 +491,7 @@ form.chat-book{gap:10px;padding:14px;border-radius:16px;background:rgba(255,255,
 </div>
 
 <script>
-/* Contact form: writes one row to the Supabase "leads" table. The public key can insert but never read (row-level security). */
-const SUPABASE_URL = "https://mtpaaizladkfjtpnkdao.supabase.co";
-const SUPABASE_KEY = "sb_publishable_JPkZK7XX94_KVaRBnFYpwQ_-1w3TY24";
+/* Contact form: sends one walkthrough request to /api/lead, which saves it to the "leads" table (The Engine's Inquiries tab) with limits per visitor. */
 const form = document.getElementById("leadForm"), msg = document.getElementById("formMsg"), btn = document.getElementById("sendBtn");
 const say = (text, cls) => { msg.textContent = text; msg.className = cls; };
 /* Where the visitor came from, so walkthrough rates can be counted per campaign: "website", or "website · <utm_source>/<utm_campaign>", at most 50 characters (the table's limit). */
@@ -509,12 +507,13 @@ form.addEventListener("submit", async e => {
   const message = [f.business.trim() && "Business: " + f.business.trim(), f.message.trim()].filter(Boolean).join("\n\n");
   btn.disabled = true; say("Sending…", "");
   try {
-    const r = await fetch(SUPABASE_URL + "/rest/v1/leads", {
+    const r = await fetch("/api/lead", {
       method: "POST",
-      headers: {apikey: SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=minimal"},
-      body: JSON.stringify({name, email, message: message || null, source: leadSource()}),
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({name, email, message, source: leadSource()}),
       signal: AbortSignal.timeout(15000)
     });
+    if (r.status === 429) return say("We already have a few requests from this connection. Please try again in an hour.", "err");
     if (!r.ok) throw new Error("HTTP " + r.status);
     form.reset(); say("Thanks! Your message is in. We reply by email within 24 hours.", "ok");
   } catch (err) {
@@ -628,12 +627,13 @@ form.addEventListener("submit", async e => {
       site && "Website: " + site, siteNote && "What the assistant read on it: " + siteNote, "Their words:\n" + words].filter(Boolean).join("\n\n").slice(0, 4000);
     btn.disabled = true; bookMsg.textContent = "Sending…"; bookMsg.className = "";
     try {
-      const r = await fetch(SUPABASE_URL + "/rest/v1/leads", {
+      const r = await fetch("/api/lead", {
         method: "POST",
-        headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, message, source: leadSource().replace(/^website/, "website chat").slice(0, 50) }),
         signal: AbortSignal.timeout(15000)
       });
+      if (r.status === 429) return err("We already have a few requests from this connection. Please try again in an hour.");
       if (!r.ok) throw new Error("HTTP " + r.status);
       bookMsg.textContent = ""; finish();
     } catch (er) {
