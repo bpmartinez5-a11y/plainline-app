@@ -27,6 +27,7 @@ Put the tier at the top of the PR body. A fresh agent that didn't write the chan
 ## Where the details live (read only what the task needs)
 - Files and what they do: `docs/claude/site.md` · API conventions: `api/CLAUDE.md` (loads when you work in `api/`)
 - How to work cheaply in this repo: `docs/claude/token-habits.md`
+- The five agent layers (prompt, context, harness, loop, graph) and where each file sits: `docs/claude/layers.md`
 
 ## Studio engine (URL in, website + owner dashboard out)
 - Not to be confused with **The Engine** (Oct 30): Plainline's AI-run CRM, the Ops app in jarvis-app (`ops/`, ops.plainlineops.com) with Scout and the work ledger. "The Engine" in a request means that, unless it's about `studio-engine.js`.
