@@ -1,6 +1,6 @@
 # The five layers (for Claude)
 
-This map sorts the repo by the five layers of agent work (Ben, Nov 3). Use it to find where a change goes. The files stay where they are. The same map for jarvis-app is `agents/layers.md` there.
+This map sorts the repo by the five layers of agent work (Ben, Nov 3). Use it to find where a change goes. The files stay where they are. The same map for jarvis-app is `agents/layers.md` there. Its "In plain words" section explains the layers without code words.
 
 | Layer | Job | Where it lives here |
 |---|---|---|
