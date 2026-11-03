@@ -5,10 +5,11 @@ Every change in `api/` is **High** tier: Ben approves and the-enforcer passes.
 | File | What it does | Auth |
 |---|---|---|
 | `chat.js` | Demo text assistant: POST builds a prompt, calls Claude and returns one JSON reply; GET reports whether AI is on | Public; same-origin check and per-IP limit |
-| `studio-scan.js` | Studio: fetches a business's website server-side and returns its pages | `x-studio-key` header (Ben only) |
+| `studio-scan.js` | Studio: fetches a business's website server-side and returns its pages. Public addresses only: the connection's own DNS lookup is checked (`safeLookup`), so there's no second lookup to rebind | `x-studio-key` header (Ben only) |
 | `studio-build.js` | Studio: asks Claude to build a client site from a scan | `x-studio-key` header (Ben only) |
 | `studio-profile.js` | Studio engine path: asks Claude for a site profile (one forced tool call), then sanitizes it and keeps only photos and links from the scan; streams a heartbeat, last line is the JSON | `x-studio-key` header (Ben only) |
 | `_studio.js` | Shared Studio helpers (`authorized`, `body`). Files starting with `_` aren't routes on Vercel. | — |
+| `_errtype.js` | What to log when Anthropic returns an error: the error type only, never the body (it can quote visitor or client-site text) | — |
 
 Conventions every endpoint keeps:
 - 405 for the wrong method, 400 for bad input, 401 for a wrong Studio key, 403 for a wrong origin on `/api/chat`, 422 when a scan can't read a site, 429 when rate-limited, 501 when an env var is missing (`ANTHROPIC_API_KEY`, `STUDIO_KEY`), 502 when Claude or an upstream call fails.

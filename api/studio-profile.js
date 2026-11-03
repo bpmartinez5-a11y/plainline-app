@@ -3,6 +3,7 @@
 // so Claude only writes facts and structure here, not page code. Streams a heartbeat while Claude works
 // so the request stays under the function time limit, then sends the profile as the last line.
 const { authorized, body } = require("./_studio");
+const errType = require("./_errtype");
 const Engine = require("../studio-engine.js");
 
 const MODEL = process.env.STUDIO_MODEL || "claude-sonnet-5-5";
@@ -121,7 +122,7 @@ module.exports = async function handler(req, res) {
       signal: AbortSignal.timeout(280_000)
     });
   } catch (e) { return res.status(502).json({ error: "Couldn't reach Claude: " + e.message }); }
-  if (!r.ok) { console.error("anthropic", r.status, await r.text()); return res.status(502).json({ error: `Claude said ${r.status}` }); }
+  if (!r.ok) { console.error("anthropic", r.status, await errType(r)); return res.status(502).json({ error: `Claude said ${r.status}` }); }
 
   res.status(200);
   res.setHeader("Content-Type", "text/plain; charset=utf-8");

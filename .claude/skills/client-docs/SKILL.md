@@ -27,3 +27,4 @@ The ten templates live in the Plainline Client Docs artifact (https://claude.ai/
 5. Feedback answers marked "Yes" for sharing go to the case-study writer. Anything negative goes to Ben the same day.
 6. Write every document to `docs/claude/writing-standard.md`. The delivery guide, the Fact Sheet and any SOP get the full checklist. The agreement keeps the lawyer's wording.
 7. Run the review gate (`reviewer`, then `refuter`) on any document that changes the agreement terms or the package menu.
+8. Stripe invoices carry the same words as the Invoice and Payment templates (Ben, Nov 1). Stripe › Settings › Billing › Invoices holds the default memo, the default footer and 15-day terms (agreement §5.2). When you change payment wording in a template, give Ben the new Stripe text in the same step. Payment links open only on invoice.stripe.com or pay.plainlineops.com, and the statement descriptor is PLAINLINE.

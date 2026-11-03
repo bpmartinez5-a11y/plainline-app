@@ -1,0 +1,19 @@
+# The same tests Claude runs locally (node --test tests/*.test.js), on every PR and every push to main,
+# so a broken change can't merge green. No dependencies to install: the tests use Node's built-in runner.
+name: Tests
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/*.test.js

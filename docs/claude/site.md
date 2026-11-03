@@ -7,6 +7,7 @@
 | `studio.html`, `studio-styles.json` | Studio: Ben's tool that scans a business's site and builds a client site; the search bar builds a website + owner dashboard through the engine (uses `api/studio-*`) | ~18 KB |
 | `studio-engine.js` | The engine: renders a site profile into the client website and owner dashboard (browser and Node). Fixtures in `studio-examples/`, tests in `tests/` | ~86 KB |
 | `api/` | Serverless endpoints. See `api/CLAUDE.md` | |
+| `tests/` | `node --test tests/*.test.js`: Studio engine and profile, and the demo chat endpoint (`chat.test.js`, fake Claude and Jev, no network). `.github/workflows/tests.yml` runs them on every PR | |
 | `appstore/` | App Store listing (`listing.md`), screenshot generator (`make_screenshots.js`, `seed.js`) and screenshots | Don't read the PNGs |
 | `icons/`, `manifest.webmanifest` | Installable web app icons and manifest | |
 | `privacy.html`, `terms.html` | Legal pages. Keep in step with what the API stores or logs | |

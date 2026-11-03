@@ -2,10 +2,13 @@
 
 plainlineops.com: the Plainline site, the live demo (`demo.html`), the Studio (`studio.html`, Ben-only site builder) and the API in `api/`, deployed on Vercel. Ben is not a developer; Claude does all the coding. These apply here too, from the jarvis-app repo: the agent rules (`agents/README.md` › Rules every agent follows) and CLAUDE.md's "Keep it lean" and "Before anything ships" (the-enforcer).
 
+Plainline is the PL: head of Ben's Cerberus project (Oct 31; the other heads are Jarvis, JV:, personal, and Hermes, FUN:, side projects). Plainline work never carries Ben's money or personal data, and Plainline names never go on personal cards.
+
 Plainline is an AI agency (Oct 30): it brings AI into how a company's team works, builds AI tools (websites and apps next), and runs the work behind a business, from an AI front desk for one location up to a staffed back office for a large company, with the top end of the market as the focus. It sells the finished result: software clients run (The Engine, its AI-run CRM, is the door-opener for smaller companies) plus the setup, coaching and staffed work that get them to their goal. Smaller companies come in through the product; larger ones buy the outcome (Ben, Oct 30).
 
 ## Hard rules
 - Never show a Plainline price, plan price, unit rate or dollar amount on the website or anything client-facing, ever (Ben, Oct 30). Every engagement is quoted after qualification, research and a walkthrough. The price ladder lives only in Ben's private plan page. Calls to action say "Book a walkthrough".
+- Pricing rule (Ben, Nov 1): setup is the total of the build list, and the monthly maintenance is 10% of that setup. Check every row of any quote, tier or price table against it before Ben sees it. Prices themselves stay out of this repo.
 - No AI-looking imagery: no generated faces, robots or glowing-brain art. Visuals are real-looking UI cards built from the client's own data, over documentary photos from Higgsfield.
 - Example businesses and numbers are labeled "values illustrative" until real client data replaces them.
 - Instructions and client documents follow the writing standard in `docs/claude/writing-standard.md` (rules based on ASD-STE100 Simplified Technical English). Never copy the STE dictionary, and never call a document "STE compliant".
@@ -24,6 +27,7 @@ Put the tier at the top of the PR body. A fresh agent that didn't write the chan
 ## Where the details live (read only what the task needs)
 - Files and what they do: `docs/claude/site.md` · API conventions: `api/CLAUDE.md` (loads when you work in `api/`)
 - How to work cheaply in this repo: `docs/claude/token-habits.md`
+- The five agent layers (prompt, context, harness, loop, graph) and where each file sits: `docs/claude/layers.md`
 
 ## Studio engine (URL in, website + owner dashboard out)
 - Not to be confused with **The Engine** (Oct 30): Plainline's AI-run CRM, the Ops app in jarvis-app (`ops/`, ops.plainlineops.com) with Scout and the work ledger. "The Engine" in a request means that, unless it's about `studio-engine.js`.
