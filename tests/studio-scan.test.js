@@ -6,7 +6,7 @@ const assert = require("node:assert");
 const http = require("node:http");
 const zlib = require("node:zlib");
 const dns = require("node:dns");
-const { privateIp, checkUrl, get } = require("../api/studio-scan.js")._test;
+const { get, _test: { privateIp, checkUrl } } = require("../api/_scan.js");
 
 function server(handler) {
   return new Promise(resolve => { const s = http.createServer(handler).listen(0, "127.0.0.1", () => resolve(s)); });
@@ -117,7 +117,7 @@ test("odd but common encodings are read; a cut-off zipped page keeps what arrive
     assert.match((await get(base + "/list")).html, /Zipped page/);
     assert.match((await get(base + "/cut")).html, /Zipped page/);
     assert.strictEqual((await get(base + "/empty")).html, "");
-    await assert.rejects(get(base + "/stack"), /format the Studio can't read/);
+    await assert.rejects(get(base + "/stack"), /format we can't read/);
   } finally { s.close(); }
 });
 

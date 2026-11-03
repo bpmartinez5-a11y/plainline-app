@@ -11,10 +11,4 @@ function authorized(req, res) {
   return true;
 }
 
-function body(req) {
-  let b = req.body;
-  if (typeof b === "string") { try { b = JSON.parse(b); } catch { b = {}; } }
-  return b && typeof b === "object" ? b : {};
-}
-
-module.exports = { authorized, body };
+module.exports = { authorized, body: require("./_public").jsonBody };

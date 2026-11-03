@@ -257,6 +257,40 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
   body{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
   .hero p{font-size:17px}
 }
+/* Walkthrough chat: an AI assistant asks what work piles up, can read the visitor's website, ends with Book a walkthrough */
+.ask{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:28px;align-items:start}
+@media (max-width:860px){.ask{grid-template-columns:minmax(0,1fr);gap:18px}}
+.ask h2{font-size:28px;margin:8px 0 12px}
+.ask .lede{margin:0 0 14px}
+.ask-ai{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--muted);margin:0;padding:12px 14px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+.ask-ai svg{width:18px;height:18px;flex:none;color:var(--green);margin-top:1px}
+.chat{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.chat .thread-top{margin:0}
+.chat-log{display:flex;flex-direction:column;gap:8px;min-height:180px;max-height:min(440px,60vh);overflow-y:auto;overscroll-behavior:contain;padding:4px 2px;scroll-behavior:smooth}
+.chat-log .msg{max-width:88%;white-space:pre-wrap;overflow-wrap:anywhere}
+.chat-log .note{align-self:center;font-size:13px;color:var(--muted);text-align:center;max-width:90%}
+.chat-chips{display:flex;flex-wrap:wrap;gap:8px}
+.chat-chips:empty{display:none}
+.chat-chips button{min-height:40px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink);font:600 14px var(--f-body);cursor:pointer;transition:background-color var(--t-fast),border-color var(--t-fast),transform var(--t-panel) var(--spring)}
+.chat-chips button:hover{background:rgba(255,255,255,.14);border-color:var(--line-hi)}
+.chat-chips button:active{transform:scale(.96)}
+.chat-chips button.go{background:linear-gradient(180deg,var(--blue),var(--blue-2));border-color:rgba(255,255,255,.22);color:#fff}
+form.chat-in{flex-direction:row;align-items:flex-end;gap:8px;padding:6px 6px 6px 14px;border:1px solid var(--line);border-radius:24px;background:rgba(255,255,255,.05);transition:border-color var(--t-fast),box-shadow var(--t-fast)}
+form.chat-in:focus-within{border-color:var(--blue);box-shadow:0 0 0 4px rgba(76,140,246,.25)}
+.chat-in textarea{flex:1;min-height:40px;max-height:140px;resize:none;border:0;background:none;padding:9px 0;border-radius:0;box-shadow:none!important;font-size:16px}
+.chat-in button{flex:none;width:40px;height:40px;border-radius:50%;border:0;display:grid;place-items:center;background:linear-gradient(180deg,var(--blue),var(--blue-2));color:#fff;cursor:pointer;transition:transform var(--t-panel) var(--spring),opacity var(--t-fast)}
+.chat-in button:active{transform:scale(.92)}
+.chat-in button:disabled{opacity:.45;cursor:default}
+.chat-in svg{width:18px;height:18px}
+form.chat-book{gap:10px;padding:14px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid var(--line-hi)}
+.chat-book h3{font-size:20px;font-weight:500}
+.chat-book .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:520px){.chat-book .row{grid-template-columns:1fr}}
+.chat-book p{margin:0}
+#bookMsg{font-size:14px;min-height:1.4em}
+#bookMsg.err{color:var(--warn)}
+.chat [hidden]{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -290,6 +324,30 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
     <figcaption class="thread-note">Example conversation · made-up salon</figcaption>
   </figure>
   </div>
+
+  <section id="ask" class="ask" aria-labelledby="askTitle">
+    <div>
+      <span class="kicker">Ask Plainline</span>
+      <h2 id="askTitle">What work keeps piling up?</h2>
+      <p class="lede">Tell our assistant in a sentence or two. Add your website and it reads your public pages, then names where Plainline could take work off your team.</p>
+      <p class="ask-ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/><path d="M19 15l.8 1.9 1.9.8-1.9.8L19 20.4l-.8-1.9-1.9-.8 1.9-.8z"/></svg><span>This assistant is an AI. A person from Plainline reads every walkthrough request. Please don't share passwords or payment details.</span></p>
+    </div>
+    <div class="chat" id="chat">
+      <div class="thread-top"><i aria-hidden="true">P/</i><div><b>Plainline assistant</b><small>AI assistant</small></div><button type="button" id="chatReset" hidden>Start over</button></div>
+      <div class="chat-log" id="chatLog" role="log" aria-live="polite" aria-label="Chat with Plainline's AI assistant"></div>
+      <div class="chat-chips" id="chatChips"></div>
+      <form class="chat-book" id="chatBook" hidden novalidate>
+        <h3>Book a walkthrough</h3>
+        <p class="fine">We send this chat with your request. We reply by email within 24 hours.</p>
+        <div class="row"><label>Your name<input name="name" required maxlength="200" autocomplete="name"></label><label>Email<input name="email" type="email" required maxlength="320" autocomplete="email"></label></div>
+        <label class="hp" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
+        <button class="btn" id="bookBtn">Book a walkthrough</button>
+        <p id="bookMsg" role="status" aria-live="polite"></p>
+        <p class="fine">By sending, you confirm you're 18 or older and agree to our <a href="/terms">Terms</a>. See our <a href="/privacy">privacy policy</a>.</p>
+      </form>
+      <form class="chat-in" id="chatIn"><label class="sr" for="chatText">Your message</label><textarea id="chatText" rows="1" maxlength="800" placeholder="e.g. Quote follow-ups and missed calls" enterkeyhint="send"></textarea><button id="chatSend" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></form>
+    </div>
+  </section>
 
   <section id="plans">
     <h2>How much do you want us to run?</h2>
@@ -466,6 +524,126 @@ form.addEventListener("submit", async e => {
 });
 </script>
 <script>
+/* Walkthrough chat: asks what work piles up, reads the visitor's website through /api/walkthrough when they share it,
+   and ends with "Book a walkthrough", which saves the request to the same "leads" table as the contact form
+   (The Engine's Inquiries tab). Without AI (501, 429 or a failed reply) it answers from built-in lines. */
+(() => {
+  const $ = id => document.getElementById(id);
+  const logEl = $("chatLog"), chipsEl = $("chatChips"), input = $("chatIn"), text = $("chatText"), sendBtn = $("chatSend"), book = $("chatBook"), bookMsg = $("bookMsg"), reset = $("chatReset");
+  const HELLO = "Hi, I'm Plainline's AI assistant. What work keeps piling up at your company?";
+  const STARTERS = ["Missed calls and texts", "Following up on quotes", "Scheduling and reschedules", "Updating records"];
+  const BOOK = "Book a walkthrough", MAX_TURNS = 10, MAX_CHARS = 8500;
+  const SITE = /(?<![@\w.-])((?:https?:\/\/)?(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,24}(?::\d{2,5})?(?:\/[^\s<>"']*)?)/i;
+  let log, turns, site, siteNote, summary, aiOff = false, busy, done;
+
+  const scroll = () => { logEl.scrollTop = logEl.scrollHeight; };
+  function say(kind, t) {
+    const d = document.createElement("div");
+    d.className = kind === "note" ? "note" : "msg pop " + kind;
+    d.textContent = t; logEl.append(d); scroll(); return d;
+  }
+  function chips(list, offer) {
+    chipsEl.replaceChildren(...[...list, ...(offer ? [BOOK] : [])].map(c => {
+      const b = document.createElement("button"); b.type = "button"; b.textContent = c;
+      if (c === BOOK) { b.className = "go"; b.onclick = () => openBook(true); } else b.onclick = () => send(c);
+      return b;
+    }));
+  }
+  function openBook(focus) {
+    if (done) return;
+    book.hidden = false; chipsEl.replaceChildren();
+    book.scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    if (focus) book.name.focus();
+  }
+  function lock(on) { text.disabled = sendBtn.disabled = on; input.hidden = on && done; }
+  function start() {
+    log = [{ role: "assistant", text: HELLO }]; turns = 0; site = siteNote = summary = ""; busy = done = false;
+    logEl.replaceChildren(); book.hidden = true; book.reset(); bookMsg.textContent = ""; reset.hidden = true; lock(false); input.hidden = false;
+    say("in", HELLO); chips(STARTERS, false);
+  }
+  /* The newest messages that fit the server's limit (it drops a leading assistant line itself) */
+  function recent() {
+    const out = []; let n = 0;
+    for (let i = log.length - 1; i >= 0 && out.length < 24; i--) { n += log[i].text.length; if (n > MAX_CHARS) break; out.unshift(log[i]); }
+    return out;
+  }
+  function fallback() {
+    const t = turns > 1 ? "Thanks. A person from Plainline can look at this with you. Book a walkthrough and we reply by email within 24 hours."
+      : "Thanks. That's the kind of work Plainline takes off a team's plate. Book a walkthrough and a person from Plainline looks at it with you. We reply by email within 24 hours.";
+    say("in", t); log.push({ role: "assistant", text: t }); chips([], true); openBook(false);
+  }
+  async function send(raw) {
+    const msg = String(raw || "").trim().slice(0, 800);
+    if (!msg || busy || done) return;
+    busy = true; reset.hidden = false; text.value = ""; grow(); chips([], false);
+    say("out", msg); log.push({ role: "visitor", text: msg }); turns++;
+    const found = !site && (msg.match(SITE) || [])[1];
+    if (found) site = found.replace(/[.,;:!?)]+$/, "");
+    if (aiOff) { busy = false; return fallback(); }
+    lock(true);
+    const dots = say("in typing", ""); dots.innerHTML = "<span></span><span></span><span></span>"; dots.setAttribute("aria-hidden", "true");
+    let d = null;
+    try {
+      const r = await fetch("/api/walkthrough", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: recent(), site: found ? site : undefined, siteNote: siteNote || undefined }),
+        signal: AbortSignal.timeout(found ? 40000 : 25000)
+      });
+      if (r.status === 501 || r.status === 429) aiOff = true;
+      else if (r.ok) d = await r.json();
+    } catch (err) { console.error("walkthrough chat failed", err.name); }
+    dots.remove(); busy = false; lock(false);
+    if (!d || typeof d.reply !== "string") return fallback();
+    say("in", d.reply); log.push({ role: "assistant", text: d.reply });
+    if (d.summary) summary = d.summary;
+    if (d.siteNote) siteNote = d.siteNote;
+    if (d.notFit) { done = true; lock(true); chips([], false); return say("note", "Thanks for stopping by."); }
+    if (turns >= MAX_TURNS) { lock(true); chips([], true); return openBook(false); }
+    chips(Array.isArray(d.chips) ? d.chips : [], true);
+    if (d.offer) openBook(false); else if (matchMedia("(hover:hover)").matches) text.focus();
+  }
+  function grow() { text.style.height = "auto"; text.style.height = Math.min(text.scrollHeight, 140) + "px"; }
+
+  input.addEventListener("submit", e => { e.preventDefault(); send(text.value); });
+  text.addEventListener("input", grow);
+  text.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); send(text.value); } });
+  reset.addEventListener("click", start);
+
+  book.addEventListener("submit", async e => {
+    e.preventDefault();
+    const f = Object.fromEntries(new FormData(book)), name = f.name.trim(), email = f.email.trim(), btn = $("bookBtn");
+    const err = t => { bookMsg.textContent = t; bookMsg.className = "err"; };
+    if (!name) { book.name.focus(); return err("Please add your name."); }
+    if (!/^\S+@\S+\.\S+$/.test(email)) { book.email.focus(); return err("Please add a valid email so we can reply."); }
+    const finish = () => {
+      done = true; book.hidden = true; lock(true); chips([], false);
+      say("in", `Thanks, ${name.split(" ")[0]}. Your walkthrough request is in. A person from Plainline replies by email within 24 hours.`);
+      const b = document.createElement("div"); b.className = "booked pop"; b.textContent = "Walkthrough requested"; logEl.append(b); scroll();
+    };
+    if (f.website) return finish(); // a bot filled the hidden field
+    const words = log.filter(m => m.role === "visitor").map(m => "- " + m.text).join("\n");
+    const message = ["Walkthrough chat on the website.", summary && "AI summary (check it against their words): " + summary,
+      site && "Website: " + site, siteNote && "What the assistant read on it: " + siteNote, "Their words:\n" + words].filter(Boolean).join("\n\n").slice(0, 4000);
+    btn.disabled = true; bookMsg.textContent = "Sending…"; bookMsg.className = "";
+    try {
+      const r = await fetch(SUPABASE_URL + "/rest/v1/leads", {
+        method: "POST",
+        headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
+        body: JSON.stringify({ name, email, message, source: leadSource().replace(/^website/, "website chat").slice(0, 50) }),
+        signal: AbortSignal.timeout(15000)
+      });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      bookMsg.textContent = ""; finish();
+    } catch (er) {
+      console.error("walkthrough request failed", er);
+      err("Sorry, that didn't send. Please try again, or use the form at the bottom of the page.");
+    } finally { btn.disabled = false; }
+  });
+
+  start();
+})();
+</script>
+<script>
 /* Hero conversation: plays once when on screen; on reduced motion it shows the finished thread. */
 (() => {
   const box = document.getElementById("msgs"), replay = document.getElementById("replay");
@@ -498,10 +676,10 @@ form.addEventListener("submit", async e => {
   }
   replay.addEventListener("click", play);
   new IntersectionObserver((es, o) => { if (es[0].isIntersecting) { o.disconnect(); play(); } }, {threshold: .35}).observe(document.getElementById("thread"));
-  /* Phone dock hides while the hero buttons or the contact form are on screen */
+  /* Phone dock hides while the hero buttons, the walkthrough chat or the contact form are on screen */
   const dock = document.getElementById("dock"), seen = new Set();
   const io = new IntersectionObserver(es => { es.forEach(e => e.isIntersecting ? seen.add(e.target) : seen.delete(e.target)); dock.classList.toggle("away", seen.size > 0); });
-  io.observe(document.querySelector(".hero .cta")); io.observe(document.getElementById("contact"));
+  io.observe(document.querySelector(".hero .cta")); io.observe(document.getElementById("chat")); io.observe(document.getElementById("contact"));
 })();
 </script>
 <script>
