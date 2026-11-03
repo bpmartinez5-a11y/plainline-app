@@ -14,7 +14,7 @@ Moved off the public demo on Oct 30, 2026: prospects see "Book a walkthrough" in
 Plainline sells an AI front desk for missed and after-hours calls, but the texting and call parts are not built yet. The demo and the site cover web chat only. Do these steps in order. Most of them can start before a client signs. The first client could sign on about Dec 1, which leaves about two weeks to launch.
 
 **Before any client signs**
-1. **Pick the texting and calling provider.** Ben picks one, for example Twilio or Telnyx. Add it to `docs/subprocessors.md` and `privacy.html` in the same PR.
+1. **Texting provider: Twilio** (Ben, Nov 2, 2026; already in `docs/subprocessors.md` and `privacy.html`). A calling provider, if the client needs one, is added to both in the same PR.
 2. **Start texting registration.** US business texting needs A2P 10DLC brand and campaign registration. It can take a few weeks, so start it as soon as Ben picks the provider. Use Plainlineops LLC as the brand.
 3. **Build the runtime in a sandbox** for a made-up client (`studio-examples/ridgeline-sample.json`): missed-call text-back, the hand-off sender, STOP and quiet hours. `api/` is High tier: Ben approves and the-enforcer passes.
 4. **Rehearse once.** Copy The Engine for the made-up client (jarvis-app `ops/README.md`, "A copy for a client"). Run a missed call, a hand-off, a failed send and a STOP from start to finish.
