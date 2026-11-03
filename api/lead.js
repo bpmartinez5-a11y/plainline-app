@@ -7,7 +7,7 @@ const { sameSite, clientIp, limiter, jsonBody } = require("./_public");
 const PROJECT = "mtpaaizladkfjtpnkdao"; // Plainline's Supabase project; any other URL in env is a setup mistake
 const overLimit = limiter(3, 200); // requests per IP per hour; per warm instance per hour
 const overDaily = limiter(6, 1000, 24 * 60 * 60 * 1000); // per IP per day
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL = /^\S+@\S+\.\S+$/; // the same check as the page
 
 const str = (v, n) => (typeof v === "string" ? v.trim().slice(0, n) : "");
 
