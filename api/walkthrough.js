@@ -10,10 +10,15 @@ const { get, facts } = require("./_scan");
 const MODEL = process.env.ANTHROPIC_MODEL || "claude-haiku-5-5"; // the public demo's model: keep it Haiku-class
 const API = (process.env.ANTHROPIC_BASE_URL || "https://api.anthropic.com") + "/v1/messages";
 const overLimit = limiter(25, 500); // replies per IP per hour; per warm instance per hour
+const SCAN_MS = 12000; // a slow site must not hold the reply past the function limit
 const MAX_TURNS = 12, MAX_MESSAGES = 26, MAX_TEXT = 1000, MAX_TOTAL = 9000;
 
 // Never a price on anything a visitor sees (Plainline hard rule). The prompt says so; this catches a slip.
-const PRICE = /[$€£]\s?\d|\b\d[\d,.]*\s?k?\s?(dollars|usd|bucks)\b|\bper (month|hour|seat|user|location)\b|\/\s?(mo|month|hr|hour|seat|user)\b|\b(price[sd]?|pricing|costs?|fees?|rates?|budget)\b[^.?!]{0,40}\d/i;
+const PRICE = new RegExp([
+  "[$€£]\\s?\\d", "\\b(dollars?|usd|bucks|grand)\\b", "\\b(hundred|thousand)\\b",
+  "\\d\\s?k\\b", "\\d\\s?(a|per|each|every)\\s(month|year|week|hour|seat|user)\\b", "\\/\\s?(mo|month|yr|year|hr|hour|seat|user)\\b",
+  "\\b(price[sd]?|pricing|costs?|fees?|budget)\\b[^.?!]{0,40}\\d", "\\b(start(s|ing)?|from) (at )?\\d"
+].join("|"), "i");
 const NO_PRICE = "We quote every engagement after a walkthrough, so I can't give a price here. Want to book one? A person from Plainline replies by email within 24 hours.";
 
 const SYSTEM = `You are the AI assistant in the chat on plainlineops.com, the website of Plainline.
@@ -107,7 +112,7 @@ module.exports = async function handler(req, res) {
 
   const extra = [];
   if (siteNote) extra.push(`<website-note>${siteNote.replace(/<\/?website/gi, "")}</website-note>`);
-  if (site) extra.push(await readSite(site));
+  if (site) extra.push(await Promise.race([readSite(site), new Promise(r => setTimeout(r, SCAN_MS, `<website>Could not read ${site.replace(/[<>"]/g, "")}: the site took too long to answer.</website>`))]));
   if (extra.length) messages[messages.length - 1].content += "\n\n" + extra.join("\n");
 
   try {

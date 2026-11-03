@@ -533,8 +533,9 @@ form.addEventListener("submit", async e => {
   const HELLO = "Hi, I'm Plainline's AI assistant. What work keeps piling up at your company?";
   const STARTERS = ["Missed calls and texts", "Following up on quotes", "Scheduling and reschedules", "Updating records"];
   const BOOK = "Book a walkthrough", MAX_TURNS = 10, MAX_CHARS = 8500;
-  const SITE = /(?<![@\w.-])((?:https?:\/\/)?(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,24}(?::\d{2,5})?(?:\/[^\s<>"']*)?)/i;
-  let log, turns, site, siteNote, summary, aiOff = false, busy, done;
+  /* A web address: with http(s):// or www., or ending in a common business domain ending (so "Node.js" or an email isn't one) */
+  const SITE = /(?<![@\w.-])((?:https?:\/\/|www\.)[^\s<>"']{3,250}|(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:com|net|org|co|us|biz|info|io|ai|app|dev|shop|store|site|services|pro)(?:\/[^\s<>"']*)?)(?![\w@-]|\.\w)/i;
+  let log, turns, site, siteNote, summary, aiOff = false, busy, done, chatId = 0;
 
   const scroll = () => { logEl.scrollTop = logEl.scrollHeight; };
   function say(kind, t) {
@@ -557,7 +558,7 @@ form.addEventListener("submit", async e => {
   }
   function lock(on) { text.disabled = sendBtn.disabled = on; input.hidden = on && done; }
   function start() {
-    log = [{ role: "assistant", text: HELLO }]; turns = 0; site = siteNote = summary = ""; busy = done = false;
+    chatId++; log = [{ role: "assistant", text: HELLO }]; turns = 0; site = siteNote = summary = ""; busy = done = false;
     logEl.replaceChildren(); book.hidden = true; book.reset(); bookMsg.textContent = ""; reset.hidden = true; lock(false); input.hidden = false;
     say("in", HELLO); chips(STARTERS, false);
   }
@@ -577,8 +578,8 @@ form.addEventListener("submit", async e => {
     if (!msg || busy || done) return;
     busy = true; reset.hidden = false; text.value = ""; grow(); chips([], false);
     say("out", msg); log.push({ role: "visitor", text: msg }); turns++;
-    const found = !site && (msg.match(SITE) || [])[1];
-    if (found) site = found.replace(/[.,;:!?)]+$/, "");
+    const me = chatId, found = !siteNote && ((msg.match(SITE) || [])[1] || "").replace(/[.,;:!?)]+$/, "").slice(0, 300);
+    if (found) site = found;
     if (aiOff) { busy = false; return fallback(); }
     lock(true);
     const dots = say("in typing", ""); dots.innerHTML = "<span></span><span></span><span></span>"; dots.setAttribute("aria-hidden", "true");
@@ -592,11 +593,12 @@ form.addEventListener("submit", async e => {
       if (r.status === 501 || r.status === 429) aiOff = true;
       else if (r.ok) d = await r.json();
     } catch (err) { console.error("walkthrough chat failed", err.name); }
+    if (me !== chatId) return; // the visitor pressed Start over while this reply was on its way
     dots.remove(); busy = false; lock(false);
     if (!d || typeof d.reply !== "string") return fallback();
     say("in", d.reply); log.push({ role: "assistant", text: d.reply });
     if (d.summary) summary = d.summary;
-    if (d.siteNote) siteNote = d.siteNote;
+    if (d.siteNote) siteNote = d.siteNote; // no note means the site couldn't be read: a later address is tried again
     if (d.notFit) { done = true; lock(true); chips([], false); return say("note", "Thanks for stopping by."); }
     if (turns >= MAX_TURNS) { lock(true); chips([], true); return openBook(false); }
     chips(Array.isArray(d.chips) ? d.chips : [], true);

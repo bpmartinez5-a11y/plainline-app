@@ -50,13 +50,14 @@ test("returns only the reply fields, with the greeting and the tool forced", asy
 });
 
 test("a price never reaches the visitor", async () => {
-  for (const reply of ["Plans start at $2,000.", "It runs about 500 dollars a month.", "Our pricing starts near 2k", "That's 99/mo."]) {
+  for (const reply of ["Plans start at $2,000.", "It runs about 500 dollars a month.", "Our pricing starts near 2k", "That's 99/mo.", "five hundred a month", "1,500 a month", "starting at 2k"]) {
     install({ ...good, reply, chips: ["$500 plan"] });
     const { out } = await call();
     assert.match(out.reply, /quote every engagement after a walkthrough/, reply);
     assert.deepStrictEqual(out.chips, []);
     assert.strictEqual(out.offer, true);
   }
+  for (const reply of ["Do you get 20 calls a week?", "We reply within 24 hours.", "You have 2 locations."]) { install({ ...good, reply }); assert.strictEqual((await call()).out.reply, reply); } // volumes and hours are not prices
   install({ ...good, chips: ["Costs 300 a month", "Book a walkthrough"] });
   assert.deepStrictEqual((await call()).out.chips, ["Book a walkthrough"]);
 });
