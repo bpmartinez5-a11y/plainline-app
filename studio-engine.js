@@ -167,6 +167,10 @@ ${BASE_CSS}`;
 html{scroll-behavior:smooth;overflow-x:clip}
 body{margin:0;background-color:var(--bg);color:var(--ink);font:400 16px/1.55 var(--body);-webkit-font-smoothing:antialiased;overflow-x:clip}
 img{max-width:100%;display:block}
+/* Photos fade in over their tile instead of popping in. Only when the runtime has run (.js), so no-JS viewers see every image. */
+.js img{opacity:0;transition:opacity .4s ease}
+.js img.pl-in{opacity:1}
+@media (prefers-reduced-motion:reduce){.js img{transition:none}}
 a{color:inherit}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
@@ -308,6 +312,11 @@ footer{border-top:2px solid var(--ink);margin-top:40px;padding-block:28px calc(2
   // Runs inside the generated website. Must not use anything from this file's scope.
   function siteRuntime() {
     const P = window.__PROFILE__, OPT = window.__OPTIONS__ || {};
+    // Reveal each photo once it has loaded (or failed), so none stays hidden.
+    document.documentElement.classList.add("js");
+    document.querySelectorAll("img").forEach(i => { if (i.complete) i.classList.add("pl-in"); });
+    document.addEventListener("load", e => { if (e.target.tagName === "IMG") e.target.classList.add("pl-in"); }, true);
+    document.addEventListener("error", e => { if (e.target.tagName === "IMG") e.target.classList.add("pl-in"); }, true);
     const KEY = "pl:" + P._slug + ":edits";
     const store = { get() { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { return {}; } } };
     let edits = store.get();
@@ -632,6 +641,10 @@ h2{font:800 25px/1 var(--display);text-transform:var(--up);margin:0}
 
   function dashRuntime() {
     const P = window.__PROFILE__, OPT = window.__OPTIONS__ || {};
+    document.documentElement.classList.add("js");
+    document.querySelectorAll("img").forEach(i => { if (i.complete) i.classList.add("pl-in"); });
+    document.addEventListener("load", e => { if (e.target.tagName === "IMG") e.target.classList.add("pl-in"); }, true);
+    document.addEventListener("error", e => { if (e.target.tagName === "IMG") e.target.classList.add("pl-in"); }, true);
     const NS = "pl:" + P._slug + ":", KEY = NS + "edits";
     let canStore = true; try { localStorage.setItem(NS + "t", "1"); localStorage.removeItem(NS + "t"); } catch (e) { canStore = false; }
     const mem = {};

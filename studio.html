@@ -242,9 +242,12 @@ function payload() {
   return { business, scan: s, style, notes: $("#f-notes").value.trim(), domain: $("#q-domain").value.trim() };
 }
 const extract = t => { const a = t.search(/<!doctype html/i), b = t.toLowerCase().lastIndexOf("</html>"); return a >= 0 ? t.slice(a, b > a ? b + 7 : undefined) : ""; };
+// Grey boxes in the shape of a page, shown while the first build is still writing. Never replaces a finished build.
+const SKELETON = '<!doctype html><meta charset="utf-8"><style>body{margin:0;padding:16px;background:#EDEFF1;font-family:system-ui,sans-serif}@media (prefers-color-scheme:dark){body{background:#0E1013}}.b{background:#CDD2D8;border-radius:8px;margin:12px 0}@media (prefers-color-scheme:dark){.b{background:#2A2F36}}.s{animation:p 1.4s ease-in-out infinite}@keyframes p{50%{opacity:.45}}@media (prefers-reduced-motion:reduce){.s{animation:none}}</style><div class="b s" style="height:44px;width:60%"></div><div class="b s" style="height:220px"></div><div class="b s" style="height:16px;width:90%"></div><div class="b s" style="height:16px;width:75%"></div><div class="b s" style="height:160px"></div>';
 $("#buildBtn").onclick = async () => {
   if (!scan && !$("#f-name").value.trim()) return say($("#buildMsg"), "Scan a site or enter the business name first.", "err");
   $("#buildBtn").disabled = true; $("#dlBtn").disabled = $("#openBtn").disabled = true; say($("#buildMsg"), "Designing… this takes a minute or two.");
+  if (!html) { $("#frame").srcdoc = SKELETON; $("#stage").hidden = false; }
   let text = "";
   try {
     const r = await call("/api/studio-build", payload()), reader = r.body.getReader(), dec = new TextDecoder();
@@ -255,7 +258,7 @@ $("#buildBtn").onclick = async () => {
     $("#frame").srcdoc = html; $("#stage").hidden = false; $("#dlBtn").disabled = $("#openBtn").disabled = false;
     const todos = (html.match(/class="todo"/g) || []).length;
     say($("#buildMsg"), (err ? "Partly built: " + err[1].trim() + ". " : "Done. ") + (todos ? `${todos} placeholder${todos > 1 ? "s" : ""} to fill before the owner sees it (highlighted).` : "No placeholders left."), err ? "err" : "ok");
-  } catch (e) { say($("#buildMsg"), e.message, "err"); }
+  } catch (e) { say($("#buildMsg"), e.message, "err"); if (!html) $("#stage").hidden = true; }
   finally { $("#buildBtn").disabled = false; }
 };
 const view = desk => { $("#stage").classList.toggle("desk", desk); $("#deskBtn").setAttribute("aria-pressed", desk); $("#phoneBtn").setAttribute("aria-pressed", !desk); };
