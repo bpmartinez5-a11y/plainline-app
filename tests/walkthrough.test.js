@@ -113,7 +113,7 @@ test("the assistant answers from the home page's own facts, never an amount", as
   const { FACTS, pageFacts } = handler._test;
   assert.match(FACTS, /What does it cost\? Every engagement is quoted/); // the Questions section
   assert.match(FACTS, /Back Office/); // the levels
-  assert.doesNotMatch(FACTS, /What work keeps piling up|Your name|Corner Cuts/); // not the chat, the form or the made-up examples
+  assert.doesNotMatch(FACTS, /What work keeps piling up|Your name|Corner Cuts|Marcus|Needs you/); // not the chat, the form or the made-up examples
   const calls = install(good);
   await call();
   assert.ok(calls.body.system.includes(FACTS.slice(0, 200)));

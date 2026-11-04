@@ -25,16 +25,17 @@ const NO_PRICE = "We quote every engagement after a walkthrough, so I can't give
 
 // What the assistant may say about Plainline comes from the home page itself (one source of truth): the levels,
 // the questions, what we build, what every plan includes, how it works and who we work with. Not the chat,
-// the contact form or the made-up example businesses. Read once per warm instance.
-const SKIP = /\b(ask|contact|looks)\b/;
+// the contact form or the made-up examples. Read once per warm instance.
+const SKIP = /\b(ask|contact|looks|desk)\b/; // desk and looks hold made-up example businesses and customers
 function pageFacts(file = path.join(__dirname, "..", "index.html")) {
   try {
     const html = fs.readFileSync(file, "utf8");
     const parts = [...html.matchAll(/<section\b([^>]*)>([\s\S]*?)<\/section>/gi)].filter(m => !SKIP.test(m[1]))
       .map(m => clean(m[2].replace(/<(script|style|svg)[\s\S]*?<\/\1>/gi, " ").replace(/<\/(h2|h3|dt|dd|li|p|b|summary)>/gi, ". ")).replace(/(\.\s*){2,}/g, ". ").replace(/\s+([.,])/g, "$1").replace(/([?!:→])\./g, "$1"));
-    const text = parts.filter(Boolean).join("\n").replace(/[$€£]\s?\d[\d,.]*/g, "").slice(0, 9000); // no amounts, ever
-    return text.length > 500 ? text : "";
-  } catch { return ""; }
+    const text = parts.filter(Boolean).join("\n").replace(/[$€£]\s?\d[\d,.]*|\b\d[\d,.]*\s?(dollars?|usd|k)\b/gi, "").slice(0, 9000); // no amounts, ever
+    if (text.length > 500) return text;
+    console.error("walkthrough: home page facts too short"); return "";
+  } catch (e) { console.error("walkthrough: home page facts unreadable", e.code || e.name); return ""; }
 }
 const FACTS = pageFacts();
 

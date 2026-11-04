@@ -534,13 +534,16 @@ form.addEventListener("submit", async e => {
   const STARTERS = ["Following up on quotes", "Missed calls and texts", "How does the AI front desk work?", "Can you run our back office?"];
   const BOOK = "Book a walkthrough", MAX_TURNS = 14, MAX_CHARS = 11500;
   /* Without AI, questions are answered from the page's own Questions section: the entry that shares the most words wins */
-  const STOP = new Set("about after also and any are can could does for from have how into just more much our out that the their them then there they this what when where which who why will with work you your".split(" "));
+  const STOP = new Set("about after also and any are can could does for from have how into just more much our out that the their them then there they this what when where which who why will with work you your help team company plainline need tell like want run".split(" "));
   const words = t => (t.toLowerCase().match(/[a-z]{3,}/g) || []).filter(w => !STOP.has(w)).map(w => w.replace(/(ing|ed|es|s)$/, ""));
   const FAQ = [...document.querySelectorAll("#faq details")].map(d => { const a = d.querySelector("p").textContent.trim(); return { q: new Set(words(d.querySelector("summary").textContent)), w: new Set(words(a)), a }; });
   function faqAnswer(msg) {
     const m = new Set(words(msg.replace(/\b(price|pricing|charge|expensive|quote)\b/gi, "cost")));
-    let best = null, top = 1; // a question word counts 2, an answer word 1: one shared question word, or two answer words, is the bar
-    for (const f of FAQ) { let n = 0; for (const w of m) n += f.q.has(w) ? 2 : f.w.has(w) ? 1 : 0; if (n > top) { top = n; best = f; } }
+    let best = null, top = 0; // a question word counts 2, an answer word 1; the bar is one shared question word or three answer words
+    for (const f of FAQ) {
+      let q = 0, a = 0; for (const w of m) f.q.has(w) ? q++ : f.w.has(w) && a++;
+      const n = q * 2 + a; if ((q || a >= 3) && n > top) { top = n; best = f; }
+    }
     return best && best.a;
   }
   /* A web address: with http(s):// or www., or ending in a common business domain ending (so "Node.js" or an email isn't one) */
