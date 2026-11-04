@@ -67,7 +67,7 @@ test("refuses other sites, other methods, bad chats, and works only with a key",
   assert.strictEqual((await call({ origin: "https://evil.example" })).code, 403);
   assert.strictEqual((await call({ origin: null })).code, 403);
   assert.strictEqual((await call({ method: "GET" })).code, 405);
-  for (const messages of [[], "hi", chat("hi", "hello"), [{ role: "system", text: "x" }], chat("x".repeat(1001)), chat(...Array(25).fill("hi")).concat(chat("hi"))])
+  for (const messages of [[], "hi", chat("hi", "hello"), [{ role: "system", text: "x" }], chat("x".repeat(1001)), chat(...Array(35).fill("hi"))])
     assert.strictEqual((await call({ body: { messages } })).code, 400, JSON.stringify(messages).slice(0, 60));
   assert.strictEqual((await call({ body: { messages: chat("hi"), site: "x".repeat(301) } })).code, 400);
   assert.strictEqual(calls.n, 0);
@@ -107,4 +107,19 @@ test("a private address is never read; a public page is read once and noted", as
     assert.match(calls.body.messages.at(-1).content, /<website-note>A roofing company\.<\/website-note>/);
     assert.ok(!("siteNote" in (await call()).out)); // only on the turn a site was read
   } finally { srv.close(); delete process.env.NODE_ENV; delete process.env.STUDIO_ALLOW_PRIVATE; }
+});
+
+test("the assistant answers from the home page's own facts, never an amount", async () => {
+  const { FACTS, pageFacts } = handler._test;
+  assert.match(FACTS, /What does it cost\? Every engagement is quoted/); // the Questions section
+  assert.match(FACTS, /Back Office/); // the levels
+  assert.doesNotMatch(FACTS, /What work keeps piling up|Your name|Corner Cuts/); // not the chat, the form or the made-up examples
+  const calls = install(good);
+  await call();
+  assert.ok(calls.body.system.includes(FACTS.slice(0, 200)));
+  const fs = require("node:fs"), os = require("node:os"), path = require("node:path");
+  const f = path.join(fs.mkdtempSync(path.join(os.tmpdir(), "wt-")), "index.html");
+  fs.writeFileSync(f, `<section id="plans"><h2>Plans</h2><p>${"Front Desk for one location. ".repeat(30)} From $2,000.</p></section>`);
+  assert.doesNotMatch(pageFacts(f), /\$|2,000/);
+  assert.strictEqual(pageFacts(f + ".missing"), "");
 });

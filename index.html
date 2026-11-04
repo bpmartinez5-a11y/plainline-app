@@ -530,9 +530,19 @@ form.addEventListener("submit", async e => {
 (() => {
   const $ = id => document.getElementById(id);
   const logEl = $("chatLog"), chipsEl = $("chatChips"), input = $("chatIn"), text = $("chatText"), sendBtn = $("chatSend"), book = $("chatBook"), bookMsg = $("bookMsg"), reset = $("chatReset");
-  const HELLO = "Hi, I'm Plainline's AI assistant. What work keeps piling up at your company?";
-  const STARTERS = ["Missed calls and texts", "Following up on quotes", "Scheduling and reschedules", "Updating records"];
-  const BOOK = "Book a walkthrough", MAX_TURNS = 10, MAX_CHARS = 8500;
+  const HELLO = "Hi, I'm Plainline's AI assistant. Ask me anything about Plainline, or tell me what work keeps piling up at your company.";
+  const STARTERS = ["Following up on quotes", "Missed calls and texts", "How does the AI front desk work?", "Can you run our back office?"];
+  const BOOK = "Book a walkthrough", MAX_TURNS = 14, MAX_CHARS = 11500;
+  /* Without AI, questions are answered from the page's own Questions section: the entry that shares the most words wins */
+  const STOP = new Set("about after also and any are can could does for from have how into just more much our out that the their them then there they this what when where which who why will with work you your".split(" "));
+  const words = t => (t.toLowerCase().match(/[a-z]{3,}/g) || []).filter(w => !STOP.has(w)).map(w => w.replace(/(ing|ed|es|s)$/, ""));
+  const FAQ = [...document.querySelectorAll("#faq details")].map(d => { const a = d.querySelector("p").textContent.trim(); return { q: new Set(words(d.querySelector("summary").textContent)), w: new Set(words(a)), a }; });
+  function faqAnswer(msg) {
+    const m = new Set(words(msg.replace(/\b(price|pricing|charge|expensive|quote)\b/gi, "cost")));
+    let best = null, top = 1; // a question word counts 2, an answer word 1: one shared question word, or two answer words, is the bar
+    for (const f of FAQ) { let n = 0; for (const w of m) n += f.q.has(w) ? 2 : f.w.has(w) ? 1 : 0; if (n > top) { top = n; best = f; } }
+    return best && best.a;
+  }
   /* A web address: with http(s):// or www., or ending in a common business domain ending (so "Node.js" or an email isn't one) */
   const SITE = /(?<![@\w.-])((?:https?:\/\/|www\.)[^\s<>"']{3,250}|(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:com|net|org|co|us|biz|info|io|ai|app|dev|shop|store|site|services|pro)(?:\/[^\s<>"']*)?)(?![\w@-]|\.\w)/i;
   let log, turns, site, siteNote, summary, aiOff = false, busy, done, chatId = 0;
@@ -568,7 +578,9 @@ form.addEventListener("submit", async e => {
     for (let i = log.length - 1; i >= 0 && out.length < 24; i--) { n += log[i].text.length; if (n > MAX_CHARS) break; out.unshift(log[i]); }
     return out;
   }
-  function fallback() {
+  function fallback(msg) {
+    const known = faqAnswer(msg || "");
+    if (known) { say("in", known); log.push({ role: "assistant", text: known }); return chips([], true); }
     const t = turns > 1 ? "Thanks. A person from Plainline can look at this with you. Book a walkthrough and we reply by email within 24 hours."
       : "Thanks. That's the kind of work Plainline takes off a team's plate. Book a walkthrough and a person from Plainline looks at it with you. We reply by email within 24 hours.";
     say("in", t); log.push({ role: "assistant", text: t }); chips([], true); openBook(false);
@@ -580,7 +592,7 @@ form.addEventListener("submit", async e => {
     say("out", msg); log.push({ role: "visitor", text: msg }); turns++;
     const me = chatId, found = !siteNote && ((msg.match(SITE) || [])[1] || "").replace(/[.,;:!?)]+$/, "").slice(0, 300);
     if (found) site = found;
-    if (aiOff) { busy = false; return fallback(); }
+    if (aiOff) { busy = false; return fallback(msg); }
     lock(true);
     const dots = say("in typing", ""); dots.innerHTML = "<span></span><span></span><span></span>"; dots.setAttribute("aria-hidden", "true");
     let d = null;
@@ -595,7 +607,7 @@ form.addEventListener("submit", async e => {
     } catch (err) { console.error("walkthrough chat failed", err.name); }
     if (me !== chatId) return; // the visitor pressed Start over while this reply was on its way
     dots.remove(); busy = false; lock(false);
-    if (!d || typeof d.reply !== "string") return fallback();
+    if (!d || typeof d.reply !== "string") return fallback(msg);
     say("in", d.reply); log.push({ role: "assistant", text: d.reply });
     if (d.summary) summary = d.summary;
     if (d.siteNote) siteNote = d.siteNote; // no note means the site couldn't be read: a later address is tried again

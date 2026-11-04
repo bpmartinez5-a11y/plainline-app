@@ -44,5 +44,10 @@
         }
       ]
     }
-  ]
+  ],
+  "functions": {
+    "api/walkthrough.js": {
+      "includeFiles": "index.html"
+    }
+  }
 }
