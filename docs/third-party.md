@@ -12,3 +12,6 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+## claude-seo (SEO skills and scripts)
+`.claude/skills/seo-local`, `seo-schema`, `seo-geo`, `seo-technical`, `seo-page` and `.claude/seo/` are copied from https://github.com/AgriciDaniel/claude-seo at commit 6be93f4 (v2.5.0), MIT License, Copyright (c) 2026 agricidaniel. The full license is in `.claude/seo/LICENSE`. Only these 5 skills and 7 scripts are used; the installer, hooks, agents and extensions are not. Rules: `.claude/seo/README.md`.
