@@ -344,7 +344,7 @@ footer{border-top:2px solid var(--ink);margin-top:40px;padding-block:28px calc(2
 
     function brand() { const parts = B.name.split(" "); return parts.length > 1 ? `${esc(parts.slice(0, -1).join(" "))} <span>${esc(parts[parts.length - 1])}</span>` : esc(B.name); }
     document.body.innerHTML = `
-${OPT.preview ? `<div class="concept">Concept preview by Plainline · built from ${esc(B.domain || B.name)} · not live</div>` : OPT.connected ? "" : `<div class="concept">Preview · this site isn't connected yet, so the booking form doesn't send</div>`}
+${OPT.shared ? `<div class="concept">Concept preview by Plainline · made from ${esc(B.domain || B.name)} · not the official site</div>` : OPT.preview ? `<div class="concept">Concept preview by Plainline · built from ${esc(B.domain || B.name)} · not live</div>` : OPT.connected ? "" : `<div class="concept">Preview · this site isn't connected yet, so the booking form doesn't send</div>`}
 <header class="top"><div class="wrap bar">
 <a class="brand" href="#home">${/^ADD:/i.test(B.name) ? say(B.name) : brand()}</a>
 <button class="iconbtn menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav">Menu</button>
@@ -849,11 +849,13 @@ ${P.about.photo ? `<div class="field"><label for="t-me">Photo on the About page<
 
   /* ---------- Render ---------- */
   function page(p, kind, opts) {
-    const o = { preview: !!(opts && opts.preview), connected: !!(opts && opts.connected), ownerLink: !!(opts && (opts.preview || opts.ownerLink)), dashboardHref: (opts && opts.dashboardHref) || "owner.html", siteHref: (opts && opts.siteHref) || "index.html" };
+    // shared: a concept page sent to the business itself (api/preview.js): no owner link, no canonical to their domain.
+    const shared = !!(opts && opts.shared);
+    const o = { preview: !!(opts && opts.preview) || shared, shared, connected: !!(opts && opts.connected), ownerLink: !shared && !!(opts && (opts.preview || opts.ownerLink)), dashboardHref: (opts && opts.dashboardHref) || "owner.html", siteHref: (opts && opts.siteHref) || "index.html" };
     const B = p.business, isSite = kind === "site";
     const metaDesc = isSite ? (p.hero.lede || [B.kind, B.city].filter(Boolean).join(" in ")) : "";
     const extra = isSite
-      ? `<meta name="description" content="${escHtml(metaDesc.slice(0, 155))}">\n${B.domain ? `<link rel="canonical" href="https://${escHtml(B.domain)}/">\n` : ""}<meta property="og:title" content="${escHtml(B.name)}">\n${p.hero.photos[0] ? `<meta property="og:image" content="${escHtml(p.hero.photos[0].src)}">\n` : ""}${o.connected ? "" : '<meta name="robots" content="noindex">\n'}<script type="application/ld+json">${embed(ldJson(p))}</script>`
+      ? `<meta name="description" content="${escHtml(metaDesc.slice(0, 155))}">\n${B.domain && !o.shared ? `<link rel="canonical" href="https://${escHtml(B.domain)}/">\n` : ""}<meta property="og:title" content="${escHtml(B.name)}">\n${p.hero.photos[0] ? `<meta property="og:image" content="${escHtml(p.hero.photos[0].src)}">\n` : ""}${o.connected ? "" : '<meta name="robots" content="noindex">\n'}<script type="application/ld+json">${embed(ldJson(p))}</script>`
       : `<meta name="robots" content="noindex,nofollow">`;
     const runtime = isSite ? siteRuntime : dashRuntime;
     return `${head(p, isSite ? B.name : B.name + " · Owner", extra)}

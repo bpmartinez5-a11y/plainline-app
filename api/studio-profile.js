@@ -104,54 +104,63 @@ function enforce(profile, scan) {
   return scrub(profile);
 }
 
-module.exports = async function handler(req, res) {
-  res.setHeader("Cache-Control", "no-store");
-  if (req.method !== "POST") return res.status(405).json({ error: "Use POST" });
-  if (!authorized(req, res)) return;
+// Ask Claude for the profile and enforce the rules on it. onBeat runs every few stream events, so a caller
+// that holds a browser connection can send a heartbeat. Throws with a message a person can read.
+// Shared with /api/preview (The Engine's website previews).
+async function plan(b, onBeat = () => {}, timeoutMs = 280_000) {
   const key = process.env.ANTHROPIC_API_KEY;
-  if (!key) return res.status(501).json({ error: "Add ANTHROPIC_API_KEY in Vercel to build sites" });
-  const b = body(req);
-  if (!b.scan || !b.scan.site) return res.status(400).json({ error: "Scan their site first" });
-
   let r;
   try {
     r = await fetch(API, {
       method: "POST",
       headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
       body: JSON.stringify({ model: MODEL, max_tokens: 8000, stream: true, system: SYSTEM, tools: [TOOL], tool_choice: { type: "tool", name: "save_profile" }, messages: [{ role: "user", content: brief(b) }] }),
-      signal: AbortSignal.timeout(280_000)
+      signal: AbortSignal.timeout(timeoutMs)
     });
-  } catch (e) { return res.status(502).json({ error: "Couldn't reach Claude: " + e.message }); }
-  if (!r.ok) { console.error("anthropic", r.status, await errType(r)); return res.status(502).json({ error: `Claude said ${r.status}` }); }
-
-  res.status(200);
-  res.setHeader("Content-Type", "text/plain; charset=utf-8");
+  } catch (e) { throw Object.assign(new Error("Couldn't reach Claude: " + e.message), { upstream: true }); }
+  if (!r.ok) { console.error("anthropic", r.status, await errType(r)); throw Object.assign(new Error(`Claude said ${r.status}`), { upstream: true }); }
   const reader = r.body.getReader(), dec = new TextDecoder();
   let buf = "", json = "", stop = "", beat = 0;
-  try {
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buf += dec.decode(value, { stream: true });
-      let i;
-      while ((i = buf.indexOf("\n")) >= 0) {
-        const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
-        if (!line.startsWith("data:")) continue;
-        let ev; try { ev = JSON.parse(line.slice(5)); } catch { continue; }
-        if (ev.type === "content_block_delta" && ev.delta && ev.delta.type === "input_json_delta") json += ev.delta.partial_json;
-        else if (ev.type === "message_delta" && ev.delta && ev.delta.stop_reason) stop = ev.delta.stop_reason;
-        else if (ev.type === "error") throw new Error((ev.error && ev.error.message) || "stream error");
-      }
-      if (++beat % 20 === 0) res.write(" "); // heartbeat so the connection stays open
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    let i;
+    while ((i = buf.indexOf("\n")) >= 0) {
+      const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
+      if (!line.startsWith("data:")) continue;
+      let ev; try { ev = JSON.parse(line.slice(5)); } catch { continue; }
+      if (ev.type === "content_block_delta" && ev.delta && ev.delta.type === "input_json_delta") json += ev.delta.partial_json;
+      else if (ev.type === "message_delta" && ev.delta && ev.delta.stop_reason) stop = ev.delta.stop_reason;
+      else if (ev.type === "error") throw new Error((ev.error && ev.error.message) || "stream error");
     }
-    if (stop === "max_tokens") throw new Error("The profile was cut off at the length limit. Try again");
-    let raw; try { raw = JSON.parse(json); } catch { throw new Error("Claude didn't return a usable profile. Try again"); }
-    const profile = enforce(Engine.sanitize(raw), b.scan);
-    delete profile._tokens; delete profile._slug; // the browser re-derives these when it renders
-    res.write("\n" + JSON.stringify({ profile }));
+    if (++beat % 20 === 0) onBeat();
+  }
+  if (stop === "max_tokens") throw new Error("The profile was cut off at the length limit. Try again");
+  let raw; try { raw = JSON.parse(json); } catch { throw new Error("Claude didn't return a usable profile. Try again"); }
+  const profile = enforce(Engine.sanitize(raw), b.scan);
+  delete profile._tokens; delete profile._slug; // the browser re-derives these when it renders
+  return profile;
+}
+
+module.exports = async function handler(req, res) {
+  res.setHeader("Cache-Control", "no-store");
+  if (req.method !== "POST") return res.status(405).json({ error: "Use POST" });
+  if (!authorized(req, res)) return;
+  if (!process.env.ANTHROPIC_API_KEY) return res.status(501).json({ error: "Add ANTHROPIC_API_KEY in Vercel to build sites" });
+  const b = body(req);
+  if (!b.scan || !b.scan.site) return res.status(400).json({ error: "Scan their site first" });
+  // Start streaming only once Claude answers, so a failed call still gets a plain 502.
+  let started = false;
+  const start = () => { if (started) return; started = true; res.status(200); res.setHeader("Content-Type", "text/plain; charset=utf-8"); };
+  try {
+    const profile = await plan(b, () => { start(); res.write(" "); }); // heartbeat so the connection stays open
+    start(); res.write("\n" + JSON.stringify({ profile }));
   } catch (e) {
+    if (e.upstream && !started) return res.status(502).json({ error: e.message });
     console.error(e);
-    res.write("\n" + JSON.stringify({ error: String(e.message || e) }));
+    start(); res.write("\n" + JSON.stringify({ error: String(e.message || e) }));
   }
   res.end();
 };
+module.exports.plan = plan;

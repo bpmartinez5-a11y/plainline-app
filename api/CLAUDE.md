@@ -8,6 +8,7 @@ Every change in `api/` is **High** tier: Ben approves and the-enforcer passes.
 | `studio-scan.js` | Studio: fetches a business's website server-side and returns its pages. Public addresses only: the connection's own DNS lookup is checked (`safeLookup`), so there's no second lookup to rebind | `x-studio-key` header (Ben only) |
 | `studio-build.js` | Studio: asks Claude to build a client site from a scan | `x-studio-key` header (Ben only) |
 | `studio-profile.js` | Studio engine path: asks Claude for a site profile (one forced tool call), then sanitizes it and keeps only photos and links from the scan; streams a heartbeat, last line is the JSON | `x-studio-key` header (Ben only) |
+| `preview.js` | The Engine's free website previews: POST (from ops.plainlineops.com only) scans an approved lead's site and saves a Studio profile on the lead; GET `/preview/<slug>` serves it as a labeled, noindex concept page for 30 days | POST: the rep's Supabase token (row-level security, 2-step); GET: public, unguessable slug |
 | `_studio.js` | Shared Studio helpers (`authorized`, `body`). Files starting with `_` aren't routes on Vercel. | — |
 | `_errtype.js` | What to log when Anthropic returns an error: the error type only, never the body (it can quote visitor or client-site text) | — |
 
