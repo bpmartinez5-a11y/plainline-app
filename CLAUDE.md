@@ -45,7 +45,7 @@ Put the tier at the top of the PR body. A fresh agent that didn't write the chan
 - `/tech-lead` before anything hard to undo · `/architect-mvp` design, then build → `architect`
 - `/audit-codebase` report only → `auditor` · `/refactor-clean` same behavior, cleaner structure → `auditor`
 - `/debug-prod` → `debugger` · `/perf-pass` → `perf-engineer` · `/security-audit` → `security-auditor`
-- `/build-ui` card-kit style components · `/ship-it` review gate and Vercel deploy · `/client-kit` → `intake` · `/client-docs` the 10 client documents
+- `/build-ui` card-kit style components · `/tactile-ui` buttons and confirmations that feel like real objects (ideas only from dqnamo's The Kitchen, no code copied) · `/ship-it` review gate and Vercel deploy · `/client-kit` → `intake` · `/client-docs` the 10 client documents
 - `/seo-local`, `/seo-schema`, `/seo-geo`, `/seo-technical`, `/seo-page`: SEO and AI-search checks for Plainline and client sites (claude-seo, MIT). Rules in `.claude/seo/README.md`.
 - Every change ends with the review gate: `reviewer`, then `refuter`.
 - Extra reviewers, all read-only, findings to `refuter`: `database-reviewer` on any schema, migration or query change; `silent-failure-hunter` on API and save paths (and Big audits); `test-gap-reviewer` on Medium and High PRs. Adapted from everything-claude-code (MIT, `docs/third-party.md`); nothing else from that repo is installed.

@@ -212,7 +212,9 @@ main{perspective:1600px}
 .tagline{font:800 18px/1.1 var(--display);text-transform:var(--up);letter-spacing:.1em;margin:16px 0 0}
 .btns{display:flex;gap:10px;flex-wrap:wrap}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:12px 20px;border-radius:999px;font-weight:600;text-decoration:none;border:1px solid var(--ink);cursor:pointer;background:transparent}
-.btn.solid{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.solid{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);box-shadow:inset 0 -3px 0 rgb(0 0 0 / .18),0 1px 2px rgb(0 0 0 / .12)}
+/* Tactile press (idea from dqnamo's "The Kitchen", our own code): buttons sink a little when pressed, like a real key. */
+.btn{transition:transform .15s cubic-bezier(.23,1,.32,1),box-shadow .15s}.btn:active{transform:translateY(1px) scale(.98)}.btn.solid:active{box-shadow:inset 0 -1px 0 rgb(0 0 0 / .18)}
 .deck{position:relative;height:clamp(340px,46vw,540px);perspective:1200px;transform-style:preserve-3d}
 .deck figure{position:absolute;margin:0;inset:8% 12%;border-radius:var(--r);overflow:hidden;box-shadow:var(--soft);transform-style:preserve-3d;will-change:transform;background:var(--chalk)}
 .deck img,.panel img,.tile img{width:100%;height:100%;object-fit:cover}
@@ -296,7 +298,10 @@ form.card{background:var(--surface);border-radius:var(--r);padding:22px;display:
 .field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:12px;font-size:16px;min-height:46px}
 .field textarea{min-height:110px;resize:vertical}
 .check{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--muted)}
-.ok{background:var(--chalk);border-radius:10px;padding:18px}
+.ok{background:var(--chalk);border-radius:10px 10px 0 0;padding:18px 18px 24px;-webkit-mask:radial-gradient(circle at 7px 100%,transparent 4px,#000 4.5px) 0 0/14px 100%;mask:radial-gradient(circle at 7px 100%,transparent 4px,#000 4.5px) 0 0/14px 100%}
+.ok dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:10px 0;padding:10px 0;border-block:1px dashed var(--line)}.ok dt{color:var(--muted)}.ok dd{margin:0;font-weight:600}.ok p{margin:0}
+/* The request slip prints out of the form line by line, like a receipt. */
+@keyframes print{from{clip-path:inset(0 0 100% 0);transform:translateY(-16px)}to{clip-path:inset(0 0 -8px 0);transform:none}}.ok.print{animation:print .9s steps(9,end)}
 @media (max-width:860px){.book{grid-template-columns:1fr}.row{grid-template-columns:1fr}}
 .strip{display:flex;gap:10px;flex-wrap:wrap}
 .strip span{font:800 17px/1 var(--display);text-transform:var(--up);letter-spacing:.05em;padding:10px 14px;border:1px solid var(--line);border-radius:6px}
@@ -439,7 +444,7 @@ ${K.minors ? `<div class="check"><input type="checkbox" id="f-guardian" name="gu
 <div class="field"><label for="f-msg">Anything else?</label><textarea id="f-msg" name="msg"></textarea></div>
 <div class="check"><input type="checkbox" id="f-ok" required><label for="f-ok">${esc(B.name)} can contact me about this request. My details aren't sold or shared.</label></div>
 <button class="btn solid" type="submit">Send request</button>
-<div class="ok" id="ok" hidden role="status"><b>Preview only. Nothing was sent.</b> Once this site is connected, your request goes straight to ${esc(B.name)}.</div>
+<div class="ok" id="ok" hidden role="status"><div class="mono">Your request</div><dl></dl><p><b>Preview only. Nothing was sent.</b> Once this site is connected, your request goes straight to ${esc(B.name)}.</p></div>
 </form></section>`;
       }
     };
@@ -479,7 +484,12 @@ ${K.minors ? `<div class="check"><input type="checkbox" id="f-guardian" name="gu
       if (form) {
         const sync = () => { const t = (form.querySelector("[name=type]:checked") || form.querySelector("[name=type]")).value; form.querySelectorAll("[data-for]").forEach(el => el.hidden = el.dataset.for !== t); };
         form.addEventListener("change", sync); sync();
-        form.addEventListener("submit", e => { e.preventDefault(); if (!form.reportValidity()) return; document.getElementById("ok").hidden = false; });
+        form.addEventListener("submit", e => {
+          e.preventDefault(); if (!form.reportValidity()) return;
+          const ok = document.getElementById("ok"), fd = new FormData(form), t = P.booking.types.find(t => t.id === fd.get("type"));
+          ok.querySelector("dl").innerHTML = [["For", t && t.label], ["Name", fd.get("name")], ["Date", fd.get("date")], ["Where", fd.get("loc")]].filter(r => r[1]).map(r => `<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join("");
+          ok.hidden = false; ok.classList.remove("print"); void ok.offsetWidth; ok.classList.add("print");
+        });
       }
       app.querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", async () => {
         try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = "Copied"; }
@@ -567,6 +577,12 @@ body{font-size:15px;padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .top .act{margin-left:auto;display:flex;gap:6px}
 .chipbtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 13px;min-height:40px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;color:var(--ink);white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
 .chipbtn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chipbtn{transition:transform .15s cubic-bezier(.23,1,.32,1)}.chipbtn:active{transform:scale(.97)}
+/* Hold to confirm (idea from dqnamo's "The Kitchen", our own code): red fills the button while it is held. */
+.hold{position:relative;overflow:hidden;isolation:isolate;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;color:#B42318;border-color:color-mix(in srgb,#D64545 45%,var(--line))}
+.hold::after{content:"";position:absolute;inset:0;z-index:-1;background:color-mix(in srgb,#D64545 24%,transparent);clip-path:inset(0 100% 0 0);transition:clip-path .18s cubic-bezier(.23,1,.32,1)}
+.hold.on::after{clip-path:inset(0);transition:clip-path 1.2s linear}
+.toast .undo{background:none;border:0;color:inherit;font:inherit;text-decoration:underline;margin-left:10px;padding:4px;cursor:pointer}
 .tabs{display:flex;gap:4px}
 .tab{flex:1;border:0;background:transparent;cursor:pointer;display:grid;justify-items:center;gap:3px;padding:8px 4px;border-radius:12px;color:var(--muted);font-size:11.5px;font-weight:600;min-height:52px}
 .tab svg{width:22px;height:22px}
@@ -688,7 +704,36 @@ h2{font:800 25px/1 var(--display);text-transform:var(--up);margin:0}
     const fmt = d => { const x = new Date(d + "T12:00:00"); return { m: x.toLocaleString("en-US", { month: "short" }), d: x.getDate(), wd: x.toLocaleString("en-US", { weekday: "short" }) }; };
     const daysAway = d => Math.round((new Date(d + "T12:00:00") - new Date().setHours(12, 0, 0, 0)) / 864e5);
     const typeLabel = id => (TYPES.find(t => t.id === id) || { label: "Other" }).label;
-    function toast(t) { const el = $("#toast"); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 1800); }
+    function toast(t, undo) {
+      const el = $("#toast"); el.textContent = t; toast.undo = undo;
+      if (undo) el.insertAdjacentHTML("beforeend", '<button class="undo" id="undo">Undo</button>');
+      el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => { el.hidden = true; toast.undo = null; }, undo ? 8000 : 1800);
+      if (undo) $("#undo").focus();
+    }
+    // An edit after a delete or reset makes its Undo unsafe (it would put back the old copy), so the edit ends the Undo.
+    document.addEventListener("input", () => { if (!toast.undo) return; toast.undo = null; const u = $("#undo"); if (u) u.remove(); });
+    // Buttons that remove data fire only after a 1.2 s hold (mouse, touch, or Enter/Space held down), then offer Undo.
+    const HOLD = {
+      clearEx: () => { const was = jobs; jobs = jobs.filter(j => !j.ex); saveJobs(); render(); toast("Examples cleared", () => { jobs = was; saveJobs(); render(); }); },
+      resetSite: () => { const was = site; site = {}; saveSite(); render(); toast("Site edits reset", () => { site = was; saveSite(); render(); }); }
+    };
+    const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let held = null, firedAt = 0;
+    const letGo = () => { if (!held) return; clearTimeout(held.t); held.b.classList.remove("on"); if (held.label) held.b.textContent = held.label; held = null; };
+    function grab(e) {
+      const b = e.target.closest && e.target.closest("button.hold");
+      if (!b || held || e.button > 0 || (e.type === "keydown" && e.key !== "Enter" && e.key !== " ")) return;
+      if (e.type === "keydown") e.preventDefault();
+      else if (b.hasPointerCapture(e.pointerId)) b.releasePointerCapture(e.pointerId); // touch: let a slide off the button cancel
+      b.classList.add("on");
+      held = { b, t: setTimeout(() => { const fn = HOLD[b.id]; letGo(); firedAt = Date.now(); if (fn) fn(); }, 1200) };
+      if (still) { held.label = b.textContent; b.textContent = "Keep holding…"; } // reduced motion: no fill animation, so say it
+    }
+    document.addEventListener("pointerdown", grab); document.addEventListener("keydown", grab);
+    ["pointerup", "pointercancel"].forEach(n => document.addEventListener(n, letGo));
+    document.addEventListener("keyup", e => { if (e.key === "Enter" || e.key === " ") letGo(); });
+    document.addEventListener("pointerout", e => { if (held && e.target === held.b && !held.b.contains(e.relatedTarget)) letGo(); });
+    document.addEventListener("focusout", e => { if (held && e.target === held.b) letGo(); });
     const chrome = (label, right) => `<div class="chrome"><span class="lights"><i></i><i></i><i></i></span><span>${label}</span><span class="r">${right || ""}</span></div>`;
     const exTag = `<div class="ex">Example data · clear it on the ${esc(cap(WORD))}s tab</div>`;
     function cap(s) { return s ? s[0].toUpperCase() + s.slice(1) : s; }
@@ -742,7 +787,7 @@ h2{font:800 25px/1 var(--display);text-transform:var(--up);margin:0}
       return `<div class="head"><div><div class="eyebrow">${jobs.length} ${esc(WORD)}s · tap a status to move it along</div><h1>${esc(cap(WORD))}s</h1></div><button class="chipbtn primary" id="addJob">+ Add ${esc(WORD)}</button></div>
 <div class="toolbar"><div class="seg" role="group" aria-label="Sort">${[["date", "Soonest"], ["money", "Most $"], ["miles", "Closest"]].map(([k, l]) => `<button aria-pressed="${sortBy === k}" data-sort="${k}">${l}</button>`).join("")}</div>
 ${TYPES.length > 1 ? `<div class="seg" role="group" aria-label="Filter">${[["all", "All"], ...TYPES.map(t => [t.id, t.label])].map(([k, l]) => `<button aria-pressed="${filter === k}" data-filter="${esc(k)}">${esc(l)}</button>`).join("")}</div>` : ""}
-${hasEx ? `<button class="chipbtn" id="clearEx">Clear examples</button>` : ""}</div>
+${hasEx ? `<button class="chipbtn hold" id="clearEx" aria-label="Clear examples. Press and hold">Hold to clear examples</button>` : ""}</div>
 <div class="jobs">${list.length ? list.map(jobCard).join("") : `<div class="card"><div class="body"><b>Nothing here yet.</b><span class="small">Tap “Add ${esc(WORD)}” when a request comes in. Once the site is live, requests land here on their own.</span></div></div>`}</div>`;
     };
     function jobCard(j) {
@@ -783,7 +828,7 @@ ${P.about.photo ? `<div class="field"><label for="t-me">Photo on the About page<
 <div style="display:grid;gap:10px">${fixes.map(f => `<div style="display:grid;gap:6px"><div class="req">Page: ${esc(f.page)}\nChange: ${esc(f.text)}</div>
 <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><span class="pill ${f.state === "Done" ? "ok" : f.state === "Sent" ? "" : "warn"}">${esc(f.state)}</span>
 <button class="chipbtn" data-copyfix="${f.id}" style="margin-left:auto">Copy request</button><button class="chipbtn" data-fixstate="${f.id}">${f.state === "To send" ? "Mark sent" : f.state === "Sent" ? "Mark done" : "Reopen"}</button></div></div>`).join("")}</div></div></div></div>
-<div class="card">${chrome("Undo")}<div class="body"><span class="small">Put the site back the way it was before any edits made here.</span><button class="chipbtn" id="resetSite" style="justify-self:start">Reset site edits</button></div></div>`;
+<div class="card">${chrome("Undo")}<div class="body"><span class="small">Put the site back the way it was before any edits made here.</span><button class="chipbtn hold" id="resetSite" style="justify-self:start" aria-label="Reset site edits. Press and hold">Hold to reset site edits</button></div></div>`;
     };
     function drawTabs() { $("#tabs").innerHTML = TABS.map(([k, l]) => `<button class="tab" role="tab" aria-selected="${tab === k}" data-tab="${k}">${ICON[k]}<span>${esc(l)}</span></button>`).join(""); }
     function render() { drawTabs(); $("#main").innerHTML = `<div class="page">${V[tab]()}</div>`; }
@@ -796,7 +841,13 @@ ${P.about.photo ? `<div class="field"><label for="t-me">Photo on the About page<
       if (d.adv) { const j = jobs.find(x => x.id === d.adv); j.stage = (j.stage + 1) % STAGES.length; saveJobs(); render(); toast(STAGES[j.stage]); return; }
       if (d.sort) { sortBy = d.sort; render(); return; }
       if (d.filter) { filter = d.filter; render(); return; }
-      if (t.id === "clearEx") { jobs = jobs.filter(j => !j.ex); saveJobs(); render(); toast("Examples cleared"); return; }
+      if (t.classList.contains("hold")) {
+        // A screen reader or switch sends a plain click (detail 0) and cannot hold: ask with the browser's own dialog.
+        if (e.detail === 0) { if (HOLD[t.id] && confirm(t.getAttribute("aria-label").split(".")[0] + "?")) HOLD[t.id](); }
+        else if (Date.now() - firedAt > 400) toast("Press and hold to confirm");
+        return;
+      }
+      if (t.id === "undo" && toast.undo) { const u = toast.undo; toast.undo = null; u(); toast("Restored"); return; }
       if (t.id === "addJob") return openJob();
       if (d.edit) return openJob(jobs.find(x => x.id === d.edit));
       if (d.cover) return pickFor({ cover: d.cover, path: d.path });
@@ -805,7 +856,6 @@ ${P.about.photo ? `<div class="field"><label for="t-me">Photo on the About page<
       if (t.id === "fx-add") { const tx = $("#fx-text").value.trim(); if (!tx) { $("#fx-text").focus(); return; } fixes.unshift({ id: "f" + Date.now(), page: $("#fx-page").value, text: tx.slice(0, 1000), state: "To send" }); saveFixes(); render(); toast("Request ready to send"); return; }
       if (d.copyfix) { const f = fixes.find(x => x.id === d.copyfix); return copy(`Website change for ${B.name}:\nPage: ${f.page}\nChange: ${f.text}`, "Copied. Paste it to Plainline"); }
       if (d.fixstate) { const f = fixes.find(x => x.id === d.fixstate); f.state = f.state === "To send" ? "Sent" : f.state === "Sent" ? "Done" : "To send"; saveFixes(); render(); return; }
-      if (t.id === "resetSite") { site = {}; saveSite(); render(); toast("Site edits reset"); }
     });
     document.addEventListener("input", e => {
       const el = e.target, d = el.dataset;
@@ -833,16 +883,16 @@ ${P.about.photo ? `<div class="field"><label for="t-me">Photo on the About page<
 <div class="field"><label for="j-type">Type</label><select id="j-type">${TYPES.map(t => `<option value="${esc(t.id)}" ${j.type === t.id ? "selected" : ""}>${esc(t.label)}</option>`).join("")}</select></div></div>
 <div class="grid2"><div class="field"><label for="j-date">Date</label><input id="j-date" type="date" required value="${esc(j.date)}"></div><div class="field"><label for="j-place">Where</label><input id="j-place" value="${esc(j.place)}"></div></div>
 <div class="grid2"><div class="field"><label for="j-miles">Miles away</label><input id="j-miles" inputmode="numeric" value="${esc(j.miles)}"></div><div class="field"><label for="j-value">Pay ($)</label><input id="j-value" inputmode="numeric" value="${esc(j.value)}"></div></div>
-<div style="display:flex;gap:8px;flex-wrap:wrap">${!isNew ? `<button type="button" class="chipbtn" id="j-del">Delete</button>` : ""}<span style="flex:1"></span><button type="button" class="chipbtn" id="j-cancel">Cancel</button><button class="chipbtn primary" type="submit">Save</button></div></form></div>`;
+<div style="display:flex;gap:8px;flex-wrap:wrap">${!isNew ? `<button type="button" class="chipbtn hold" id="j-del" aria-label="Delete. Press and hold">Hold to delete</button>` : ""}<span style="flex:1"></span><button type="button" class="chipbtn" id="j-cancel">Cancel</button><button class="chipbtn primary" type="submit">Save</button></div></form></div>`;
       sh.hidden = false; $("#j-what").focus();
       $("#j-cancel").onclick = () => sh.hidden = true;
       sh.onclick = e => { if (e.target === sh) sh.hidden = true; };
-      if (!isNew) $("#j-del").onclick = () => { jobs = jobs.filter(x => x.id !== j.id); saveJobs(); sh.hidden = true; render(); toast("Deleted"); };
+      HOLD["j-del"] = () => { const was = jobs; jobs = jobs.filter(x => x.id !== j.id); saveJobs(); sh.hidden = true; render(); toast("Deleted", () => { jobs = was; saveJobs(); render(); }); };
       $("#jobForm").onsubmit = e => { e.preventDefault();
         Object.assign(j, { what: $("#j-what").value.trim().slice(0, 120), name: $("#j-name").value.trim().slice(0, 80), type: $("#j-type").value, date: $("#j-date").value, place: $("#j-place").value.trim().slice(0, 80), miles: +$("#j-miles").value.replace(/\D/g, "") || 0, value: +$("#j-value").value.replace(/\D/g, "") || 0, ex: false });
         if (isNew) jobs.push(j); saveJobs(); sh.hidden = true; tab = "jobs"; render(); toast(isNew ? "Added" : "Saved"); };
     }
-    addEventListener("keydown", e => { if (e.key === "Escape") $("#sheet").hidden = true; });
+    addEventListener("keydown", e => { if (e.key === "Escape") { letGo(); $("#sheet").hidden = true; } });
     $("#dateLine").textContent = new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
     render();
   }
