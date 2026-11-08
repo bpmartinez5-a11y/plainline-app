@@ -48,6 +48,15 @@
   "functions": {
     "api/walkthrough.js": {
       "includeFiles": "index.html"
+    },
+    "api/preview.js": {
+      "maxDuration": 300
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/preview/:slug",
+      "destination": "/api/preview?slug=:slug"
+    }
+  ]
 }
