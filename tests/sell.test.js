@@ -38,3 +38,11 @@ test("the page is kept out of search and out of the sitemap", () => {
 test("the privacy policy names what the seller page saves", () => {
   assert.match(fs.readFileSync(path.join(__dirname, "..", "privacy.html"), "utf8"), /<b>Seller questions\.<\/b>/);
 });
+
+test("a filled hidden field keeps the answers and never shows success", () => {
+  // Autofill can fill the hidden "website" field; the server then saves nothing (api/lead.js), so the page must not say "Thanks".
+  const hp = html.split("\n").find((l) => l.includes('if (v("website"))'));
+  assert.ok(hp, "the honeypot check is on the page");
+  assert.doesNotMatch(hp, /Thanks|form\.reset/);
+  assert.match(hp, /"err"/);
+});

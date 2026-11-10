@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="/fonts/plainline.css">
 <!-- The seller one-pager (Ben, Nov 10), sent from The Engine's Send to box. The text is the seller kit's one page
      (project files plainline/sellers/onboarding/seller-one-pager.html): change it there first, then here.
-     No prices and no pay terms on this page: the terms wait on Ben's pick and an attorney. Not in the sitemap. -->
+     No prices, rates or amounts on this page: the seller agreement holds them, after an attorney checks it. Not in the sitemap. -->
 <style>
 :root{--ease:cubic-bezier(.2,.8,.2,1);--t-fast:200ms;
   --wall:#d9cebf;--wall-2:#c4b49f;--floor:#a48b72;--glass:rgba(52,41,34,.72);--surface:rgba(18,14,12,.34);
@@ -108,10 +108,10 @@ footer a{color:var(--muted)}
     <ul>
       <li>Heating, cooling and plumbing shops</li>
       <li>Auto repair, tire, body and detail shops</li>
-      <li>Golf courses, ranges, simulator venues and teaching pros</li>
+      <li>Golf courses, driving ranges, simulator venues and teaching pros</li>
     </ul>
     <p>Owner-run, where the phone brings in the work and the owner is too busy to answer it.</p>
-    <p class="fine">We do not take financial services, gun shops or ranges.</p>
+    <p class="fine">We do not take financial services, gun shops or gun ranges.</p>
   </div>
 </section>
 
@@ -197,12 +197,12 @@ form.addEventListener("submit", async e => {
   if (!name) { form.elements.name.focus(); return say("Please add your name.", "err"); }
   if (!/^\S+@\S+\.\S+$/.test(email)) { form.elements.email.focus(); return say("Please add a valid email so we can reply.", "err"); }
   if (f.reach !== "Email" && f.phone.replace(/\D/g, "").length < 10) { form.elements.phone.focus(); return say("Please add your phone number, or pick Email me.", "err"); }
-  if (v("website")) { form.reset(); return say("Thanks! Your answers are in.", "ok"); } // a bot filled the hidden field
+  if (v("website")) return say("Sorry, that did not send. Please email ben@plainlineops.com or pick a time above.", "err"); // the hidden field is filled: a bot, or autofill, so keep the answers and say so
   go.disabled = true; say("Sending…");
   try {
     const r = await fetch("/api/lead", { method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, message: answers(f), source: "website · sellers" }), signal: AbortSignal.timeout(15000) });
-    if (r.status === 429) return say("We already have a few answers from this connection. Please try again in an hour.", "err");
+    if (r.status === 429) return say("We can't take more answers right now. Please try again later, or pick a time above.", "err");
     if (!r.ok) throw new Error("HTTP " + r.status);
     form.reset(); say("Thanks! Your answers are in. We reply by email within 24 hours.", "ok");
   } catch (err) {
