@@ -13,7 +13,7 @@ This map sorts the repo by the five layers of agent work (Ben, Nov 3). Use it to
 ## Rules per layer
 
 1. **Prompt.** A skill says when to use it in its description and how in its body. Each subagent has one job and a fixed output.
-2. **Context.** Grep or Glob first, then read only the line range. Never read `demo.html` whole. Hand searches and reviews to the Sonnet subagents, so each gets its own context.
+2. **Context.** Grep or Glob first, then read only the line range. Never read `demo.html` whole. Use the Sonnet subagents for wide searches and reviews, so each gets its own context; do a small lookup yourself.
 3. **Harness.** Plan mode before multi-file edits. Tests run on every PR: `node --test tests/*.test.js`. Previews are off; test locally, then check production after the merge.
 4. **Loop.** Green means: tests pass and every finding that `refuter` keeps is fixed. Only verified findings go back. After three rounds, rethink the design.
 5. **Graph.** Ask for every arrow: does the next step read the previous step's output? If no value crosses, run the steps in parallel. The read-only reviewers run in parallel; `refuter` waits for all of them. Ben is the one human gate, for High PRs only.

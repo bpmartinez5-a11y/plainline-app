@@ -6,7 +6,7 @@ The settings in `.claude/settings.json` cover most of this automatically. The re
 | Fix | Where |
 |---|---|
 | Opus plans, Sonnet does the edits (`opusplan`) | `settings.json` → `model` |
-| Medium effort by default, not max everywhere | `settings.json` → `effortLevel`. Use `/effort high` only for a hard problem, then drop back. |
+| High effort by default (Ben, Nov 10), never max | `settings.json` → `effortLevel`. Use `/effort medium` or `low` for an easy turn. Fable 5.2 only when Ben names it (`CLAUDE.md`, How Claude works here). |
 | Start in plan mode before edits | `settings.json` → `permissions.defaultMode: "plan"` |
 | Subagents run on Sonnet and only report back, so their file reading stays out of the main conversation | `.claude/agents/*.md` → `model: sonnet` (the security auditor also gets `effort: high`) |
 | Never read `node_modules`, build output, minified files, source maps | `settings.json` → `permissions.deny` |
@@ -24,4 +24,4 @@ The settings in `.claude/settings.json` cover most of this automatically. The re
 - **Grep, then read with offsets.** Find the line first, then read 40–80 lines around it. Never read `demo.html` whole.
 - **Edit with diffs, not rewrites.** Ask for the specific change. "Rewrite the file" resends all of it.
 - **No 1-minute loops.** Every `/loop` fire resends the whole context. Use 10 minutes or more, or wait for an event instead.
-- **Skills over CLAUDE.md.** Repeatable procedures go in `.claude/skills/` and load only when used. CLAUDE.md stays under about 40 lines.
+- **Skills over CLAUDE.md.** Repeatable procedures go in `.claude/skills/` and load only when used. Keep CLAUDE.md short.

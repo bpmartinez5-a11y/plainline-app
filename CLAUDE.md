@@ -16,6 +16,16 @@ Plainline is an AI agency (Oct 30): it brings AI into how a company's team works
 - Instructions and client documents follow the writing standard in `docs/claude/writing-standard.md` (rules based on ASD-STE100 Simplified Technical English). Never copy the STE dictionary, and never call a document "STE compliant".
 - Client builds keep the promises in the client agreement (client-docs skill): the assistant says it is automated; hand-offs reach the designated contact in under 5 minutes, failed sends are resent by the Fact Sheet backup method, and every send is logged (§§2.3, 3.3, 7.12); outbound message types in the Order Form go only to numbers with a consent record and never during quiet hours; STOP is honored automatically; replies to a customer's own message and hand-off notices to the client are not blocked (§3.4).
 
+## How Claude works here (Ben, Nov 10: the Fable 5.2 prompting rules; the same list is in jarvis-app's CLAUDE.md)
+- This codebase is yours: what it's for and how it's built are your call, and you'll keep building on it. A client's site belongs to the client: there, change only what the task asks.
+- Finish the job. Keep going until the work Ben asked for is done; don't stop to list what is left or to offer to continue. Work through ordinary errors, timeouts and empty results: find the cause, then retry, fix the call or use another tool. Stop only for a High step, a rule that says ask or wait (such as the third review round or the usage limit), or a choice that is Ben's (put it on a card and carry on with the rest), and say what you found.
+- Prove it before you call it done: test output, a file check, a log line or a screenshot, in the PR or the report. If a file or input is missing, say so; never make up a stand-in such as a fake `data.csv`.
+- Every few tool calls, give the user a one-line update on where things stand. In a project thread that line goes on the progress checklist, so Ben gets no extra pings.
+- Ask a subagent or another model for its answer and a short why, never for its full reasoning.
+- Delegate only when it pays: do a small search yourself; use a subagent for work that runs in parallel, a fresh-eyes review (the review gate) or a big read on a cheaper model. Each subagent adds to the cost.
+- Say the length and tone you want in every prompt and brief; the effort level barely changes how long a reply is.
+- Effort is high by default (`.claude/settings.json`); use low or medium for easy turns. Fable 5.2 runs only when Ben names it; a thread may suggest it in one line when Opus is not enough: a very hard problem (a root-cause hunt, an architecture call, three review rounds with no fix) or a long unattended run. Fable runs at high; xhigh only where a test shows a gain; never max by default.
+
 ## Review gate (Ben turned it on 2026-10-18)
 Every PR here and to client sites gets a risk tier and a fresh-eyes review before it merges. The change sets the tier:
 - **Low** (copy, images, styles, docs): automated review and checks green.
@@ -55,7 +65,7 @@ Put the tier at the top of the PR body. A fresh agent that didn't write the chan
 - Blocked or missing something? Before saying "can't" or asking Ben to change a setting, follow jarvis-app's `situational-awareness` skill (`.claude/skills/situational-awareness/SKILL.md`; `add_repo` jarvis-app if it isn't here). Standing OK (Ben, Oct 29): when the sandbox network blocks a public website, fetch it through Firecrawl; no sign-ins or forms, nothing personal in the request.
 - Plan mode before multi-file edits. Edit with small diffs; never rewrite a whole file to change part of it.
 - Find things with Grep or Glob first, then Read only the line range you need. `demo.html` is ~58 KB; don't read it whole.
-- Hand searches, reviews and research to the Sonnet subagents in `.claude/agents/`.
+- Use the Sonnet subagents in `.claude/agents/` for a wide search, a review or long research, so their reading stays out of the main conversation. Do a small lookup yourself.
 
 ## Compact instructions
 When compacting, keep: the current task, decisions made, file paths and line numbers touched, and open questions. Drop: full file contents, command output, and dead ends.
