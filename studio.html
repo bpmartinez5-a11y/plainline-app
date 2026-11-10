@@ -130,7 +130,7 @@ box-shadow:0 0 0 2px #fff,0 4px 10px -4px rgba(60,30,15,.4);font:700 15px/1 var(
 .g-eq.off>i{animation:none}
 @keyframes g-eq{to{height:100%}}
 :root{--g-side-w:280px;--g-side-space:calc(var(--g-side-w) + 32px)}
-:root:has(.g-side .g-fold input:checked){--g-side-w:72px}
+@media (min-width:761px){:root:has(.g-side .g-fold input:checked){--g-side-w:72px}}
 :root:not(:has(.g-side)){--g-side-space:0px}
 .g-side{position:fixed;z-index:30;top:16px;bottom:16px;left:max(16px,env(safe-area-inset-left,0px));width:var(--g-side-w);box-sizing:border-box;
 display:flex;flex-direction:column;gap:2px;padding:12px;transition:width var(--t-panel) var(--ease)}
@@ -146,6 +146,7 @@ display:flex;flex-direction:column;gap:2px;padding:12px;transition:width var(--t
 .g-fold:focus-within{outline:2px solid var(--g-accent);outline-offset:2px}
 .g-fold .gi{transition:transform var(--t-panel) var(--ease)}
 .g-fold input:checked+.gi{transform:rotate(180deg)}
+@media (min-width:761px){
 .g-side:has(.g-fold input:checked){padding-inline:12px}
 .g-side:has(.g-fold input:checked) :is(.g-label,.g-search,.g-card,.g-row>em,.g-row>.end,.g-wide,header>div,header>.g-tag){display:none}
 .g-side:has(.g-fold input:checked) .g-row{justify-content:center;padding:4px;gap:0}
@@ -160,6 +161,7 @@ transition:opacity var(--t-fast) var(--ease),transform var(--t-fast) var(--ease)
 .g-side:has(.g-fold input:checked) .g-row:hover{background:transparent}
 .g-side:has(.g-fold input:checked) .g-row:hover>.g-tile{transform:scale(1.22)}
 .g-side:has(.g-fold input:checked) .g-row:hover+.g-row>.g-tile,.g-side:has(.g-fold input:checked) .g-row:has(+.g-row:hover)>.g-tile{transform:scale(1.1)}
+}
 @media (max-width:760px){
 :root{--g-side-space:0px}
 .g-side{top:auto;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom,0px));width:auto;flex-direction:row;padding:6px;border-radius:20px}
