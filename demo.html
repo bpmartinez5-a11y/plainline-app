@@ -19,11 +19,11 @@
 <meta name="twitter:card" content="summary_large_image">
 <script defer src="/_vercel/insights/script.js"></script>
 <link rel="stylesheet" href="/fonts/plainline.css">
-<style>/*glass*//* made by design/glass.py from design/glass.css; never edit here. Icons: Phosphor Icons 2.1.1, MIT, (c) 2023 Phosphor Icons */
+<style>/*glass*//* made by design/glass.py from design/glass.css; never edit here. Icons: Phosphor Icons 2.1.1, https://github.com/phosphor-icons/core. MIT License, Copyright (c) 2023 Phosphor Icons. Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 :root{
 --ease:cubic-bezier(.2,.8,.2,1);--t-fast:200ms;--t-panel:320ms;
 --g-font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI Variable Text","Segoe UI",Inter,Roboto,"Helvetica Neue",Arial,sans-serif;
---g-ink:#2E1F18;--g-ink-2:#6E5A50;--g-ink-3:#97847A;
+--g-ink:#2E1F18;--g-ink-2:#5E4C43;--g-ink-3:#6E5A50;
 --g-room:radial-gradient(70% 55% at 18% 0%,rgba(255,246,236,.95),rgba(255,246,236,0) 70%),radial-gradient(60% 40% at 85% 100%,rgba(214,170,136,.55),rgba(214,170,136,0) 70%),linear-gradient(180deg,#E7DAD1 0%,#D6C3B7 55%,#BFA594 100%);
 --g-photo:none;
 --g-glass:rgba(250,241,235,.50);--g-glass-top:rgba(255,250,246,.66);--g-glass-solid:#EEE2DA;
@@ -40,7 +40,7 @@
 --t-white:linear-gradient(180deg,#FFFFFF,#F1EBE7);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
---g-ink:#F6EEE9;--g-ink-2:#CDBBB1;--g-ink-3:#A08D83;
+--g-ink:#F6EEE9;--g-ink-2:#CDBBB1;--g-ink-3:#B3A096;
 --g-room:radial-gradient(60% 50% at 82% 30%,rgba(255,168,96,.22),rgba(255,168,96,0) 70%),linear-gradient(180deg,#2A1D17 0%,#1C1410 60%,#130D0A 100%);
 --g-glass:rgba(48,33,26,.50);--g-glass-top:rgba(70,50,40,.56);--g-glass-solid:#2E211B;
 --g-hi:rgba(255,236,224,.17);--g-lo:rgba(0,0,0,.24);--g-hover:rgba(255,236,224,.08);--g-card:rgba(255,236,224,.06);
@@ -48,7 +48,7 @@
 --g-shadow:0 34px 70px -30px rgba(0,0,0,.85),0 10px 26px -14px rgba(0,0,0,.6);--g-lift:0 10px 24px -12px rgba(0,0,0,.7),0 1px 2px rgba(0,0,0,.4);
 --g-accent-ink:#FFB27C;--t-white:linear-gradient(180deg,#F7F1ED,#DCD2CC)}}
 :root[data-theme="dark"]{
---g-ink:#F6EEE9;--g-ink-2:#CDBBB1;--g-ink-3:#A08D83;
+--g-ink:#F6EEE9;--g-ink-2:#CDBBB1;--g-ink-3:#B3A096;
 --g-room:radial-gradient(60% 50% at 82% 30%,rgba(255,168,96,.22),rgba(255,168,96,0) 70%),linear-gradient(180deg,#2A1D17 0%,#1C1410 60%,#130D0A 100%);
 --g-glass:rgba(48,33,26,.50);--g-glass-top:rgba(70,50,40,.56);--g-glass-solid:#2E211B;
 --g-hi:rgba(255,236,224,.17);--g-lo:rgba(0,0,0,.24);--g-hover:rgba(255,236,224,.08);--g-card:rgba(255,236,224,.06);
@@ -203,7 +203,7 @@ box-sizing:border-box;display:flex;gap:14px;align-items:flex-start;padding:16px;
 @media (prefers-reduced-motion:reduce){.g-side,.g-row,.g-tile,.g-btn,.g-round,.g-toggle,.g-toggle::before,.g-progress>i,.g-fold .gi,.g-side .g-row>span{transition:none!important}
 .g-agent,.g-agent>.g-tile,.g-in,.g-eq>i,.g-agent.out{animation:none!important}}
 .gi-calendar{--gi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32Zm0,48H48V48H72v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24Z'/%3E%3C/svg%3E")}.gi-gear{--gi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M237.94,107.21a8,8,0,0,0-3.89-5.4l-29.83-17-.12-33.62a8,8,0,0,0-2.83-6.08,111.91,111.91,0,0,0-36.72-20.67,8,8,0,0,0-6.46.59L128,41.85,97.88,25a8,8,0,0,0-6.47-.6A111.92,111.92,0,0,0,54.73,45.15a8,8,0,0,0-2.83,6.07l-.15,33.65-29.83,17a8,8,0,0,0-3.89,5.4,106.47,106.47,0,0,0,0,41.56,8,8,0,0,0,3.89,5.4l29.83,17,.12,33.63a8,8,0,0,0,2.83,6.08,111.91,111.91,0,0,0,36.72,20.67,8,8,0,0,0,6.46-.59L128,214.15,158.12,231a7.91,7.91,0,0,0,3.9,1,8.09,8.09,0,0,0,2.57-.42,112.1,112.1,0,0,0,36.68-20.73,8,8,0,0,0,2.83-6.07l.15-33.65,29.83-17a8,8,0,0,0,3.89-5.4A106.47,106.47,0,0,0,237.94,107.21ZM128,168a40,40,0,1,1,40-40A40,40,0,0,1,128,168Z'/%3E%3C/svg%3E")}.gi-inbox{--gi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M208,32H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32Zm0,176H48V168H76.69L96,187.32A15.89,15.89,0,0,0,107.31,192h41.38A15.86,15.86,0,0,0,160,187.31L179.31,168H208v40Z'/%3E%3C/svg%3E")}.gi-mobile{--gi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M176,16H80A24,24,0,0,0,56,40V216a24,24,0,0,0,24,24h96a24,24,0,0,0,24-24V40A24,24,0,0,0,176,16ZM80,32h96a8,8,0,0,1,8,8v8H72V40A8,8,0,0,1,80,32Zm96,192H80a8,8,0,0,1-8-8v-8H184v8A8,8,0,0,1,176,224Z'/%3E%3C/svg%3E")}/*glass-end*/
-/* The page around the demo is in the one glass look (design/glass.css, Ben, Nov 10): warm glass over the room photo,
+/* The page around the demo is in the one glass look (design/glass.css, Nov 10): warm glass over the room photo,
    and the page's ink and lines map onto the theme. The demo inside (the customer's phone and the front desk's contents)
    keeps its own kit colors (blue actions) below.
    Layout: a working demo console. Customer's phone on the left, the business's front desk on the right; tabs on phones. */

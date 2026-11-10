@@ -16,8 +16,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ## claude-seo (SEO skills and scripts)
 `.claude/skills/seo-local`, `seo-schema`, `seo-geo`, `seo-technical`, `seo-page` and `.claude/seo/` are copied from https://github.com/AgriciDaniel/claude-seo at commit 6be93f4 (v2.5.0), MIT License, Copyright (c) 2026 agricidaniel. The full license is in `.claude/seo/LICENSE`. Only these 5 skills and 7 scripts are used; the installer, hooks, agents and extensions are not. Rules: `.claude/seo/README.md`.
 
+## Room photos (the glass look's background)
+`media/room-day.jpg` and `media/room-night.jpg` are Higgsfield renders made for the glass look on Nov 10, 2026 (the same files as jarvis-app `app/public/media/`): an empty warm room with no people, brands or text. They carry content-credential (C2PA) marks that say they are generated.
+
 ## Phosphor Icons (icons in the glass look)
-The icon glyphs in the glass theme block (`/*glass*/` … `/*glass-end*/`) of `index.html`, `demo.html`, `studio.html`, `sell.html`, `privacy.html` and `terms.html` are Phosphor Icons 2.1.1, fill and bold weights, from https://github.com/phosphor-icons/core, MIT License, Copyright (c) 2023 Phosphor Icons. They are stamped from jarvis-app `design/icons.json` by `design/glass.py`, which adds only the glyphs a page names; never edit them in the page.
+The icon glyphs in the glass theme block (`/*glass*/` … `/*glass-end*/`) of `index.html`, `demo.html`, `studio.html`, `sell.html`, `privacy.html` and `terms.html` are Phosphor Icons 2.1.1, fill and bold weights, from https://github.com/phosphor-icons/core, MIT License, Copyright (c) 2023 Phosphor Icons. They are stamped from jarvis-app `design/icons.json` by `design/glass.py`, which adds only the glyphs a page names and the full MIT notice below; never edit them in the page.
 
 MIT License
 
