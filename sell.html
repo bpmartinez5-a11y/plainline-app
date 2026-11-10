@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#c4b49f" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#3a3029" media="(prefers-color-scheme: dark)">
+<meta name="description" content="Know business owners who miss calls? Bring them to a 20-minute walkthrough with Plainline. One page to read, five quick questions.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232d63d8'/%3E%3Cpath d='M9 22V10h7a4 4 0 0 1 0 8h-7' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+<title>Sell with Plainline</title>
+<meta property="og:site_name" content="Plainline">
+<meta property="og:title" content="Sell with Plainline">
+<meta property="og:description" content="Know business owners who miss calls? Bring them to a 20-minute walkthrough. One page to read, five quick questions.">
+<meta property="og:image" content="https://plainlineops.com/og.png">
+<script defer src="/_vercel/insights/script.js"></script>
+<link rel="stylesheet" href="/fonts/plainline.css">
+<!-- The seller one-pager (Ben, Nov 10), sent from The Engine's Send to box. The text is the seller kit's one page
+     (project files plainline/sellers/onboarding/seller-one-pager.html): change it there first, then here.
+     No prices and no pay terms on this page: the terms wait on Ben's pick and an attorney. Not in the sitemap. -->
+<style>
+:root{--ease:cubic-bezier(.2,.8,.2,1);--t-fast:200ms;
+  --wall:#d9cebf;--wall-2:#c4b49f;--floor:#a48b72;--glass:rgba(52,41,34,.72);--surface:rgba(18,14,12,.34);
+  --ink:#f7f2ea;--muted:rgba(247,242,234,.82);--line:rgba(255,255,255,.15);--line-hi:rgba(255,255,255,.28);--link:#b4ccff;
+  --blue:#3f78ea;--blue-2:#2d63d8;--green:#b7e6cf;--warn:#f2bd72;--ok:#86cdb0;--accent-soft:rgba(134,205,176,.16);
+  --blur:blur(28px) saturate(140%);--shadow:inset 0 1px 0 rgba(255,255,255,.14),0 30px 60px -28px rgba(20,12,6,.65);
+  --f-display:"Fraunces",Georgia,"Times New Roman",serif;--f-body:"Plus Jakarta Sans","Segoe UI",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--wall:#4a4038;--wall-2:#3a3029;--floor:#3b2f26;--glass:rgba(22,18,16,.66);--surface:rgba(8,6,5,.4);color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--wall-2);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55;
+  padding:18px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
+.room{position:fixed;inset:-60px;z-index:-1;filter:blur(26px);pointer-events:none;background:linear-gradient(180deg,var(--wall) 0%,var(--wall-2) 62%,var(--floor) 62%,var(--floor) 100%)}
+main{max-width:860px;margin:0 auto}
+a{color:var(--link)}
+:focus-visible{outline:2px solid var(--link);outline-offset:2px}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;letter-spacing:-.01em;line-height:1.15;margin:0}
+header,section{-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);background:var(--glass);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
+header{display:flex;align-items:center;gap:12px;padding:12px 18px}
+header b{font:600 15px var(--f-body);letter-spacing:.12em}
+header a{margin-left:auto;font-size:15px;color:var(--muted);text-decoration:none}
+section{margin-top:16px;padding:26px}
+@media (max-width:640px){section{padding:20px 16px}}
+h1{font-size:40px;margin-bottom:10px}
+.lede{font-size:20px;color:var(--muted);margin:0}
+h2{font-size:24px;margin-bottom:10px}
+p{margin:0 0 8px}
+ul{margin:0 0 8px;padding-left:20px}
+li{margin-bottom:4px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media (max-width:700px){.cols{grid-template-columns:1fr}}
+.fine{font-size:14px;color:var(--muted);margin:0}
+.job{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:0}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media (max-width:700px){.steps{grid-template-columns:1fr 1fr}}
+.steps li{counter-increment:s;border-top:3px solid var(--green);padding-top:8px;font-size:15px}
+.steps li::before{content:counter(s);display:block;font:700 20px var(--f-body);color:var(--green)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 24px;border:1px solid rgba(255,255,255,.22);border-radius:999px;
+  background:linear-gradient(180deg,var(--blue),var(--blue-2));color:#fff;font:600 17px var(--f-body);text-decoration:none;cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 16px -6px rgba(45,99,216,.7)}
+.btn.ghost{background:rgba(255,255,255,.08);border-color:var(--line);box-shadow:none}
+.btn:disabled{opacity:.55;cursor:default}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
+form{display:flex;flex-direction:column;gap:16px}
+fieldset{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+legend{font-weight:600;margin-bottom:8px;padding:0}
+legend small,label small{font-weight:400;color:var(--muted)}
+.pick{display:flex;flex-wrap:wrap;gap:8px}
+.pick label{display:flex;align-items:center;gap:8px;min-height:44px;padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:15px;cursor:pointer}
+.pick label:has(input:checked){border-color:var(--green);background:var(--accent-soft)}
+.pick input{width:18px;height:18px;margin:0;accent-color:#3f78ea}
+.field{display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:560px){.row{grid-template-columns:1fr}}
+input[type=text],input[type=email],input[type=tel],textarea{min-height:44px;font:inherit;font-size:16px;font-weight:400;color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:10px 14px;background:var(--surface)}
+input:focus,textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(76,140,246,.25)}
+textarea{min-height:96px;resize:vertical}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+#msg{min-height:1.5em;margin:0;font-size:15px}
+#msg.ok{color:var(--ok)}#msg.err{color:var(--warn)}
+footer{margin-top:16px;font-size:13px;color:var(--muted);text-align:center}
+footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="room" aria-hidden="true"></div>
+<main>
+<header><img src="/icons/icon-192.png" alt="" width="32" height="32"><b>PLAINLINE</b><a href="/">plainlineops.com</a></header>
+
+<section aria-labelledby="h1">
+  <h1 id="h1">Sell with Plainline</h1>
+  <p class="lede">Know business owners who miss calls? Bring them to a 20-minute walkthrough. Plainline does the rest, and you get paid when they become a client.</p>
+  <div class="cta"><a class="btn" href="#questions">Answer 5 quick questions</a><a class="btn ghost" href="https://calendar.app.google/hZbyd1vnBrK6uEwKA" target="_blank" rel="noopener">Book a short intro call</a></div>
+</section>
+
+<section class="cols">
+  <div>
+    <h2>What Plainline does</h2>
+    <p>Plainline brings AI into how small service businesses run.</p>
+    <ul>
+      <li>An AI front desk answers missed calls and texts, day and night. It always says it is automated.</li>
+      <li>It books the job, or it sends the urgent ones to the owner in under 5 minutes.</li>
+      <li>It follows up on quotes and shows the owner which calls became jobs.</li>
+      <li>Plainline sets it all up. The owner installs nothing.</li>
+    </ul>
+  </div>
+  <div>
+    <h2>Who we help</h2>
+    <ul>
+      <li>Heating, cooling and plumbing shops</li>
+      <li>Auto repair, tire, body and detail shops</li>
+      <li>Golf courses, ranges, simulator venues and teaching pros</li>
+    </ul>
+    <p>Owner-run, where the phone brings in the work and the owner is too busy to answer it.</p>
+    <p class="fine">We do not take financial services, gun shops or ranges.</p>
+  </div>
+</section>
+
+<section>
+  <h2>What you do</h2>
+  <p class="job">Your one job is to book the walkthrough. You do not sell the product, quote or sign. Plainline gives you a short guide, the words to use and a one-page lead form.</p>
+  <h2 style="margin-top:22px">How a lead moves</h2>
+  <ol class="steps">
+    <li>Talk to an owner you know. Ask what happens to the calls they miss.</li>
+    <li>If they name a problem, ask for 20 minutes with Plainline.</li>
+    <li>Send Plainline the lead form the same day. The lead is yours for 90 days.</li>
+    <li>Plainline runs the walkthrough, quotes and tells you the result.</li>
+  </ol>
+</section>
+
+<section class="cols">
+  <div>
+    <h2>The rules</h2>
+    <ul>
+      <li>Never say a price. Plainline quotes after the walkthrough.</li>
+      <li>Tell owners that Plainline pays you.</li>
+      <li>Talk as yourself. No auto-dialers, bought lists or mass texts.</li>
+      <li>Stop when someone says no.</li>
+    </ul>
+  </div>
+  <div>
+    <h2>How you get paid</h2>
+    <p>You earn a share when a client you bring pays Plainline. The terms are in a written seller agreement that you sign before you start.</p>
+  </div>
+</section>
+
+<section id="questions" aria-labelledby="qh">
+  <h2 id="qh">Next step: 5 quick questions</h2>
+  <p class="fine" style="margin-bottom:16px">About 2 minutes. We reply by email within 24 hours. Or <a href="https://calendar.app.google/hZbyd1vnBrK6uEwKA" target="_blank" rel="noopener">pick a time</a> for a short intro call, or reply to <a href="mailto:ben@plainlineops.com">ben@plainlineops.com</a> with "I'm in".</p>
+  <form id="f" novalidate>
+    <fieldset><legend>1. What interests you? <small>Pick any.</small></legend><div class="pick">
+      <label><input type="checkbox" name="want" value="Bringing owners to Plainline">Bringing owners to Plainline</label>
+      <label><input type="checkbox" name="want" value="A sales role">A sales role</label>
+      <label><input type="checkbox" name="want" value="AI for my own business">AI for my own business</label>
+      <label><input type="checkbox" name="want" value="Learning about AI">Learning about AI</label></div></fieldset>
+    <label class="field">2. What do you do now? <small>Your job or your business, in a few words.</small><input type="text" name="now" maxlength="200" autocomplete="organization-title"></label>
+    <fieldset><legend>3. Have you sold before?</legend><div class="pick">
+      <label><input type="radio" name="sold" value="Yes, to business owners">Yes, to business owners</label>
+      <label><input type="radio" name="sold" value="Yes, other sales">Yes, other sales</label>
+      <label><input type="radio" name="sold" value="No, but I know many owners">No, but I know many owners</label>
+      <label><input type="radio" name="sold" value="No">No</label></div></fieldset>
+    <fieldset><legend>4. Which owners do you know? <small>Pick any.</small></legend><div class="pick">
+      <label><input type="checkbox" name="know" value="Heating, cooling or plumbing">Heating, cooling or plumbing</label>
+      <label><input type="checkbox" name="know" value="Auto repair or detail">Auto repair or detail</label>
+      <label><input type="checkbox" name="know" value="Golf">Golf</label>
+      <label><input type="checkbox" name="know" value="Other service businesses">Other service businesses</label>
+      <label><input type="checkbox" name="know" value="None yet">None yet</label></div></fieldset>
+    <fieldset><legend>5. How do we reach you?</legend>
+      <div class="row"><label class="field">Your name<input type="text" name="name" required maxlength="200" autocomplete="name"></label>
+      <label class="field">Email<input type="email" name="email" required maxlength="320" autocomplete="email"></label></div>
+      <label class="field">Phone <small>(only if you want a text or a call)</small><input type="tel" name="phone" maxlength="30" autocomplete="tel"></label>
+      <div class="pick" role="group" aria-label="Best way to reach you">
+      <label><input type="radio" name="reach" value="Email" checked>Email me</label>
+      <label><input type="radio" name="reach" value="Text">Text me</label>
+      <label><input type="radio" name="reach" value="Call">Call me</label></div></fieldset>
+    <label class="field">Anything you want to ask us? <small>(optional)</small><textarea name="note" maxlength="1000"></textarea></label>
+    <label class="hp" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
+    <p class="fine">We use your answers only to reply to you about Plainline. We do not sell them or share them. See our <a href="/privacy">privacy policy</a>. By sending, you confirm you are 18 or older.</p>
+    <button class="btn" id="go">Send my answers</button>
+    <p id="msg" role="status" aria-live="polite"></p>
+  </form>
+</section>
+
+<footer>© 2026 Plainlineops LLC · 11016 Quivira Rd #1017, Overland Park, KS 66210 · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></footer>
+</main>
+
+<script>
+/* The answers go to /api/lead like the home page's contact form: one row in the "leads" table (The Engine's Inquiries
+   tab), tagged "website · sellers". Nothing else stores them. */
+const answers = f => { const lines = [["Interested in", f.want.join("; ")], ["Does now", f.now], ["Sold before", f.sold], ["Knows owners in", f.know.join("; ")], ["Reach by", f.reach], ["Phone", f.phone], ["Note", f.note]].filter(x => x[1]).map(x => x[0] + ": " + x[1]); return ["Seller page answers"].concat(lines).join("\n").slice(0, 5000); }; // the leads table caps message at 5000
+const form = document.getElementById("f"), msg = document.getElementById("msg"), go = document.getElementById("go");
+const say = (t, c) => { msg.textContent = t; msg.className = c || ""; };
+form.addEventListener("submit", async e => {
+  e.preventDefault();
+  const d = new FormData(form), v = k => String(d.get(k) || "").trim();
+  const f = { want: d.getAll("want"), now: v("now"), sold: v("sold"), know: d.getAll("know"), reach: v("reach"), phone: v("phone"), note: v("note") };
+  const name = v("name"), email = v("email");
+  if (!name) { form.elements.name.focus(); return say("Please add your name.", "err"); }
+  if (!/^\S+@\S+\.\S+$/.test(email)) { form.elements.email.focus(); return say("Please add a valid email so we can reply.", "err"); }
+  if (f.reach !== "Email" && f.phone.replace(/\D/g, "").length < 10) { form.elements.phone.focus(); return say("Please add your phone number, or pick Email me.", "err"); }
+  if (v("website")) { form.reset(); return say("Thanks! Your answers are in.", "ok"); } // a bot filled the hidden field
+  go.disabled = true; say("Sending…");
+  try {
+    const r = await fetch("/api/lead", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, message: answers(f), source: "website · sellers" }), signal: AbortSignal.timeout(15000) });
+    if (r.status === 429) return say("We already have a few answers from this connection. Please try again in an hour.", "err");
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    form.reset(); say("Thanks! Your answers are in. We reply by email within 24 hours.", "ok");
+  } catch (err) {
+    console.error("seller answers failed", err.name);
+    say("Sorry, that did not send. Please check your connection and try again.", "err");
+  } finally { go.disabled = false; }
+});
+</script>
+</body>
+</html>
