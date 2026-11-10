@@ -24,7 +24,7 @@ Plainline is an AI agency (Oct 30): it brings AI into how a company's team works
 - Ask a subagent or another model for its answer and a short why, never for its full reasoning.
 - Delegate only when it pays: do a small search yourself; use a subagent for work that runs in parallel, a fresh-eyes review (the review gate) or a big read on a cheaper model. Each subagent adds to the cost.
 - Say the length and tone you want in every prompt and brief; the effort level barely changes how long a reply is.
-- Effort is high by default (`.claude/settings.json`); use low or medium for easy turns. Hard work runs on Opus at high. Fable 5.2 runs only when Ben names it; a thread may suggest it in one line when Opus is not enough: a very hard problem (a root-cause hunt, an architecture call, three review rounds with no fix) or a long unattended run. Fable runs at high; xhigh only where a test shows a gain; never max by default.
+- Effort is high by default (`.claude/settings.json`); use low or medium for easy turns. Fable 5.2 runs only when Ben names it; a thread may suggest it in one line when Opus is not enough: a very hard problem (a root-cause hunt, an architecture call, three review rounds with no fix) or a long unattended run. Fable runs at high; xhigh only where a test shows a gain; never max by default.
 
 ## Review gate (Ben turned it on 2026-10-18)
 Every PR here and to client sites gets a risk tier and a fresh-eyes review before it merges. The change sets the tier:
