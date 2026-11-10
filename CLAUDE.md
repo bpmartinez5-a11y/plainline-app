@@ -18,13 +18,13 @@ Plainline is an AI agency (Oct 30): it brings AI into how a company's team works
 
 ## How Claude works here (Ben, Nov 10: the Fable 5.2 prompting rules; the same list is in jarvis-app's CLAUDE.md)
 - This codebase is yours: what it's for and how it's built are your call, and you'll keep building on it. A client's site belongs to the client: there, change only what the task asks.
-- Finish the job. Keep going until the work Ben asked for is done; don't stop to list what is left or to offer to continue. Work through ordinary errors, timeouts and empty results: find the cause, then retry, fix the call or use another tool. Stop only for a High step, a blocker someone set on purpose, or a choice that is Ben's (put it on a card and carry on with the rest), and say what you found.
+- Finish the job. Keep going until the work Ben asked for is done; don't stop to list what is left or to offer to continue. Work through ordinary errors, timeouts and empty results: find the cause, then retry, fix the call or use another tool. Stop only for a High step, a rule that says ask or wait (such as the third review round or the usage limit), or a choice that is Ben's (put it on a card and carry on with the rest), and say what you found.
 - Prove it before you call it done: test output, a file check, a log line or a screenshot, in the PR or the report. If a file or input is missing, say so; never make up a stand-in such as a fake `data.csv`.
 - Every few tool calls, give the user a one-line update on where things stand. In a project thread that line goes on the progress checklist, so Ben gets no extra pings.
 - Ask a subagent or another model for its answer and a short why, never for its full reasoning.
 - Delegate only when it pays: do a small search yourself; use a subagent for work that runs in parallel, a fresh-eyes review (the review gate) or a big read on a cheaper model. Each subagent adds to the cost.
 - Say the length and tone you want in every prompt and brief; the effort level barely changes how long a reply is.
-- Effort is high by default (`.claude/settings.json`); use low or medium for easy turns. Fable 5.2 runs only when Ben names it; a thread may suggest it in one line for a very hard problem or a long unattended run. Fable runs at high; xhigh only where a test shows a gain; never max by default.
+- Effort is high by default (`.claude/settings.json`); use low or medium for easy turns. Hard work runs on Opus at high. Fable 5.2 runs only when Ben names it; a thread may suggest it in one line when Opus is not enough: a very hard problem (a root-cause hunt, an architecture call, three review rounds with no fix) or a long unattended run. Fable runs at high; xhigh only where a test shows a gain; never max by default.
 
 ## Review gate (Ben turned it on 2026-10-18)
 Every PR here and to client sites gets a risk tier and a fresh-eyes review before it merges. The change sets the tier:
