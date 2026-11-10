@@ -17,7 +17,7 @@ Plainline runs on Vercel: static pages plus serverless functions in `api/`. Verc
    - **Medium**: pages, layout, demo behavior
    - **High**: anything in `api/`, forms, bookings, payments, keys, the AI disclosure, client domains
 2. `reviewer` (fresh eyes) reviews the diff, then `refuter` tries to prove each finding wrong. Fix only verified findings, with three rounds at most.
-3. High tier: `security-auditor` has no verified critical or high findings, the-enforcer passes, and Ben approves. Medium: Ben approves. Low: checks green; Ben merges.
+3. High tier: `security-auditor` has no verified critical or high findings, the-enforcer passes, and Ben approves. Medium: the review gate passes and Jarvis's look-ahead merges. Low: checks are green and the look-ahead merges.
 4. Attach the evidence to the PR: command output, and screenshots at 400px and desktop.
 
 **Pre-merge checklist**
