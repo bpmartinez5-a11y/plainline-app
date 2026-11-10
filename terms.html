@@ -12,11 +12,11 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <script defer src="/_vercel/insights/script.js"></script>
-<style>/*glass*//* made by design/glass.py from design/glass.css; never edit here. Icons: Phosphor Icons 2.1.1, MIT, (c) 2023 Phosphor Icons */
+<style>/*glass*//* made by design/glass.py from design/glass.css; never edit here. Icons: Phosphor Icons 2.1.1, https://github.com/phosphor-icons/core. MIT License, Copyright (c) 2023 Phosphor Icons. Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 :root{
 --ease:cubic-bezier(.2,.8,.2,1);--t-fast:200ms;--t-panel:320ms;
 --g-font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI Variable Text","Segoe UI",Inter,Roboto,"Helvetica Neue",Arial,sans-serif;
---g-ink:#2E1F18;--g-ink-2:#6E5A50;--g-ink-3:#97847A;
+--g-ink:#2E1F18;--g-ink-2:#5E4C43;--g-ink-3:#6E5A50;
 --g-room:radial-gradient(70% 55% at 18% 0%,rgba(255,246,236,.95),rgba(255,246,236,0) 70%),radial-gradient(60% 40% at 85% 100%,rgba(214,170,136,.55),rgba(214,170,136,0) 70%),linear-gradient(180deg,#E7DAD1 0%,#D6C3B7 55%,#BFA594 100%);
 --g-photo:none;
 --g-glass:rgba(250,241,235,.50);--g-glass-top:rgba(255,250,246,.66);--g-glass-solid:#EEE2DA;
@@ -33,7 +33,7 @@
 --t-white:linear-gradient(180deg,#FFFFFF,#F1EBE7);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
---g-ink:#F6EEE9;--g-ink-2:#CDBBB1;--g-ink-3:#A08D83;
+--g-ink:#F6EEE9;--g-ink-2:#CDBBB1;--g-ink-3:#B3A096;
 --g-room:radial-gradient(60% 50% at 82% 30%,rgba(255,168,96,.22),rgba(255,168,96,0) 70%),linear-gradient(180deg,#2A1D17 0%,#1C1410 60%,#130D0A 100%);
 --g-glass:rgba(48,33,26,.50);--g-glass-top:rgba(70,50,40,.56);--g-glass-solid:#2E211B;
 --g-hi:rgba(255,236,224,.17);--g-lo:rgba(0,0,0,.24);--g-hover:rgba(255,236,224,.08);--g-card:rgba(255,236,224,.06);
@@ -41,7 +41,7 @@
 --g-shadow:0 34px 70px -30px rgba(0,0,0,.85),0 10px 26px -14px rgba(0,0,0,.6);--g-lift:0 10px 24px -12px rgba(0,0,0,.7),0 1px 2px rgba(0,0,0,.4);
 --g-accent-ink:#FFB27C;--t-white:linear-gradient(180deg,#F7F1ED,#DCD2CC)}}
 :root[data-theme="dark"]{
---g-ink:#F6EEE9;--g-ink-2:#CDBBB1;--g-ink-3:#A08D83;
+--g-ink:#F6EEE9;--g-ink-2:#CDBBB1;--g-ink-3:#B3A096;
 --g-room:radial-gradient(60% 50% at 82% 30%,rgba(255,168,96,.22),rgba(255,168,96,0) 70%),linear-gradient(180deg,#2A1D17 0%,#1C1410 60%,#130D0A 100%);
 --g-glass:rgba(48,33,26,.50);--g-glass-top:rgba(70,50,40,.56);--g-glass-solid:#2E211B;
 --g-hi:rgba(255,236,224,.17);--g-lo:rgba(0,0,0,.24);--g-hover:rgba(255,236,224,.08);--g-card:rgba(255,236,224,.06);
@@ -196,7 +196,7 @@ box-sizing:border-box;display:flex;gap:14px;align-items:flex-start;padding:16px;
 @media (prefers-reduced-motion:reduce){.g-side,.g-row,.g-tile,.g-btn,.g-round,.g-toggle,.g-toggle::before,.g-progress>i,.g-fold .gi,.g-side .g-row>span{transition:none!important}
 .g-agent,.g-agent>.g-tile,.g-in,.g-eq>i,.g-agent.out{animation:none!important}}
 /*glass-end*/
-/* The one glass look (design/glass.css, Ben, Nov 10): the page is one glass panel over the room; its names map onto the theme */
+/* The one glass look (design/glass.css, Nov 10): the page is one glass panel over the room; its names map onto the theme */
 :root{--ink:var(--g-ink);--muted:var(--g-ink-2);--accent:var(--g-accent-ink);
   --g-photo:url(/media/room-day.jpg);--g-photo-night:url(/media/room-night.jpg)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){color-scheme:dark}}
