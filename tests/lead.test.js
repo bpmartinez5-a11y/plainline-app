@@ -77,6 +77,21 @@ test("the database cap shows as 429, other failures as 502", async () => {
   assert.strictEqual((await call()).code, 502);
 });
 
+test("a saved request starts the Event runner once; a failed save starts nothing", async () => {
+  require("../api/_fire.js")._reset();
+  process.env.EVENT_FIRE_TOKEN = "sk-ant-oat01-" + "b".repeat(40);
+  try {
+    let calls = install();
+    assert.strictEqual((await call()).code, 200);
+    assert.deepStrictEqual(calls.map((c) => c.url), [URL_OK + "/rest/v1/leads", "https://api.anthropic.com/v1/claude_code/routines/trig_01QPPFmh4MwZEEjbd367YqaB/fire"]);
+    assert.deepStrictEqual(calls[1].body, { text: "inquiry" }); // never the visitor's name, email or words
+    require("../api/_fire.js")._reset();
+    calls = install(500);
+    assert.strictEqual((await call()).code, 502);
+    assert.strictEqual(calls.length, 1);
+  } finally { delete process.env.EVENT_FIRE_TOKEN; }
+});
+
 test("no key, or a key for another project, is 501", async () => {
   install();
   delete process.env.SUPABASE_SECRET_KEY;
