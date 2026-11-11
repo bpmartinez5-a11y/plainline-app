@@ -11,6 +11,7 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/consent.js"></script>
 <link rel="stylesheet" href="/fonts/plainline.css">
 <style>
 :root{--bg:#eaeff1;--ink:#12222b;--muted:#5b6d76;--line:#d3dce0;--accent:#0d6b71;
@@ -49,9 +50,9 @@ ul{padding-left:22px}
   <h2>What we don't do</h2>
   <ul>
     <li>We don't sell or rent your information.</li>
-    <li>We don't use advertising or tracking cookies, or analytics that follow you across sites.</li>
+    <li>We don't use advertising cookies unless you choose "Allow" (see <a href="#ads">Ad measurement</a>), and our own page counts don't follow you across sites.</li>
     <li>We don't knowingly collect information from children. This site is for businesses and adults.</li>
-    <li>Browsers can send a "Do Not Track" signal. We don't track visitors across sites, so we treat every visit the same whether or not the signal is on.</li>
+    <li>If your browser sends a Global Privacy Control signal, we treat it as "No thanks" to ad measurement and don't ask. Browsers can also send a "Do Not Track" signal; there is no common standard for it, so we rely on your "Allow" or "No thanks" choice and on Global Privacy Control instead.</li>
     <li>When we make data de-identified so it can't be tied to a person or business, we keep it that way: we don't try to re-identify it, and we require anyone we share it with to make the same promise.</li>
   </ul>
 
@@ -65,9 +66,14 @@ ul{padding-left:22px}
     <li><b>TypeSafe AI</b> sorts your latest demo messages (for example, a booking request or something urgent) so a person can be brought in, when message sorting is turned on.</li>
     <li><b>Twilio</b> sends and receives our text messages.</li>
     <li><b>Google Workspace</b> runs our email, so our replies to you go through it, and our walkthrough booking page (Google Calendar), where you pick a time.</li>
+    <li><b>Google Ads</b> and <b>Meta</b> measure which of our ads bring visitors, only if you choose "Allow" (see <a href="#ads">Ad measurement</a>).</li>
     <li><b>Google Fonts</b> serves the site's fonts, which means your browser connects to Google to load them.</li>
   </ul>
 
+  <h2 id="ads">Ad measurement</h2>
+  <p>We sometimes advertise on Google and Meta (Facebook and Instagram). To learn which ads lead to a booked walkthrough, our pages can load Google's and Meta's measurement tags, but only after you choose "Allow" on the notice at the bottom of the page. Until then, and if you choose "No thanks", they don't load and set no cookies.</p>
+  <p>If you allow it, Google and Meta receive that you visited our page, the page address, your IP address and browser information, the ad you came from, and whether you tapped the link to book a walkthrough. They can use their cookies and what they know about your account under their own terms (<a href="https://policies.google.com/technologies/ads" rel="noopener">Google</a>, <a href="https://www.facebook.com/privacy/policy/" rel="noopener">Meta</a>). We never send them what you type into our forms, the chat or the demo. Sharing for ads this way can count as "sharing" or "targeted advertising" under some state laws; choosing "No thanks", or using Global Privacy Control, opts you out.</p>
+  <p><button type="button" onclick="var r=window.plAdsChoice&&window.plAdsChoice();this.nextElementSibling.textContent=r==='off'?'Ad measurement is off on this site right now.':r==='gpc'?'Your browser sends Global Privacy Control, so ad measurement stays off.':'Your choice is cleared. Pick again on the notice.'">Change your ad measurement choice</button> <span class="muted" role="status"></span></p>
   <h2>Text messages</h2>
   <p>We text you only if you text us first or ask us to, for example to confirm or move a walkthrough. Each text is about your request. When you text our business number, an automated assistant may answer, and its first reply says so. A person takes over when needed. Message frequency varies. Message and data rates may apply. Reply STOP to stop our texts at any time. Reply HELP, or use the <a href="/#contact">contact form</a>, for help.</p>
   <p>Replies to your texts can come at any hour. Texts we start, such as a walkthrough reminder, go out only between 10 AM and 7 PM Central time. Texting us is not a condition of buying anything.</p>
