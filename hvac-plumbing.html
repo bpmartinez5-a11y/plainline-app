@@ -5,16 +5,20 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#c4b49f" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#3a3029" media="(prefers-color-scheme: dark)">
-<meta name="description" content="For HVAC and plumbing shops in the Kansas City metro: an AI front desk answers the calls and texts you miss, day and night, books the job or sends urgent ones to you in under 5 minutes. Book a walkthrough.">
+<meta name="description" content="After-hours answering for Kansas City HVAC and plumbing shops: missed callers get a text back, jobs get booked, urgent calls reach you in under 5 minutes.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232d63d8'/%3E%3Cpath d='M9 22V10h7a4 4 0 0 1 0 8h-7' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
-<title>After-hours answering for HVAC and plumbing shops in Kansas City · Plainline</title>
+<title>After-hours answering for KC HVAC and plumbing · Plainline</title>
 <link rel="canonical" href="https://plainlineops.com/hvac-plumbing">
+<meta property="og:type" content="website">
 <meta property="og:site_name" content="Plainline">
 <meta property="og:url" content="https://plainlineops.com/hvac-plumbing">
 <meta property="og:title" content="Answer the calls you can't pick up · Plainline">
-<meta property="og:description" content="For HVAC and plumbing shops in the Kansas City metro: an AI front desk answers the calls and texts you miss, books the job or sends urgent ones to you in under 5 minutes.">
+<meta property="og:description" content="For HVAC and plumbing shops in the Kansas City metro: missed callers get a text back from an AI front desk that books the job or sends urgent ones to you in under 5 minutes.">
 <meta property="og:image" content="https://plainlineops.com/og.png">
+<meta property="og:image:alt" content="Plainline: AI text assistants for local businesses, set up for you">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Answer the calls you can't pick up · Plainline">
+<meta name="twitter:description" content="For HVAC and plumbing shops in the Kansas City metro: missed callers get a text back from an AI front desk that books the job or sends urgent ones to you in under 5 minutes.">
 <script defer src="/_vercel/insights/script.js"></script>
 <link rel="stylesheet" href="/fonts/plainline.css">
 <!-- The page for Plainline's one offer until the first client pays (Ben, Nov 5): the front desk for KC HVAC and plumbing
@@ -23,7 +27,7 @@
      section word for word (tests/hvac-plumbing.test.js). -->
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Service","name":"AI front desk for HVAC and plumbing shops","serviceType":"After-hours call and text answering, booking and urgent hand-off","url":"https://plainlineops.com/hvac-plumbing","provider":{"@type":"Organization","name":"Plainline","url":"https://plainlineops.com/"},"areaServed":{"@type":"Place","name":"Kansas City metropolitan area"},"audience":{"@type":"BusinessAudience","audienceType":"HVAC and plumbing shops"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
-{"@type":"Question","name":"What happens when I miss a call on a job?","acceptedAnswer":{"@type":"Answer","text":"The front desk answers the caller by text right away, day or night. It asks what they need, books the job into an open time on your schedule, or sends the urgent ones to you in under 5 minutes. You see every call it caught in one list."}},
+{"@type":"Question","name":"What happens when I miss a call on a job?","acceptedAnswer":{"@type":"Answer","text":"The front desk texts the caller back within the hours you set, and it answers their texts right away. It asks what they need, books the job into an open time on your schedule, or sends the urgent ones to you in under 5 minutes. You see every call it caught in one list."}},
 {"@type":"Question","name":"How is this different from an answering service?","acceptedAnswer":{"@type":"Answer","text":"A message service takes a note, and someone still has to call back. The front desk answers right away from your own services, hours and rules. It books the job when it can, hands the rest to you, and shows you which calls became booked jobs."}},
 {"@type":"Question","name":"Is it a person or AI?","acceptedAnswer":{"@type":"Answer","text":"It is an AI front desk, and it always tells customers it is automated. Anything it can't answer, and anything urgent, goes to you or to the person you name."}},
 {"@type":"Question","name":"What about emergencies like a burst pipe or no heat?","acceptedAnswer":{"@type":"Answer","text":"You tell us what counts as urgent during setup. Those calls go to you or your on-call tech in under 5 minutes. If a send fails, it goes again by a backup method, and every send is logged."}},
@@ -64,6 +68,8 @@ li{margin-bottom:6px}
 .box h3{font:600 15px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
 .box.now h3{color:var(--warn)}.box.new h3{color:var(--green)}
 .card{max-width:420px;margin:4px 0 8px}
+.card figcaption,.lede+.fine{margin-top:10px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .card .top{display:flex;justify-content:space-between;font-size:14px;color:var(--warn);font-weight:600}
 .card b{display:block;font-size:18px;margin:6px 0 2px}
 .card q{display:block;color:var(--muted);margin:6px 0}
@@ -96,20 +102,21 @@ footer a{color:var(--muted)}
 
 <section aria-labelledby="h1">
   <h1 id="h1">Answer the calls you can't pick up</h1>
-  <p class="lede">For HVAC and plumbing shops in the Kansas City metro. When you are on a job or the shop is closed, Plainline's AI front desk answers your missed calls and texts. It books the job, or it sends the urgent ones to you in under 5 minutes. It always says it is automated.</p>
-  <div class="cta"><a class="btn" href="https://calendar.app.google/hZbyd1vnBrK6uEwKA" target="_blank" rel="noopener">Book a walkthrough</a><a class="btn ghost" href="/demo">Try the live demo</a></div>
+  <p class="lede">For HVAC and plumbing shops in the Kansas City metro. When you can't pick up, Plainline's AI front desk texts the caller back and answers their texts. It books the job, or it sends the urgent ones to you in under 5 minutes. It always says it is automated.</p>
+  <p class="fine">Texting on your business number starts once the phone carriers approve it.</p>
+  <div class="cta"><a class="btn" href="https://calendar.app.google/hZbyd1vnBrK6uEwKA" target="_blank" rel="noopener">Book a walkthrough<span class="sr"> (opens in a new tab)</span></a><a class="btn ghost" href="/demo">Try the live demo</a></div>
 </section>
 
 <section aria-labelledby="h-miss">
   <h2 id="h-miss">What happens to a call you miss</h2>
   <div class="cols">
-    <div class="box now"><h3>Today</h3><ul>
+    <div class="box now"><h3>Today, for many shops</h3><ul>
       <li>After hours, the call goes to voicemail.</li>
       <li>On a job, you answer from a ladder or call back hours later.</li>
       <li>A message service takes a note, and someone still has to call back.</li>
     </ul></div>
     <div class="box new"><h3>With Plainline</h3><ul>
-      <li>The caller gets an answer by text right away, day and night.</li>
+      <li>The caller gets a text back within the hours you set, and their texts get an answer right away.</li>
       <li>It books the job into an open time, or sends the urgent ones to you in under 5 minutes.</li>
       <li>You see every call it caught in one list, and which ones became booked jobs.</li>
     </ul></div>
@@ -118,14 +125,14 @@ footer a{color:var(--muted)}
 
 <section aria-labelledby="h-card">
   <h2 id="h-card">What an urgent hand-off looks like</h2>
-  <figure class="box card" aria-label="Example urgent hand-off for a made-up plumbing shop, values illustrative" style="margin-inline:0">
+  <figure class="box card">
     <div class="top"><span>Needs you</span><span>9:42 PM</span></div>
     <b>Water heater leaking in the basement</b>
     <span class="fine">Sam · North Kansas City · made-up customer</span>
     <q>Water is on the floor. Can someone come tonight?</q>
     <span class="sent">Sent to the on-call plumber at 9:43 PM</span>
+    <figcaption class="fine">Example for a made-up shop · values illustrative</figcaption>
   </figure>
-  <p class="fine">Example for a made-up shop · values illustrative</p>
 </section>
 
 <section aria-labelledby="h-how">
@@ -140,7 +147,7 @@ footer a{color:var(--muted)}
 <section aria-labelledby="h-faq">
   <h2 id="h-faq">Questions</h2>
   <div class="faq">
-    <details><summary>What happens when I miss a call on a job?</summary><p>The front desk answers the caller by text right away, day or night. It asks what they need, books the job into an open time on your schedule, or sends the urgent ones to you in under 5 minutes. You see every call it caught in one list.</p></details>
+    <details><summary>What happens when I miss a call on a job?</summary><p>The front desk texts the caller back within the hours you set, and it answers their texts right away. It asks what they need, books the job into an open time on your schedule, or sends the urgent ones to you in under 5 minutes. You see every call it caught in one list.</p></details>
     <details><summary>How is this different from an answering service?</summary><p>A message service takes a note, and someone still has to call back. The front desk answers right away from your own services, hours and rules. It books the job when it can, hands the rest to you, and shows you which calls became booked jobs.</p></details>
     <details><summary>Is it a person or AI?</summary><p>It is an AI front desk, and it always tells customers it is automated. Anything it can't answer, and anything urgent, goes to you or to the person you name.</p></details>
     <details><summary>What about emergencies like a burst pipe or no heat?</summary><p>You tell us what counts as urgent during setup. Those calls go to you or your on-call tech in under 5 minutes. If a send fails, it goes again by a backup method, and every send is logged.</p></details>
@@ -151,9 +158,9 @@ footer a{color:var(--muted)}
 </section>
 
 <section aria-labelledby="h-go">
-  <h2 id="h-go">See it on your own phone</h2>
-  <p>Text the demo like a customer would. Then book 20 minutes, and we show you what it would say for your shop.</p>
-  <div class="cta"><a class="btn" href="https://calendar.app.google/hZbyd1vnBrK6uEwKA" target="_blank" rel="noopener">Book a walkthrough</a><a class="btn ghost" href="/demo">Try the live demo</a></div>
+  <h2 id="h-go">Try it in your browser</h2>
+  <p>Write to the demo like a customer would. It runs on a sample business. Then book 20 minutes, and we show you what it would say for your shop.</p>
+  <div class="cta"><a class="btn" href="https://calendar.app.google/hZbyd1vnBrK6uEwKA" target="_blank" rel="noopener">Book a walkthrough<span class="sr"> (opens in a new tab)</span></a><a class="btn ghost" href="/demo">Try the live demo</a></div>
   <p class="fine" style="margin-top:12px">Rather write? Use the <a href="/#contact">form on our home page</a>. We reply by email within 24 hours.</p>
 </section>
 
