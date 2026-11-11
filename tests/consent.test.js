@@ -115,3 +115,26 @@ test("ad landing pages load consent.js and the privacy policy describes it", () 
   assert.match(p, /<b>Google Ads<\/b> and <b>Meta<\/b>/);
   assert.doesNotMatch(p, /We don't use advertising or tracking cookies, or analytics/, "the old no-cookies promise is gone");
 });
+
+test("tags never collect form data: Meta autoConfig off, Google enhanced conversions off, and only the booking tap is sent", () => {
+  const r = run({ google: G, meta: M, stored: "yes" });
+  const fb = r.window.fbq.queue.map((a) => [...a]);
+  assert.deepStrictEqual(fb[0], ["set", "autoConfig", false, M], "autoConfig is switched off before init");
+  assert.deepStrictEqual(fb[1], ["init", M]);
+  const cfg = r.window.dataLayer.map((a) => [...a]).find((a) => a[0] === "config");
+  assert.equal(JSON.stringify(cfg), JSON.stringify(["config", G, { allow_enhanced_conversions: false }]));
+  const click = r.listeners.click;
+  const link = (href) => ({ target: { closest: (sel) => (href.startsWith("https://calendar.app.google/") && sel.includes("calendar.app.google") ? { href } : null) } });
+  const before = [r.window.fbq.queue.length, r.window.dataLayer.length];
+  click(link("https://plainlineops.com/demo"));
+  assert.deepStrictEqual([r.window.fbq.queue.length, r.window.dataLayer.length], before, "other links send nothing");
+  click(link("https://calendar.app.google/x"));
+  assert.deepStrictEqual([...r.window.fbq.queue.at(-1)], ["track", "Lead"]);
+  assert.deepStrictEqual([...r.window.dataLayer.at(-1)], ["event", "book_walkthrough_click"]);
+});
+
+test("the banner names only the platforms that are on", () => {
+  assert.match(run({ google: G }).bannerEl().html, /May Google measure/);
+  assert.match(run({ meta: M }).bannerEl().html, /May Meta measure/);
+  assert.match(run({ google: G, meta: M }).bannerEl().html, /May Google and Meta measure/);
+});

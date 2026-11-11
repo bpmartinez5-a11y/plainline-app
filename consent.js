@@ -13,9 +13,10 @@
   const KEY = "pl_ads_consent";
   const google = /^AW-\d{6,14}$/.test(TAGS.google) ? TAGS.google : "";
   const meta = /^\d{10,20}$/.test(TAGS.meta) ? TAGS.meta : "";
+  let mem = null; // the choice for this page when the browser blocks storage
   const store = {
-    get() { try { return localStorage.getItem(KEY); } catch { return null; } },
-    set(v) { try { v ? localStorage.setItem(KEY, v) : localStorage.removeItem(KEY); } catch {} },
+    get() { try { return localStorage.getItem(KEY); } catch { return mem; } },
+    set(v) { mem = v; try { v ? localStorage.setItem(KEY, v) : localStorage.removeItem(KEY); } catch {} },
   };
   const gpc = navigator.globalPrivacyControl === true;
   let loaded = false;
@@ -34,7 +35,7 @@
       window.dataLayer = window.dataLayer || [];
       window.gtag = function () { window.dataLayer.push(arguments); };
       window.gtag("js", new Date());
-      window.gtag("config", google);
+      window.gtag("config", google, { allow_enhanced_conversions: false }); // no hashed form data
       add("https://www.googletagmanager.com/gtag/js?id=" + google);
     }
     if (meta) {
@@ -42,6 +43,7 @@
       const fbq = function () { fbq.callMethod ? fbq.callMethod.apply(fbq, arguments) : q.push(arguments); };
       fbq.queue = q; fbq.push = fbq; fbq.loaded = true; fbq.version = "2.0";
       window.fbq = window._fbq = fbq;
+      fbq("set", "autoConfig", false, meta); // no automatic form or button capture, no advanced matching
       fbq("init", meta);
       fbq("track", "PageView");
       add("https://connect.facebook.net/en_US/fbevents.js");
