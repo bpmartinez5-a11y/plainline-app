@@ -13,7 +13,7 @@
 - How it starts: a walkthrough of how the business runs today, then each plan is scoped, Plainline builds and tests everything, the client tries it, and Plainline runs it and tunes it monthly.
 - Pricing: every engagement is quoted per company after a walkthrough and research on the business. Plainline doesn't publish prices.
 - Reply time: Plainline replies to every message within 24 hours.
-- Based in the Kansas City metro. Run by Plainlineops LLC.
+- Based in the Kansas City metro. Run by Plainlineops LLC. Founder: Ben Martinez. He does every walkthrough himself.
 - Focus now: the front desk for HVAC and plumbing shops in the Kansas City metro. When the owner is on a job or the shop is closed, it answers missed calls and texts, books the job or sends urgent calls to the owner in under 5 minutes, and always says it is automated.
 
 ## Pages
