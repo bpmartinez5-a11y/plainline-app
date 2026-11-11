@@ -3,6 +3,7 @@
 // table itself, so a script can't fill the database's hourly cap and lock out real visitors: each IP gets a few
 // requests (here and in the Vercel firewall rule on /api/lead), and the database keeps a last-resort cap for everyone.
 const { sameSite, clientIp, limiter, jsonBody } = require("./_public");
+const { fireEvent } = require("./_fire"); // starts the Event runner, which sends the booking-link reply in minutes
 
 const PROJECT = "mtpaaizladkfjtpnkdao"; // Plainline's Supabase project; any other URL in env is a setup mistake
 const overLimit = limiter(3, 200); // requests per IP per hour; per warm instance per hour
@@ -37,7 +38,7 @@ module.exports = async function handler(req, res) {
   if (key.startsWith("eyJ")) headers.Authorization = "Bearer " + key; // the older service-role key is a JWT
   try {
     const r = await fetch(url.replace(/\/$/, "") + "/rest/v1/leads", { method: "POST", headers, body: JSON.stringify(row), signal: AbortSignal.timeout(10000) });
-    if (r.ok) return res.status(200).json({ ok: true });
+    if (r.ok) { await fireEvent("inquiry"); return res.status(200).json({ ok: true }); } // never fails the request (_fire.js)
     console.error("lead: supabase", r.status); // never the visitor's name, email or words
     return res.status(r.status === 400 && /too many inquiries/.test(await r.text()) ? 429 : 502).json({ error: "Save failed" });
   } catch (e) {
