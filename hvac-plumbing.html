@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#c4b49f" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#3a3029" media="(prefers-color-scheme: dark)">
+<meta name="description" content="For HVAC and plumbing shops in the Kansas City metro: an AI front desk answers the calls and texts you miss, day and night, books the job or sends urgent ones to you in under 5 minutes. Book a walkthrough.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232d63d8'/%3E%3Cpath d='M9 22V10h7a4 4 0 0 1 0 8h-7' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+<title>After-hours answering for HVAC and plumbing shops in Kansas City · Plainline</title>
+<link rel="canonical" href="https://plainlineops.com/hvac-plumbing">
+<meta property="og:site_name" content="Plainline">
+<meta property="og:url" content="https://plainlineops.com/hvac-plumbing">
+<meta property="og:title" content="Answer the calls you can't pick up · Plainline">
+<meta property="og:description" content="For HVAC and plumbing shops in the Kansas City metro: an AI front desk answers the calls and texts you miss, books the job or sends urgent ones to you in under 5 minutes.">
+<meta property="og:image" content="https://plainlineops.com/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<script defer src="/_vercel/insights/script.js"></script>
+<link rel="stylesheet" href="/fonts/plainline.css">
+<!-- The page for Plainline's one offer until the first client pays (Ben, Nov 5): the front desk for KC HVAC and plumbing
+     shops. Search and answer engines read it, and it is the landing page for any ad test. Product words match sell.html
+     and the pilot page; no price, rate or amount ever (CLAUDE.md hard rules). The FAQ schema must match the Questions
+     section word for word (tests/hvac-plumbing.test.js). -->
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Service","name":"AI front desk for HVAC and plumbing shops","serviceType":"After-hours call and text answering, booking and urgent hand-off","url":"https://plainlineops.com/hvac-plumbing","provider":{"@type":"Organization","name":"Plainline","url":"https://plainlineops.com/"},"areaServed":{"@type":"Place","name":"Kansas City metropolitan area"},"audience":{"@type":"BusinessAudience","audienceType":"HVAC and plumbing shops"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"What happens when I miss a call on a job?","acceptedAnswer":{"@type":"Answer","text":"The front desk answers the caller by text right away, day or night. It asks what they need, books the job into an open time on your schedule, or sends the urgent ones to you in under 5 minutes. You see every call it caught in one list."}},
+{"@type":"Question","name":"How is this different from an answering service?","acceptedAnswer":{"@type":"Answer","text":"A message service takes a note, and someone still has to call back. The front desk answers right away from your own services, hours and rules. It books the job when it can, hands the rest to you, and shows you which calls became booked jobs."}},
+{"@type":"Question","name":"Is it a person or AI?","acceptedAnswer":{"@type":"Answer","text":"It is an AI front desk, and it always tells customers it is automated. Anything it can't answer, and anything urgent, goes to you or to the person you name."}},
+{"@type":"Question","name":"What about emergencies like a burst pipe or no heat?","acceptedAnswer":{"@type":"Answer","text":"You tell us what counts as urgent during setup. Those calls go to you or your on-call tech in under 5 minutes. If a send fails, it goes again by a backup method, and every send is logged."}},
+{"@type":"Question","name":"Do I have to install or learn anything?","acceptedAnswer":{"@type":"Answer","text":"No. Plainline sets it up and tests it with you. You do three things: a 20-minute walkthrough, name one person for urgent calls, and OK the words the front desk uses."}},
+{"@type":"Question","name":"What does it cost?","acceptedAnswer":{"@type":"Answer","text":"Every shop gets a quote after the walkthrough and our research on the business. We don't publish prices."}},
+{"@type":"Question","name":"Where do you work?","acceptedAnswer":{"@type":"Answer","text":"Plainline is based in the Kansas City metro and works with HVAC and plumbing shops here first, on both the Kansas and Missouri sides."}}
+]}</script>
+<style>
+:root{--wall:#d9cebf;--wall-2:#c4b49f;--floor:#a48b72;--glass:rgba(52,41,34,.72);--surface:rgba(18,14,12,.34);
+  --ink:#f7f2ea;--muted:rgba(247,242,234,.82);--line:rgba(255,255,255,.15);--link:#b4ccff;--blue:#3f78ea;--blue-2:#2d63d8;--green:#b7e6cf;--warn:#f2bd72;
+  --blur:blur(28px) saturate(140%);--shadow:inset 0 1px 0 rgba(255,255,255,.14),0 30px 60px -28px rgba(20,12,6,.65);
+  --f-display:"Fraunces",Georgia,"Times New Roman",serif;--f-body:"Plus Jakarta Sans","Segoe UI",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--wall:#4a4038;--wall-2:#3a3029;--floor:#3b2f26;--glass:rgba(22,18,16,.66);--surface:rgba(8,6,5,.4);color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--wall-2);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55;
+  padding:18px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
+.room{position:fixed;inset:-60px;z-index:-1;filter:blur(26px);pointer-events:none;background:linear-gradient(180deg,var(--wall) 0%,var(--wall-2) 62%,var(--floor) 62%,var(--floor) 100%)}
+main{max-width:860px;margin:0 auto}
+a{color:var(--link)}
+:focus-visible{outline:2px solid var(--link);outline-offset:2px}
+h1,h2{font-family:var(--f-display);font-weight:400;letter-spacing:-.01em;line-height:1.15;margin:0}
+header,section{-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);background:var(--glass);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
+header{display:flex;align-items:center;gap:12px;padding:12px 18px}
+header b{font:600 15px var(--f-body);letter-spacing:.12em}
+header a{margin-left:auto;font-size:15px;color:var(--muted);text-decoration:none}
+section{margin-top:16px;padding:26px}
+@media (max-width:640px){section{padding:20px 16px}}
+h1{font-size:40px;margin-bottom:10px}
+@media (max-width:640px){h1{font-size:32px}}
+.lede{font-size:20px;color:var(--muted);margin:0}
+h2{font-size:24px;margin-bottom:12px}
+p{margin:0 0 8px}
+ul{margin:0;padding-left:20px}
+li{margin-bottom:6px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:700px){.cols{grid-template-columns:1fr}}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px}
+.box h3{font:600 15px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.box.now h3{color:var(--warn)}.box.new h3{color:var(--green)}
+.card{max-width:420px;margin:4px 0 8px}
+.card .top{display:flex;justify-content:space-between;font-size:14px;color:var(--warn);font-weight:600}
+.card b{display:block;font-size:18px;margin:6px 0 2px}
+.card q{display:block;color:var(--muted);margin:6px 0}
+.card .sent{font-size:14px;color:var(--green)}
+.fine{font-size:14px;color:var(--muted);margin:0}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media (max-width:700px){.steps{grid-template-columns:1fr}}
+.steps li{counter-increment:s;border-top:3px solid var(--green);padding-top:8px;font-size:15px}
+.steps li::before{content:counter(s);display:block;font:700 20px var(--f-body);color:var(--green)}
+.steps b{display:block;font-size:17px}
+.faq details+details{border-top:1px solid var(--line)}
+.faq summary{font-weight:700;min-height:44px;padding:12px 0;cursor:pointer;display:flex;align-items:center;gap:12px;list-style:none}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";margin-left:auto;font-weight:400;font-size:20px;color:var(--muted)}
+.faq details[open] summary::after{content:"\2212"}
+.faq details p{margin:0 0 14px;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 24px;border:1px solid rgba(255,255,255,.22);border-radius:999px;
+  background:linear-gradient(180deg,var(--blue),var(--blue-2));color:#fff;font:600 17px var(--f-body);text-decoration:none;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 16px -6px rgba(45,99,216,.7)}
+.btn.ghost{background:rgba(255,255,255,.08);border-color:var(--line);box-shadow:none}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+footer{margin-top:16px;font-size:13px;color:var(--muted);text-align:center}
+footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="room" aria-hidden="true"></div>
+<main>
+<header><img src="/icons/icon-192.png" alt="" width="32" height="32"><b>PLAINLINE</b><a href="/">plainlineops.com</a></header>
+
+<section aria-labelledby="h1">
+  <h1 id="h1">Answer the calls you can't pick up</h1>
+  <p class="lede">For HVAC and plumbing shops in the Kansas City metro. When you are on a job or the shop is closed, Plainline's AI front desk answers your missed calls and texts. It books the job, or it sends the urgent ones to you in under 5 minutes. It always says it is automated.</p>
+  <div class="cta"><a class="btn" href="https://calendar.app.google/hZbyd1vnBrK6uEwKA" target="_blank" rel="noopener">Book a walkthrough</a><a class="btn ghost" href="/demo">Try the live demo</a></div>
+</section>
+
+<section aria-labelledby="h-miss">
+  <h2 id="h-miss">What happens to a call you miss</h2>
+  <div class="cols">
+    <div class="box now"><h3>Today</h3><ul>
+      <li>After hours, the call goes to voicemail.</li>
+      <li>On a job, you answer from a ladder or call back hours later.</li>
+      <li>A message service takes a note, and someone still has to call back.</li>
+    </ul></div>
+    <div class="box new"><h3>With Plainline</h3><ul>
+      <li>The caller gets an answer by text right away, day and night.</li>
+      <li>It books the job into an open time, or sends the urgent ones to you in under 5 minutes.</li>
+      <li>You see every call it caught in one list, and which ones became booked jobs.</li>
+    </ul></div>
+  </div>
+</section>
+
+<section aria-labelledby="h-card">
+  <h2 id="h-card">What an urgent hand-off looks like</h2>
+  <figure class="box card" aria-label="Example urgent hand-off for a made-up plumbing shop, values illustrative" style="margin-inline:0">
+    <div class="top"><span>Needs you</span><span>9:42 PM</span></div>
+    <b>Water heater leaking in the basement</b>
+    <span class="fine">Sam · North Kansas City · made-up customer</span>
+    <q>Water is on the floor. Can someone come tonight?</q>
+    <span class="sent">Sent to the on-call plumber at 9:43 PM</span>
+  </figure>
+  <p class="fine">Example for a made-up shop · values illustrative</p>
+</section>
+
+<section aria-labelledby="h-how">
+  <h2 id="h-how">How it starts</h2>
+  <ol class="steps">
+    <li><b>A 20-minute walkthrough</b>We learn where your calls go today, and your services, hours and rules.</li>
+    <li><b>We set it up and test it</b>You OK the words it uses and name one person for urgent calls. You install nothing.</li>
+    <li><b>It runs, and you see the results</b>Every call it caught and every job it booked, in one list. We tune it with you every month.</li>
+  </ol>
+</section>
+
+<section aria-labelledby="h-faq">
+  <h2 id="h-faq">Questions</h2>
+  <div class="faq">
+    <details><summary>What happens when I miss a call on a job?</summary><p>The front desk answers the caller by text right away, day or night. It asks what they need, books the job into an open time on your schedule, or sends the urgent ones to you in under 5 minutes. You see every call it caught in one list.</p></details>
+    <details><summary>How is this different from an answering service?</summary><p>A message service takes a note, and someone still has to call back. The front desk answers right away from your own services, hours and rules. It books the job when it can, hands the rest to you, and shows you which calls became booked jobs.</p></details>
+    <details><summary>Is it a person or AI?</summary><p>It is an AI front desk, and it always tells customers it is automated. Anything it can't answer, and anything urgent, goes to you or to the person you name.</p></details>
+    <details><summary>What about emergencies like a burst pipe or no heat?</summary><p>You tell us what counts as urgent during setup. Those calls go to you or your on-call tech in under 5 minutes. If a send fails, it goes again by a backup method, and every send is logged.</p></details>
+    <details><summary>Do I have to install or learn anything?</summary><p>No. Plainline sets it up and tests it with you. You do three things: a 20-minute walkthrough, name one person for urgent calls, and OK the words the front desk uses.</p></details>
+    <details><summary>What does it cost?</summary><p>Every shop gets a quote after the walkthrough and our research on the business. We don't publish prices.</p></details>
+    <details><summary>Where do you work?</summary><p>Plainline is based in the Kansas City metro and works with HVAC and plumbing shops here first, on both the Kansas and Missouri sides.</p></details>
+  </div>
+</section>
+
+<section aria-labelledby="h-go">
+  <h2 id="h-go">See it on your own phone</h2>
+  <p>Text the demo like a customer would. Then book 20 minutes, and we show you what it would say for your shop.</p>
+  <div class="cta"><a class="btn" href="https://calendar.app.google/hZbyd1vnBrK6uEwKA" target="_blank" rel="noopener">Book a walkthrough</a><a class="btn ghost" href="/demo">Try the live demo</a></div>
+  <p class="fine" style="margin-top:12px">Rather write? Use the <a href="/#contact">form on our home page</a>. We reply by email within 24 hours.</p>
+</section>
+
+<footer>© 2026 Plainlineops LLC · Kansas City metro · <a href="/">Home</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></footer>
+</main>
+</body>
+</html>
