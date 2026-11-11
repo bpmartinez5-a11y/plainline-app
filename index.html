@@ -473,7 +473,7 @@ form.chat-book{gap:10px;padding:14px;border-radius:16px;background:rgba(255,255,
   <section id="contact" class="contact">
     <div>
       <h2 style="font-size:28px;margin-bottom:12px">Book a walkthrough</h2>
-      <p style="color:var(--muted);margin:0">Tell us a little about your business. We reply by email within 24 hours.</p>
+      <p style="color:var(--muted);margin:0">Tell us a little about your business. We reply by email within 24 hours. Or <a href="https://calendar.app.google/hZbyd1vnBrK6uEwKA" target="_blank" rel="noopener">pick a time</a> for your walkthrough now<span class="sr"> (opens in a new tab)</span>.</p>
       <p class="billing">After you approve a quote, you pay by invoice through Stripe. <a href="https://stripe.com/@plainline" target="_blank" rel="noopener">Plainline on Stripe ↗</a></p>
     </div>
     <form id="leadForm" novalidate>
@@ -497,7 +497,14 @@ form.chat-book{gap:10px;padding:14px;border-radius:16px;background:rgba(255,255,
 <script>
 /* Contact form: sends one walkthrough request to /api/lead, which saves it to the "leads" table (The Engine's Inquiries tab) with limits per visitor. */
 const form = document.getElementById("leadForm"), msg = document.getElementById("formMsg"), btn = document.getElementById("sendBtn");
-const say = (text, cls) => { msg.textContent = text; msg.className = cls; };
+/* The walkthrough booking page (Google Calendar). Offered after every request and whenever a send fails (a busy connection,
+   the spam check or no signal), so a visitor always has a way to book. The chat below uses it too. */
+const BOOK_URL = "https://calendar.app.google/hZbyd1vnBrK6uEwKA";
+const bookLink = () => {
+  const a = Object.assign(document.createElement("a"), { href: BOOK_URL, target: "_blank", rel: "noopener", textContent: "Pick a time" });
+  a.append(Object.assign(document.createElement("span"), { className: "sr", textContent: " (opens in a new tab)" })); return a;
+};
+const say = (text, cls, link) => { msg.textContent = text; msg.className = cls; if (link) msg.append(" ", bookLink(), "."); };
 /* Where the visitor came from, so walkthrough rates can be counted per campaign: "website", or "website · <utm_source>/<utm_campaign>", at most 50 characters (the table's limit). */
 const leadSource = () => { const q = new URLSearchParams(location.search), tag = [q.get("utm_source"), q.get("utm_campaign")].filter(Boolean).join("/").replace(/[^\w.\/-]/g, "").slice(0, 40); return tag ? "website · " + tag : "website"; }; // the leads table caps source at 50 characters
 
@@ -517,12 +524,13 @@ form.addEventListener("submit", async e => {
       body: JSON.stringify({name, email, message, source: leadSource()}),
       signal: AbortSignal.timeout(15000)
     });
-    if (r.status === 429) return say("We already have a few requests from this connection. Please try again in an hour.", "err");
+    // Our own limit says 429 with no firewall header; the spam check (x-vercel-mitigated) and other errors go to the catch.
+    if (r.status === 429 && !r.headers.get("x-vercel-mitigated")) return say("We already have a few requests from this connection. To book your walkthrough now:", "err", true);
     if (!r.ok) throw new Error("HTTP " + r.status);
-    form.reset(); say("Thanks! Your message is in. We reply by email within 24 hours.", "ok");
+    form.reset(); say("Thanks! Your message is in. We reply by email within 24 hours. To book your walkthrough now:", "ok", true);
   } catch (err) {
     console.error("lead submit failed", err);
-    say("Sorry, that didn't send. Please check your connection and try again.", "err");
+    say("Sorry, that didn't send. You can book your walkthrough here instead:", "err", true);
   } finally { btn.disabled = false; }
 });
 </script>
@@ -632,12 +640,12 @@ form.addEventListener("submit", async e => {
   book.addEventListener("submit", async e => {
     e.preventDefault();
     const f = Object.fromEntries(new FormData(book)), name = f.name.trim(), email = f.email.trim(), btn = $("bookBtn");
-    const err = t => { bookMsg.textContent = t; bookMsg.className = "err"; };
+    const err = (t, link) => { bookMsg.textContent = t; bookMsg.className = "err"; if (link) bookMsg.append(" ", bookLink(), "."); };
     if (!name) { book.name.focus(); return err("Please add your name."); }
     if (!/^\S+@\S+\.\S+$/.test(email)) { book.email.focus(); return err("Please add a valid email so we can reply."); }
     const finish = () => {
       done = true; book.hidden = true; lock(true); chips([], false);
-      say("in", `Thanks, ${name.split(" ")[0]}. Your walkthrough request is in. A person from Plainline replies by email within 24 hours.`);
+      say("in", `Thanks, ${name.split(" ")[0]}. Your walkthrough request is in. We reply by email within 24 hours. To book now:`).append(" ", bookLink(), ".");
       const b = document.createElement("div"); b.className = "booked pop"; b.textContent = "Walkthrough requested"; logEl.append(b); scroll();
     };
     if (f.website) return finish(); // a bot filled the hidden field
@@ -652,12 +660,12 @@ form.addEventListener("submit", async e => {
         body: JSON.stringify({ name, email, message, source: leadSource().replace(/^website/, "website chat").slice(0, 50) }),
         signal: AbortSignal.timeout(15000)
       });
-      if (r.status === 429) return err("We already have a few requests from this connection. Please try again in an hour.");
+      if (r.status === 429 && !r.headers.get("x-vercel-mitigated")) return err("We already have a few requests from this connection. To book your walkthrough now:", true);
       if (!r.ok) throw new Error("HTTP " + r.status);
       bookMsg.textContent = ""; finish();
     } catch (er) {
       console.error("walkthrough request failed", er);
-      err("Sorry, that didn't send. Please try again, or use the form at the bottom of the page.");
+      err("Sorry, that didn't send. You can book your walkthrough here instead:", true);
     } finally { btn.disabled = false; }
   });
 
