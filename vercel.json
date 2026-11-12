@@ -1,5 +1,8 @@
 {
   "cleanUrls": true,
+  "regions": [
+    "pdx1"
+  ],
   "redirects": [
     {
       "source": "/",
@@ -17,6 +20,14 @@
     {
       "source": "/(.*)",
       "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        },
         {
           "key": "X-Content-Type-Options",
           "value": "nosniff"
@@ -41,6 +52,15 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=86400"
+        }
+      ]
+    },
+    {
+      "source": "/fonts/(.+\\.woff2)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
         }
       ]
     }
