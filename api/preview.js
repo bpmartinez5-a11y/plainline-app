@@ -40,18 +40,27 @@ function notFound(res) {
   res.end('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Preview not found</title><body style="font-family:system-ui,sans-serif;padding:24px"><p>This preview isn\'t available. Ask whoever sent you the link for a new one.</p></body>');
 }
 
-async function show(req, res) {
-  const slug = String((req.query && req.query.slug) || "");
-  if (!/^[a-z0-9-]{12,60}$/.test(slug) || !SERVICE) return notFound(res);
-  let row;
-  try { [row] = await rest(`/rest/v1/ops_leads?preview_slug=eq.${slug}&select=preview_at,ops_previews(profile)&limit=1`, SERVICE, { method: "GET" }) || []; }
-  catch { res.status(502).setHeader("Content-Type", "text/plain; charset=utf-8"); return res.end("The preview couldn't load. Try again in a minute."); }
+// The profile behind a shared preview link, as the owner sees it: null when the link is unknown or older than
+// KEEP_DAYS; throws when the database can't be read. Shared with /api/chat (the preview's live chat answers from it).
+// Ben's planner questions, to-dos and "ADD:" blanks are notes for him, so they stay off what the owner sees.
+async function profileFor(slug) {
+  slug = String(slug);
+  if (!/^[a-z0-9-]{12,60}$/.test(slug)) return null;
+  if (!SERVICE) { console.error("preview: SUPABASE_SERVICE_ROLE_KEY is not set"); return null; }
+  const [row] = await rest(`/rest/v1/ops_leads?preview_slug=eq.${slug}&select=preview_at,ops_previews(profile)&limit=1`, SERVICE, { method: "GET" }) || [];
   const profile = row && row.ops_previews && row.ops_previews.profile;
-  if (!profile || Date.now() - new Date(row.preview_at).getTime() > KEEP_DAYS * 864e5) return notFound(res);
-  // shared: the "Concept preview by Plainline · not the official site" bar, no owner link. Ben's planner
-  // questions, to-dos and "ADD:" blanks are notes for him, so they stay off the page the owner sees.
+  if (!profile || Date.now() - new Date(row.preview_at).getTime() > KEEP_DAYS * 864e5) return null;
   const blank = v => typeof v === "string" ? (/^\s*ADD:/i.test(v) ? "" : v) : Array.isArray(v) ? v.map(blank) : v && typeof v === "object" ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, blank(x)])) : v;
-  const html = Engine.render(blank(Object.assign({}, profile, { questions: [], todos: [] })), { shared: true }).site;
+  return blank(Object.assign({}, profile, { questions: [], todos: [] }));
+}
+
+async function show(req, res) {
+  let profile;
+  try { profile = await profileFor((req.query && req.query.slug) || ""); }
+  catch { res.status(502).setHeader("Content-Type", "text/plain; charset=utf-8"); return res.end("The preview couldn't load. Try again in a minute."); }
+  if (!profile) return notFound(res);
+  // shared: the "Concept preview by Plainline · not the official site" bar and no owner link.
+  const html = Engine.render(profile, { shared: true }).site;
   res.status(200);
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.setHeader("X-Robots-Tag", "noindex, nofollow");
@@ -107,4 +116,4 @@ module.exports = async function handler(req, res) {
   if (req.headers.origin !== ORIGIN) return res.status(403).json({ error: "Only The Engine can build previews" });
   return build(req, res);
 };
-Object.assign(module.exports, { newSlug });
+Object.assign(module.exports, { newSlug, profileFor });

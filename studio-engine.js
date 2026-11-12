@@ -312,6 +312,26 @@ footer{border-top:2px solid var(--ink);margin-top:40px;padding-block:28px calc(2
 .socials a{font-weight:600}
 .mbook{display:none}
 @media (max-width:860px){.mbook{display:flex;position:fixed;left:var(--gut);right:var(--gutr);bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:30;box-shadow:var(--soft)}footer{padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))}}
+.ask-btn{position:fixed;right:var(--gutr);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:35;min-height:48px;padding:0 18px;border-radius:999px;border:1px solid var(--ink);background:var(--ink);color:var(--bg);font-weight:600;cursor:pointer;box-shadow:var(--soft)}
+.ask{position:fixed;right:var(--gutr);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;width:min(380px,calc(100vw - 32px));height:min(560px,calc(100dvh - 32px));display:flex;flex-direction:column;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--soft);overflow:hidden}
+.ask[hidden],.ask-btn[hidden]{display:none}
+.ask-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.ask-head b{display:block;overflow-wrap:anywhere}
+.ask-log{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:85%;padding:10px 12px;border-radius:14px;font-size:15px;line-height:1.4;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.ai{align-self:flex-start;background:var(--chalk)}
+.msg.customer{align-self:flex-end;background:var(--accent);color:var(--accent-ink)}
+.msg.note{align-self:center;max-width:100%;padding:2px 8px;color:var(--muted);font-size:13px;text-align:center}
+.msg .btn{display:flex;margin-top:8px;min-height:40px;white-space:normal}
+.ask-chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 14px}
+.ask-chips:empty{display:none}
+.chip{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:8px 12px;font-size:13px;cursor:pointer}
+.ask-form{display:flex;gap:8px;padding:10px 14px 6px}
+.ask-form input{flex:1;min-width:0;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:10px 14px;font-size:16px;min-height:46px}
+.ask-form.busy button{opacity:.5}
+.ask-note{margin:0;padding:0 14px 12px;font-size:12px;line-height:1.4;color:var(--muted)}
+.has-ask footer{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+@media (max-width:860px){.ask-btn{bottom:calc(70px + env(safe-area-inset-bottom,0px))}.ask{inset:calc(12px + env(safe-area-inset-top,0px)) var(--gutr) calc(12px + env(safe-area-inset-bottom,0px)) var(--gut);width:auto;height:auto}.has-ask footer{padding-bottom:calc(140px + env(safe-area-inset-bottom,0px))}}
 `;
 
   // Runs inside the generated website. Must not use anything from this file's scope.
@@ -363,6 +383,14 @@ ${OPT.shared ? `<div class="concept">Concept preview by Plainline · made from $
 <div class="mono">© ${new Date().getFullYear()} ${esc(B.name)}${OPT.ownerLink ? ` · <a href="${esc(ownerLink)}" id="ownerLink">Owner login</a>` : ""}</div>
 </div></footer>
 <a class="btn solid mbook" id="mbook" href="#book" hidden>${esc(P.hero.cta)}</a>
+${OPT.shared ? `<button class="ask-btn" id="askBtn" type="button" aria-expanded="false" aria-controls="ask">Ask a question</button>
+<section class="ask" id="ask" hidden role="dialog" aria-label="Ask ${esc(B.name)}">
+<div class="ask-head"><div><b>Ask ${esc(B.name)}</b><div class="mono">Automated assistant · preview</div></div><button class="iconbtn" id="askClose" type="button">Close</button></div>
+<div class="ask-log" id="askLog" aria-live="polite"></div>
+<div class="ask-chips" id="askChips"></div>
+<form class="ask-form" id="askForm"><input id="askIn" maxlength="500" autocomplete="off" placeholder="Type a question" aria-label="Your question"><button class="btn solid" type="submit">Send</button></form>
+<p class="ask-note">Automated answers from facts ${esc(B.name)} publishes. Preview only: nothing reaches ${esc(B.name)}. Don't type card numbers or private details.</p>
+</section>` : ""}
 <div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Photo viewer"><button type="button" id="lbClose">Close</button><img id="lbImg" alt=""></div>`;
 
     const H = P.hero;
@@ -555,6 +583,56 @@ ${K.minors ? `<div class="check"><input type="checkbox" id="f-guardian" name="gu
     addEventListener("scroll", () => { mbook.hidden = /^book/.test(here) || scrollY < 520; }, { passive: true });
     addEventListener("storage", e => { if (e.key === KEY) { edits = store.get(); render(); } });
     addEventListener("hashchange", () => { const h = location.hash.slice(1); if (h !== here) { here = h; render(); } });
+    // Live chat on a concept preview sent to the business (plainlineops.com/preview/<slug>): /api/chat answers
+    // from this preview's saved profile on the server, so the page sends only the conversation. Off that address,
+    // or when the AI is off or busy, it gives one fixed answer that points to the phone number and the request form.
+    const askEl = document.getElementById("ask");
+    if (askEl) (function ask() {
+      const btn = document.getElementById("askBtn"), log = document.getElementById("askLog"), chipsEl = document.getElementById("askChips");
+      const form = document.getElementById("askForm"), input = document.getElementById("askIn"), C = P.contact;
+      const slug = (location.pathname.match(/^\/preview\/([a-z0-9-]{12,60})$/) || [])[1];
+      const chat = [], starters = ["What do you offer?", C.hours.filter(Boolean).length ? "What are your hours?" : "", "How do I book?"].filter(Boolean);
+      let live = !!slug, busy = false;
+      document.body.classList.add("has-ask");
+      const add = (cls, text, extra) => { const d = document.createElement("div"); d.className = "msg " + cls; d.textContent = text; if (extra) d.append(extra); log.append(d); log.scrollTop = log.scrollHeight; return d; };
+      const chips = list => { chipsEl.replaceChildren(...list.slice(0, 3).map(t => { const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = t; b.onclick = () => send(t); return b; })); log.scrollTop = log.scrollHeight; };
+      function fallback() {
+        const a = document.createElement("a"); a.href = "#book"; a.className = "btn solid"; a.textContent = P.booking.title || P.hero.cta || "Book";
+        add("ai", `The live assistant can't answer right now. To reach ${B.name}, ${C.phone ? "call " + C.phone + " or " : ""}send a request:`, a);
+      }
+      async function send(text) {
+        text = String(text || "").trim().slice(0, 500);
+        if (!text || busy) return;
+        add("customer", text); input.value = ""; chips([]);
+        if (!live) return fallback();
+        chat.push({ from: "customer", text });
+        busy = true; form.classList.add("busy");
+        const typing = add("ai", "…");
+        let r = null;
+        try {
+          const res = await fetch("/api/chat", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ preview: slug, chat: chat.slice(-12) }), signal: AbortSignal.timeout ? AbortSignal.timeout(35000) : undefined });
+          if (res.ok) r = (await res.json()).result;
+          else if (res.status !== 502) live = false; // off, over the limit, expired or refused: fixed answers for the rest of the visit
+        } catch (e) {}
+        typing.remove(); busy = false; form.classList.remove("busy");
+        if (!r || typeof r.reply !== "string") { chat.pop(); return fallback(); }
+        chat.push({ from: "ai", text: r.reply.slice(0, 500) });
+        add("ai", r.reply);
+        if (r.handoff) add("note", `Preview only: on the live site, this question goes to the team at ${B.name}. Nothing was sent.`);
+        chips(Array.isArray(r.chips) ? r.chips.filter(c => typeof c === "string") : []);
+      }
+      function open(on) {
+        askEl.hidden = !on; btn.hidden = on; btn.setAttribute("aria-expanded", on);
+        if (!on) return btn.focus();
+        if (!log.children.length) { add("ai", `Hi, I'm the automated assistant for ${B.name}. Ask me what they do, where they work or how to book.`); chips(starters); }
+        input.focus();
+      }
+      btn.onclick = () => open(true);
+      document.getElementById("askClose").onclick = () => open(false);
+      form.addEventListener("submit", e => { e.preventDefault(); send(input.value); });
+      log.addEventListener("click", e => { if (e.target.closest("a")) open(false); });
+      addEventListener("keydown", e => { if (e.key === "Escape" && !askEl.hidden && lb.hidden) open(false); });
+    })();
     // In the Studio preview the parent page can jump to a section (only the Studio, nothing else).
     if (OPT.preview) addEventListener("message", e => { if (e.source === parent && e.data && e.data.plStudio === "go" && typeof e.data.hash === "string") go(e.data.hash.replace(/[^a-z0-9\-/?=]/gi, "")); });
     render();

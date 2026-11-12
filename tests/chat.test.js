@@ -197,12 +197,23 @@ test("any sort failure is ignored and the demo answers as before", async () => {
 });
 
 test("a Claude error logs only its status and error type, never the body", async () => {
-  globalThis.fetch = async () => Response.json({ type: "error", error: { type: "invalid_request_error", message: "prompt quoted: Customer: my card is 4242" } }, { status: 400 });
+  globalThis.fetch = async () => Response.json({ type: "error", error: { type: "invalid_request_error", message: "prompt quoted: Customer: my card is 4242" } }, { status: 400, headers: { "request-id": "req_01<script>x" } });
   const logged = [], errors = console.error; console.error = (...a) => logged.push(a.join(" "));
   try { assert.strictEqual((await call()).code, 502); } finally { console.error = errors; }
-  assert.deepStrictEqual(logged, ["anthropic error 400 invalid_request_error"]);
+  assert.deepStrictEqual(logged, ["anthropic error 400 invalid_request_error claude-haiku-5-5 req_01scriptx"], "the model and Anthropic's request id help support; odd characters are dropped");
   globalThis.fetch = async () => new Response("<html>Customer: my card is 4242</html>", { status: 500 });
   logged.length = 0; console.error = (...a) => logged.push(a.join(" "));
   try { await call(); } finally { console.error = errors; }
-  assert.deepStrictEqual(logged, ["anthropic error 500 unknown"]);
+  assert.deepStrictEqual(logged, ["anthropic error 500 unknown claude-haiku-5-5 none"]);
+});
+
+test("the demo's Claude call leaves room for thinking and sends well-formed text", async () => {
+  let sent, raw;
+  globalThis.fetch = async (url, opts) => { raw = opts.body; sent = JSON.parse(raw); return Response.json({ content: [{ type: "thinking", thinking: "" }, { type: "text", text: JSON.stringify(booking) }] }); };
+  const prompt = PROMPT.replace("Customer: hi", "Customer: hi \uD83D");
+  assert.strictEqual((await call({ body: { prompt } })).code, 200);
+  assert.strictEqual(sent.max_tokens, 1024);
+  assert.deepStrictEqual(sent.output_config, { effort: "low" });
+  assert.match(sent.system, /text-message booking assistant/);
+  assert.ok(!/\\ud83d/i.test(raw), "a lone surrogate is replaced before sending");
 });
