@@ -10,14 +10,16 @@ const HINTS = [
 ];
 const FIELD = /^(model|messages|system|tools|tool_choice|output_config|thinking|max_tokens|stream|metadata|temperature|top_p|top_k)(\.[a-z0-9_]{1,40}){0,6}(?=:)/;
 
-async function errInfo(r) {
-  let e;
-  try { e = (await r.json()).error; } catch { return { type: "unknown", hint: "" }; }
+// e is the "error" object of an error body or of a stream "error" event.
+function describe(e) {
   const type = e && typeof e.type === "string" && /^[a-z_]{1,64}$/.test(e.type) ? e.type : "unknown";
   const msg = e && typeof e.message === "string" ? e.message : "";
   const fixed = HINTS.find(([re]) => re.test(msg));
   const field = msg.match(FIELD);
   return { type, hint: fixed ? fixed[1] : field ? "at " + field[0] : "" };
+}
+async function errInfo(r) {
+  try { return describe((await r.json()).error); } catch { return { type: "unknown", hint: "" }; }
 }
 
 // The one string to log: "invalid_request_error (credit balance too low)", or the type alone.
@@ -25,4 +27,4 @@ module.exports = async function errType(r) {
   const { type, hint } = await errInfo(r);
   return hint ? `${type} (${hint})` : type;
 };
-module.exports.errInfo = errInfo;
+Object.assign(module.exports, { errInfo, describe });

@@ -71,7 +71,7 @@ test("the response schema closes every object and requires every field (structur
 test("an answer with every field empty still renders a site", async () => {
   const { SCHEMA } = require("../api/studio-profile.js");
   const empty = s => s.type === "object" ? Object.fromEntries(Object.entries(s.properties).map(([k, x]) => [k, empty(x)]))
-    : s.type === "array" ? [] : s.type === "boolean" ? false : s.enum ? s.enum[0] : "";
+    : s.type === "array" ? [empty(s.items)] : s.type === "boolean" ? false : s.enum ? s.enum[0] : ""; // lists hold one all-empty item
   const srv = await fakeClaude(empty(SCHEMA));
   process.env.STUDIO_KEY = "k"; process.env.ANTHROPIC_BASE_URL = "http://127.0.0.1:" + srv.address().port;
   delete require.cache[require.resolve("../api/studio-profile.js")];
@@ -79,8 +79,21 @@ test("an answer with every field empty still renders a site", async () => {
   srv.close();
   const { profile } = JSON.parse(out.trim().split("\n").pop());
   assert.strictEqual(profile.about.photo, null);
+  assert.deepStrictEqual(profile.hero.photos, []);
   const Engine = require("../studio-engine.js");
   assert.match(Engine.render(profile).site, /<html/i);
+});
+
+test("an error mid-stream gives the safe type, never the message text", async () => {
+  const srv = http.createServer((req, res) => { req.resume(); req.on("end", () => {
+    res.writeHead(200, { "content-type": "text/event-stream" });
+    res.end("data: " + JSON.stringify({ type: "error", error: { type: "overloaded_error", message: "Customer wrote: call me at 555-0100" } }) + "\n\n");
+  }); }).listen(0);
+  await new Promise(r => srv.on("listening", r));
+  process.env.ANTHROPIC_BASE_URL = "http://127.0.0.1:" + srv.address().port;
+  delete require.cache[require.resolve("../api/studio-profile.js")];
+  try { await assert.rejects(require("../api/studio-profile.js").plan({ scan }), e => e.upstream && e.message === "Claude stopped mid-answer (overloaded_error)"); }
+  finally { srv.close(); }
 });
 
 test("a 400 names the reason without the request text", async () => {

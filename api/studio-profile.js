@@ -3,7 +3,7 @@
 // so Claude only writes facts and structure here, not page code. Streams a heartbeat while Claude works
 // so the request stays under the function time limit, then sends the profile as the last line.
 const { authorized, body } = require("./_studio");
-const { errInfo } = require("./_errtype");
+const { errInfo, describe } = require("./_errtype");
 const Engine = require("../studio-engine.js");
 
 const MODEL = process.env.STUDIO_MODEL || "claude-sonnet-5-5";
@@ -140,7 +140,10 @@ async function plan(b, onBeat = () => {}, timeoutMs = 280_000) {
       let ev; try { ev = JSON.parse(line.slice(5)); } catch { continue; }
       if (ev.type === "content_block_delta" && ev.delta && ev.delta.type === "text_delta") json += ev.delta.text; // thinking deltas are skipped
       else if (ev.type === "message_delta" && ev.delta && ev.delta.stop_reason) stop = ev.delta.stop_reason;
-      else if (ev.type === "error") throw new Error((ev.error && ev.error.message) || "stream error");
+      else if (ev.type === "error") { // the message text can quote the request, so only the safe type and hint go on
+        const { type, hint } = describe(ev.error);
+        throw Object.assign(new Error(`Claude stopped mid-answer (${type}${hint ? ", " + hint : ""})`), { upstream: true });
+      }
     }
     if (++beat % 20 === 0) onBeat();
   }
