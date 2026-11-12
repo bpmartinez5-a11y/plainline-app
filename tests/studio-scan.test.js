@@ -133,4 +133,12 @@ test("errType keeps only a plain error type", async () => {
   assert.strictEqual(await errType(r({ error: { type: "overloaded_error", message: "Customer: secret" } })), "overloaded_error");
   for (const b of [{ error: {} }, { error: { type: ["a"] } }, { error: { type: "has spaces and Customer text" } }, "<html>oops</html>", {}])
     assert.strictEqual(await errType(r(b)), "unknown", JSON.stringify(b));
+  // A hint is a fixed phrase or an allow-listed request field, never text from the message.
+  const bad = m => r({ error: { type: "invalid_request_error", message: m } });
+  assert.strictEqual(await errType(bad("Your credit balance is too low to access the Anthropic API.")), "invalid_request_error (credit balance too low)");
+  assert.strictEqual(await errType(bad("tools.0.input_schema: JSON schema is invalid")), "invalid_request_error (at tools.0.input_schema)");
+  assert.strictEqual(await errType(bad("The request body is not valid JSON: no low surrogate in string")), "invalid_request_error (request text is not valid JSON)");
+  assert.strictEqual(await errType(bad("Schema is too complex for compilation.")), "invalid_request_error (response schema too complex)");
+  assert.strictEqual(await errType(bad("Customer said: call me at 555-0100")), "invalid_request_error");
+  assert.strictEqual(await errType(bad("messages.0.content.secret words here: x")), "invalid_request_error");
 });

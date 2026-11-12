@@ -4,7 +4,7 @@ This map sorts the repo by the five layers of agent work (Ben, Nov 3). Use it to
 
 | Layer | Job | Where it lives here |
 |---|---|---|
-| 1. Prompt | Says the task, the limits, what "done" is and the output shape | Each skill's `SKILL.md` in `.claude/skills/`, each subagent file in `.claude/agents/`, `docs/claude/writing-standard.md`, the profile rules and `TOOL` schema in `api/studio-profile.js` |
+| 1. Prompt | Says the task, the limits, what "done" is and the output shape | Each skill's `SKILL.md` in `.claude/skills/`, each subagent file in `.claude/agents/`, `docs/claude/writing-standard.md`, the profile rules and `PROFILE` schema in `api/studio-profile.js` |
 | 2. Context | Controls what the model sees and what it cuts first | `CLAUDE.md` (map), `docs/claude/site.md` (files), `api/CLAUDE.md` (loads only in `api/`), `docs/claude/token-habits.md`, the read-deny list and autocompact setting in `.claude/settings.json` |
 | 3. Harness | Turns a model call into a predictable unit: tools, permissions, checks, limits, logs | `.claude/settings.json` (plan mode, deny list, output cap), `.claude/statusline.sh`, `tests/` and `.github/workflows/tests.yml`, `sanitize` (runs on server and browser), `vercel.json` headers, `docs/claude/security-log.md` |
 | 4. Loop | Run, check, correct, run again, and keep what was learned | The review gate: `reviewer`, then `refuter`, three rounds at most; `test-gap-reviewer` on Medium and High; incident evals for every bug that ships |

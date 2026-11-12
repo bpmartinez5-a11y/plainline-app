@@ -4,20 +4,19 @@ const test = require("node:test");
 const assert = require("node:assert");
 const http = require("node:http");
 
-function fakeClaude(input, stop = "tool_use") {
+function fakeClaude(input, stop = "end_turn", status = 200, error = null) {
   return new Promise(resolve => {
     const srv = http.createServer((req, res) => {
       let b = ""; req.on("data", c => b += c); req.on("end", () => {
         srv.lastBody = JSON.parse(b);
+        if (status !== 200) { res.writeHead(status, { "content-type": "application/json" }); return res.end(JSON.stringify({ type: "error", error })); }
         res.writeHead(200, { "content-type": "text/event-stream" });
         const j = input === null ? "" : JSON.stringify(input), ev = o => res.write("data: " + JSON.stringify(o) + "\n\n");
-        // With tool_choice auto the model thinks first and may write text before the call; the parser must skip both.
+        // The model thinks first (the parser must skip that), then writes the profile as JSON text (structured outputs).
         ev({ type: "content_block_start", index: 0, content_block: { type: "thinking", thinking: "" } });
         ev({ type: "content_block_delta", index: 0, delta: { type: "thinking_delta", thinking: "Plan the profile {\"business\":" } });
-        ev({ type: "content_block_start", index: 1, content_block: { type: "text", text: "" } });
-        ev({ type: "content_block_delta", index: 1, delta: { type: "text_delta", text: "Saving the profile now." } });
-        if (j) ev({ type: "content_block_start", index: 2, content_block: { type: "tool_use", name: "save_profile", input: {} } });
-        for (let i = 0; i < j.length; i += 50) ev({ type: "content_block_delta", index: 2, delta: { type: "input_json_delta", partial_json: j.slice(i, i + 50) } });
+        if (j) ev({ type: "content_block_start", index: 1, content_block: { type: "text", text: "" } });
+        for (let i = 0; i < j.length; i += 50) ev({ type: "content_block_delta", index: 1, delta: { type: "text_delta", text: j.slice(i, i + 50) } });
         ev({ type: "message_delta", delta: { stop_reason: stop } }); res.end();
       });
     }).listen(0, () => resolve(srv));
@@ -32,7 +31,7 @@ function call(handler, body, key = "k") {
 }
 const scan = { domain: "example.com", site: { url: "https://example.com/", title: "Example", images: [], text: "We fix pipes." }, pages: [] };
 
-test("returns a sanitized profile from Claude's tool call", async () => {
+test("returns a sanitized profile from Claude's structured output", async () => {
   const srv = await fakeClaude({ business: { name: "Pipe Pros", domain: "evil.example", socials: [{ label: "X", url: "javascript:alert(1)" }, { label: "Y", url: "https://phish.example/login" }] }, look: "grid", voice: "clean", hero: { lines: ["Pipes fixed"], photos: ["ftp://nope/x.jpg"] }, collections: [{ title: "Services", items: [{ title: "Drains" }] }], booking: { types: [{ label: "Repair" }] }, owner: { jobWord: "job" } });
   process.env.STUDIO_KEY = "k"; process.env.ANTHROPIC_API_KEY = "x"; process.env.ANTHROPIC_BASE_URL = "http://127.0.0.1:" + srv.address().port;
   delete require.cache[require.resolve("../api/studio-profile.js")];
@@ -44,10 +43,67 @@ test("returns a sanitized profile from Claude's tool call", async () => {
   assert.strictEqual(profile.business.domain, "example.com");
   assert.deepStrictEqual(profile.business.socials, []);
   assert.deepStrictEqual(profile.hero.photos, []);
-  // Sonnet 5.5 and Opus 5.5 answer a forced tool_choice ("tool" or "any") with a 400: the call must stay "auto".
-  assert.deepStrictEqual(srv.lastBody.tool_choice, { type: "auto", disable_parallel_tool_use: true });
-  assert.deepStrictEqual(srv.lastBody.tools.map(t => t.name), ["save_profile"]);
-  assert.match(srv.lastBody.system, /calling the save_profile tool once/);
+  // Sonnet 5.5 answers a forced tool_choice with a 400, so the profile comes back as structured output (as in The Engine's deck).
+  assert.strictEqual(srv.lastBody.tools, undefined);
+  assert.strictEqual(srv.lastBody.tool_choice, undefined);
+  assert.strictEqual(srv.lastBody.output_config.format.type, "json_schema");
+  assert.match(srv.lastBody.system, /response format sets/);
+});
+
+test("the response schema closes every object and requires every field (structured outputs rules)", () => {
+  process.env.ANTHROPIC_API_KEY = "x";
+  const { SCHEMA } = require("../api/studio-profile.js");
+  let objects = 0;
+  const walk = v => {
+    if (!v || typeof v !== "object") return;
+    if (v.type === "object") {
+      objects++;
+      assert.strictEqual(v.additionalProperties, false);
+      assert.deepStrictEqual(v.required, Object.keys(v.properties));
+    }
+    Object.values(v).forEach(walk);
+  };
+  walk(SCHEMA);
+  assert.ok(objects > 20, "walked " + objects);
+  assert.deepStrictEqual(SCHEMA.properties.look.enum, ["studio", "grid", "backstage"]);
+});
+
+test("an answer with every field empty still renders a site", async () => {
+  const { SCHEMA } = require("../api/studio-profile.js");
+  const empty = s => s.type === "object" ? Object.fromEntries(Object.entries(s.properties).map(([k, x]) => [k, empty(x)]))
+    : s.type === "array" ? [empty(s.items)] : s.type === "boolean" ? false : s.enum ? s.enum[0] : ""; // lists hold one all-empty item
+  const srv = await fakeClaude(empty(SCHEMA));
+  process.env.STUDIO_KEY = "k"; process.env.ANTHROPIC_BASE_URL = "http://127.0.0.1:" + srv.address().port;
+  delete require.cache[require.resolve("../api/studio-profile.js")];
+  const { out } = await call(require("../api/studio-profile.js"), { scan });
+  srv.close();
+  const { profile } = JSON.parse(out.trim().split("\n").pop());
+  assert.strictEqual(profile.about.photo, null);
+  assert.deepStrictEqual(profile.hero.photos, []);
+  const Engine = require("../studio-engine.js");
+  assert.match(Engine.render(profile).site, /<html/i);
+});
+
+test("an error mid-stream gives the safe type, never the message text", async () => {
+  const srv = http.createServer((req, res) => { req.resume(); req.on("end", () => {
+    res.writeHead(200, { "content-type": "text/event-stream" });
+    res.end("data: " + JSON.stringify({ type: "error", error: { type: "overloaded_error", message: "Customer wrote: call me at 555-0100" } }) + "\n\n");
+  }); }).listen(0);
+  await new Promise(r => srv.on("listening", r));
+  process.env.ANTHROPIC_BASE_URL = "http://127.0.0.1:" + srv.address().port;
+  delete require.cache[require.resolve("../api/studio-profile.js")];
+  try { await assert.rejects(require("../api/studio-profile.js").plan({ scan }), e => e.upstream && e.message === "Claude stopped mid-answer (overloaded_error)"); }
+  finally { srv.close(); }
+});
+
+test("a 400 names the reason without the request text", async () => {
+  const srv = await fakeClaude(null, "", 400, { type: "invalid_request_error", message: "Your credit balance is too low to access the Anthropic API." });
+  process.env.ANTHROPIC_BASE_URL = "http://127.0.0.1:" + srv.address().port;
+  delete require.cache[require.resolve("../api/studio-profile.js")];
+  const logged = [], orig = console.error; console.error = (...a) => logged.push(a.join(" "));
+  try { await assert.rejects(require("../api/studio-profile.js").plan({ scan }), e => e.upstream && e.message === "Claude said 400: credit balance too low"); }
+  finally { console.error = orig; srv.close(); }
+  assert.deepStrictEqual(logged, ["anthropic 400 invalid_request_error credit balance too low"]);
 });
 
 test("an answer with no tool call comes back as a plain error", async () => {
@@ -57,6 +113,7 @@ test("an answer with no tool call comes back as a plain error", async () => {
   const { out } = await call(require("../api/studio-profile.js"), { scan });
   srv.close();
   assert.match(JSON.parse(out.trim().split("\n").pop()).error, /without a profile \(end_turn\)/);
+  assert.match(srv.lastBody.messages[0].content, /We fix pipes/);
 });
 
 test("a cut-off answer comes back as an error, not a half profile", async () => {
