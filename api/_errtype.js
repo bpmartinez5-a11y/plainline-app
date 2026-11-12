@@ -12,8 +12,9 @@ const HINTS = [
   [/prompt is too long|context (window|length)/i, "prompt too long"],
 ];
 const FIELD = /^(model|messages|system|tools|tool_choice|output_config|thinking|max_tokens|stream|metadata|temperature|top_p|top_k)(\.[a-z0-9_]{1,40}){0,6}(?=:)/;
-const WORDS = ["organization", "workspace", "model", "region", "permission", "access", "disabled", "verify", "terms", "key", "billing", "beta", "effort", "thinking"];
-const mentions = msg => { const w = WORDS.filter(x => new RegExp("\\b" + x, "i").test(msg)).slice(0, 4); return w.length ? "mentions " + w.join(", ") : ""; };
+const WORDS = ["organization", "workspace", "model", "region", "permission", "access", "disabled", "verify", "terms", "key", "billing", "beta", "effort", "thinking",
+  "schema", "property", "properties", "required", "enum", "nest", "depth", "grammar", "format", "exceed", "limit", "support", "unsupported"];
+const mentions = msg => { const w = WORDS.filter(x => new RegExp("\\b" + x, "i").test(msg)).slice(0, 6); return w.length ? "mentions " + w.join(", ") : ""; };
 
 // e is the "error" object of an error body or of a stream "error" event.
 function describe(e) {
@@ -21,7 +22,8 @@ function describe(e) {
   const msg = e && typeof e.message === "string" ? e.message : "";
   const fixed = HINTS.find(([re]) => re.test(msg));
   const field = msg.match(FIELD);
-  return { type, hint: fixed ? fixed[1] : field ? "at " + field[0] : mentions(msg) };
+  const hint = fixed ? fixed[1] : [field && "at " + field[0], mentions(field ? msg.slice(field[0].length) : msg)].filter(Boolean).join("; ");
+  return { type, hint };
 }
 async function errInfo(r) {
   try { return describe((await r.json()).error); } catch { return { type: "unknown", hint: "" }; }

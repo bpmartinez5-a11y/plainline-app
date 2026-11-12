@@ -136,7 +136,7 @@ test("errType keeps only a plain error type", async () => {
   // A hint is a fixed phrase or an allow-listed request field, never text from the message.
   const bad = m => r({ error: { type: "invalid_request_error", message: m } });
   assert.strictEqual(await errType(bad("Your credit balance is too low to access the Anthropic API.")), "invalid_request_error (credit balance too low)");
-  assert.strictEqual(await errType(bad("tools.0.input_schema: JSON schema is invalid")), "invalid_request_error (at tools.0.input_schema)");
+  assert.strictEqual(await errType(bad("tools.0.input_schema: JSON schema is invalid")), "invalid_request_error (at tools.0.input_schema; mentions schema)");
   assert.strictEqual(await errType(bad("The request body is not valid JSON: no low surrogate in string")), "invalid_request_error (request text is not valid JSON)");
   assert.strictEqual(await errType(bad("Schema is too complex for compilation.")), "invalid_request_error (response schema too complex)");
   assert.strictEqual(await errType(bad("Customer said: call me at 555-0100")), "invalid_request_error");
@@ -145,5 +145,7 @@ test("errType keeps only a plain error type", async () => {
   assert.strictEqual(await errType(bad("prompt is too long: 210000 tokens > 200000 maximum")), "invalid_request_error (prompt too long)");
   // Otherwise only words from the fixed list leave: never the rest of the message.
   assert.strictEqual(await errType(bad("Your API key's workspace has no access to model claude-x for Jane Doe")), "invalid_request_error (mentions workspace, model, access, key)");
+  assert.strictEqual(await errType(bad("output_config.format.schema: nested properties with enum exceed the supported depth for the Acme Plumbing site")), "invalid_request_error (at output_config.format.schema; mentions properties, enum, nest, depth, exceed, support)");
+  assert.strictEqual(await errType(bad("The schema for the Acme Plumbing site has too many required properties")), "invalid_request_error (mentions schema, properties, required)");
   assert.strictEqual(await errType(bad("Turkeys and donkeys")), "invalid_request_error", "a fixed word must start a word");
 });
