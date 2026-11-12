@@ -37,63 +37,63 @@
 {"@type":"Question","name":"Where do you work?","acceptedAnswer":{"@type":"Answer","text":"Plainline is based in the Kansas City metro and works with HVAC and plumbing shops here first, on both the Kansas and Missouri sides."}}
 ]}</script>
 <style>
-:root{--wall:#d9cebf;--wall-2:#c4b49f;--floor:#a48b72;--glass:rgba(52,41,34,.72);--surface:rgba(18,14,12,.34);
-  --ink:#f7f2ea;--muted:rgba(247,242,234,.82);--line:rgba(255,255,255,.15);--link:#b4ccff;--blue:#3f78ea;--blue-2:#2d63d8;--green:#b7e6cf;--warn:#f2bd72;
-  --blur:blur(28px) saturate(140%);--shadow:inset 0 1px 0 rgba(255,255,255,.14),0 30px 60px -28px rgba(20,12,6,.65);
+:root{--g-room-top:#d9cebf;--g-room-mid:#c4b49f;--g-room-bottom:#a48b72;--g-glass:rgba(52,41,34,.72);--surface:rgba(18,14,12,.34);
+  --g-ink:#f7f2ea;--g-ink-2:rgba(247,242,234,.82);--g-line:rgba(255,255,255,.15);--g-accent-ink:#b4ccff;--g-accent-hi:#3f78ea;--g-accent:#2d63d8;--g-success-ink:#b7e6cf;--g-warn-ink:#f2bd72;
+  --blur:blur(28px) saturate(140%);--g-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 30px 60px -28px rgba(20,12,6,.65);
   --f-display:"Fraunces",Georgia,"Times New Roman",serif;--f-body:"Plus Jakarta Sans","Segoe UI",system-ui,sans-serif}
-@media (prefers-color-scheme:dark){:root{--wall:#4a4038;--wall-2:#3a3029;--floor:#3b2f26;--glass:rgba(22,18,16,.66);--surface:rgba(8,6,5,.4);color-scheme:dark}}
+@media (prefers-color-scheme:dark){:root{--g-room-top:#4a4038;--g-room-mid:#3a3029;--g-room-bottom:#3b2f26;--g-glass:rgba(22,18,16,.66);--surface:rgba(8,6,5,.4);color-scheme:dark}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--wall-2);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55;
+body{margin:0;background:var(--g-room-mid);color:var(--g-ink);font-family:var(--f-body);font-size:17px;line-height:1.55;
   padding:18px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
-.room{position:fixed;inset:-60px;z-index:-1;filter:blur(26px);pointer-events:none;background:linear-gradient(180deg,var(--wall) 0%,var(--wall-2) 62%,var(--floor) 62%,var(--floor) 100%)}
+.room{position:fixed;inset:-60px;z-index:-1;filter:blur(26px);pointer-events:none;background:linear-gradient(180deg,var(--g-room-top) 0%,var(--g-room-mid) 62%,var(--g-room-bottom) 62%,var(--g-room-bottom) 100%)}
 main{max-width:860px;margin:0 auto}
-a{color:var(--link)}
-:focus-visible{outline:2px solid var(--link);outline-offset:2px}
+a{color:var(--g-accent-ink)}
+:focus-visible{outline:2px solid var(--g-accent-ink);outline-offset:2px}
 h1,h2{font-family:var(--f-display);font-weight:400;letter-spacing:-.01em;line-height:1.15;margin:0}
-header,section{-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);background:var(--glass);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
+header,section{-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);background:var(--g-glass);border:1px solid var(--g-line);border-radius:20px;box-shadow:var(--g-shadow)}
 header{display:flex;align-items:center;gap:12px;padding:12px 18px}
 header b{font:600 15px var(--f-body);letter-spacing:.12em}
-header a{margin-left:auto;font-size:15px;color:var(--muted);text-decoration:none}
+header a{margin-left:auto;font-size:15px;color:var(--g-ink-2);text-decoration:none}
 section{margin-top:16px;padding:26px}
 @media (max-width:640px){section{padding:20px 16px}}
 h1{font-size:40px;margin-bottom:10px}
 @media (max-width:640px){h1{font-size:32px}}
-.lede{font-size:20px;color:var(--muted);margin:0}
+.lede{font-size:20px;color:var(--g-ink-2);margin:0}
 h2{font-size:24px;margin-bottom:12px}
 p{margin:0 0 8px}
 ul{margin:0;padding-left:20px}
 li{margin-bottom:6px}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media (max-width:700px){.cols{grid-template-columns:1fr}}
-.box{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px}
-.box h3{font:600 15px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
-.box.now h3{color:var(--warn)}.box.new h3{color:var(--green)}
+.box{background:var(--surface);border:1px solid var(--g-line);border-radius:16px;padding:16px}
+.box h3{font:600 15px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--g-ink-2);margin:0 0 8px}
+.box.now h3{color:var(--g-warn-ink)}.box.new h3{color:var(--g-success-ink)}
 .card{max-width:420px;margin:4px 0 8px}
 .card figcaption,.lede+.fine{margin-top:10px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.card .top{display:flex;justify-content:space-between;font-size:14px;color:var(--warn);font-weight:600}
+.card .top{display:flex;justify-content:space-between;font-size:14px;color:var(--g-warn-ink);font-weight:600}
 .card b{display:block;font-size:18px;margin:6px 0 2px}
-.card q{display:block;color:var(--muted);margin:6px 0}
-.card .sent{font-size:14px;color:var(--green)}
-.fine{font-size:14px;color:var(--muted);margin:0}
+.card q{display:block;color:var(--g-ink-2);margin:6px 0}
+.card .sent{font-size:14px;color:var(--g-success-ink)}
+.fine{font-size:14px;color:var(--g-ink-2);margin:0}
 .steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 @media (max-width:700px){.steps{grid-template-columns:1fr}}
-.steps li{counter-increment:s;border-top:3px solid var(--green);padding-top:8px;font-size:15px}
-.steps li::before{content:counter(s);display:block;font:700 20px var(--f-body);color:var(--green)}
+.steps li{counter-increment:s;border-top:3px solid var(--g-success-ink);padding-top:8px;font-size:15px}
+.steps li::before{content:counter(s);display:block;font:700 20px var(--f-body);color:var(--g-success-ink)}
 .steps b{display:block;font-size:17px}
-.faq details+details{border-top:1px solid var(--line)}
+.faq details+details{border-top:1px solid var(--g-line)}
 .faq summary{font-weight:700;min-height:44px;padding:12px 0;cursor:pointer;display:flex;align-items:center;gap:12px;list-style:none}
 .faq summary::-webkit-details-marker{display:none}
-.faq summary::after{content:"+";margin-left:auto;font-weight:400;font-size:20px;color:var(--muted)}
+.faq summary::after{content:"+";margin-left:auto;font-weight:400;font-size:20px;color:var(--g-ink-2)}
 .faq details[open] summary::after{content:"\2212"}
-.faq details p{margin:0 0 14px;color:var(--muted)}
+.faq details p{margin:0 0 14px;color:var(--g-ink-2)}
 .btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 24px;border:1px solid rgba(255,255,255,.22);border-radius:999px;
-  background:linear-gradient(180deg,var(--blue),var(--blue-2));color:#fff;font:600 17px var(--f-body);text-decoration:none;
+  background:linear-gradient(180deg,var(--g-accent-hi),var(--g-accent));color:#fff;font:600 17px var(--f-body);text-decoration:none;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 16px -6px rgba(45,99,216,.7)}
-.btn.ghost{background:rgba(255,255,255,.08);border-color:var(--line);box-shadow:none}
+.btn.ghost{background:rgba(255,255,255,.08);border-color:var(--g-line);box-shadow:none}
 .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
-footer{margin-top:16px;font-size:13px;color:var(--muted);text-align:center}
-footer a{color:var(--muted)}
+footer{margin-top:16px;font-size:13px;color:var(--g-ink-2);text-align:center}
+footer a{color:var(--g-ink-2)}
 </style>
 </head>
 <body>
