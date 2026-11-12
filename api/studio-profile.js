@@ -3,7 +3,7 @@
 // so Claude only writes facts and structure here, not page code. Streams a heartbeat while Claude works
 // so the request stays under the function time limit, then sends the profile as the last line.
 const { authorized, body } = require("./_studio");
-const errType = require("./_errtype");
+const { errInfo } = require("./_errtype");
 const Engine = require("../studio-engine.js");
 
 const MODEL = process.env.STUDIO_MODEL || "claude-sonnet-5-5";
@@ -32,33 +32,36 @@ Questions for Ben:
 - questions: up to 4 short questions, only where the scan can't settle something that changes the build (for example whether they want prices public, which services to lead with, or what to call a section). Give 2 to 4 short answer options when you can. Never ask for something the scan already answers, and don't ask about colors or style.
 - If Ben's answers are given, follow them, don't ask those again, and use them to fill any matching "ADD:" placeholder.
 
-Return the profile by calling the save_profile tool once.`;
+Return the profile as one JSON object in the shape the response format sets. Every field is required: where you have nothing for a field, give an empty string, an empty list or false, never a made-up value.`;
 
 const S = { type: "string" };
-const photo = { type: "object", properties: { src: S, alt: S }, required: ["src"] };
-const TOOL = {
-  name: "save_profile",
-  description: "Save the site profile for this business.",
-  input_schema: {
-    type: "object",
-    properties: {
-      business: { type: "object", properties: { name: S, kind: S, city: S, region: S, domain: S, tagline: S, socials: { type: "array", items: { type: "object", properties: { label: S, url: S } } } }, required: ["name"] },
-      look: { type: "string", enum: Engine.LOOKS }, voice: { type: "string", enum: Engine.VOICES }, accent: S,
-      hero: { type: "object", properties: { eyebrow: S, lines: { type: "array", items: S }, highlight: S, lede: S, cta: S, photos: { type: "array", items: photo } } },
-      collections: { type: "array", items: { type: "object", properties: { id: S, title: S, blurb: S, items: { type: "array", items: { type: "object", properties: { id: S, title: S, kicker: S, line: S, photos: { type: "array", items: photo } }, required: ["title"] } } }, required: ["title", "items"] } },
-      recent: { type: "object", properties: { title: S, photos: { type: "array", items: photo } } },
-      proof: { type: "object", properties: { title: S, items: { type: "array", items: S } } },
-      about: { type: "object", properties: { title: S, photo, paragraphs: { type: "array", items: S }, why: { type: "array", items: { type: "object", properties: { title: S, text: S } } }, timeline: { type: "array", items: { type: "object", properties: { when: S, text: S } } }, signoff: S } },
-      pricing: { type: "object", properties: { intro: S, lanes: { type: "array", items: { type: "object", properties: { id: S, name: S, who: S, startingAt: S, items: { type: "array", items: S } } } }, note: S } },
-      contact: { type: "object", properties: { phone: S, address: S, hours: { type: "array", items: S }, serviceArea: S } },
-      booking: { type: "object", properties: { title: S, intro: S, steps: { type: "array", items: S }, minors: { type: "boolean" }, types: { type: "array", items: { type: "object", properties: { id: S, label: S, fields: { type: "array", items: { type: "object", properties: { id: S, label: S, kind: { type: "string", enum: ["text", "number", "date", "select"] }, options: { type: "array", items: S } } } } } } } } },
-      owner: { type: "object", properties: { jobWord: S, stages: { type: "array", items: S } } },
-      questions: { type: "array", items: { type: "object", properties: { id: S, question: S, options: { type: "array", items: S } }, required: ["question"] } },
-      todos: { type: "array", items: S }
-    },
-    required: ["business", "look", "voice", "hero", "collections", "booking", "owner"]
+const photo = { type: "object", properties: { src: S, alt: S } };
+// The profile's shape. Claude answers in this shape through structured outputs (output_config.format), the same
+// route The Engine's deck uses: Sonnet 5.5 refuses a forced tool call with a 400, and structured outputs need every
+// object closed (additionalProperties false) with every field listed as required, which strict() adds below.
+const PROFILE = {
+  type: "object",
+  properties: {
+    business: { type: "object", properties: { name: S, kind: S, city: S, region: S, domain: S, tagline: S, socials: { type: "array", items: { type: "object", properties: { label: S, url: S } } } } },
+    look: { type: "string", enum: Engine.LOOKS }, voice: { type: "string", enum: Engine.VOICES }, accent: S,
+    hero: { type: "object", properties: { eyebrow: S, lines: { type: "array", items: S }, highlight: S, lede: S, cta: S, photos: { type: "array", items: photo } } },
+    collections: { type: "array", items: { type: "object", properties: { id: S, title: S, blurb: S, items: { type: "array", items: { type: "object", properties: { id: S, title: S, kicker: S, line: S, photos: { type: "array", items: photo } } } } } } },
+    recent: { type: "object", properties: { title: S, photos: { type: "array", items: photo } } },
+    proof: { type: "object", properties: { title: S, items: { type: "array", items: S } } },
+    about: { type: "object", properties: { title: S, photo, paragraphs: { type: "array", items: S }, why: { type: "array", items: { type: "object", properties: { title: S, text: S } } }, timeline: { type: "array", items: { type: "object", properties: { when: S, text: S } } }, signoff: S } },
+    pricing: { type: "object", properties: { intro: S, lanes: { type: "array", items: { type: "object", properties: { id: S, name: S, who: S, startingAt: S, items: { type: "array", items: S } } } }, note: S } },
+    contact: { type: "object", properties: { phone: S, address: S, hours: { type: "array", items: S }, serviceArea: S } },
+    booking: { type: "object", properties: { title: S, intro: S, steps: { type: "array", items: S }, minors: { type: "boolean" }, types: { type: "array", items: { type: "object", properties: { id: S, label: S, fields: { type: "array", items: { type: "object", properties: { id: S, label: S, kind: { type: "string", enum: ["text", "number", "date", "select"] }, options: { type: "array", items: S } } } } } } } } },
+    owner: { type: "object", properties: { jobWord: S, stages: { type: "array", items: S } } },
+    questions: { type: "array", items: { type: "object", properties: { id: S, question: S, options: { type: "array", items: S } } } },
+    todos: { type: "array", items: S }
   }
 };
+const strict = v => !v || typeof v !== "object" || Array.isArray(v) ? v : {
+  ...Object.fromEntries(Object.entries(v).map(([k, x]) => [k, strict(x)])),
+  ...(v.type === "object" && { additionalProperties: false, required: Object.keys(v.properties) })
+};
+const SCHEMA = strict(PROFILE);
 
 // Keep the parts of the scan the planner needs; drop the rest to stay well under the input limit.
 function brief(b) {
@@ -76,7 +79,7 @@ function brief(b) {
     b.notes ? `Ben's notes (follow these): ${String(b.notes).slice(0, 2000)}` : "",
     answers.length ? `Ben's answers to your earlier questions (follow these):\n${answers.join("\n")}` : "",
     `Scan of ${scan.domain || "their site"}:\n${JSON.stringify(slim)}`
-  ].filter(Boolean).join("\n\n").slice(0, MAX_INPUT);
+  ].filter(Boolean).join("\n\n").slice(0, MAX_INPUT).toWellFormed(); // a cut emoji half would make the request invalid JSON
 }
 
 // The rules in SYSTEM are also enforced here, so a model mistake can't reach the page:
@@ -114,14 +117,16 @@ async function plan(b, onBeat = () => {}, timeoutMs = 280_000) {
     r = await fetch(API, {
       method: "POST",
       headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-      // Sonnet 5.5 (and Opus 5.5) answer a forced tool_choice ("tool" or "any") with a 400, so the call is "auto" and
-      // SYSTEM asks for save_profile. Thinking now runs before the call and counts toward max_tokens: low effort
-      // keeps it short, so the build stays inside the time limit.
-      body: JSON.stringify({ model: MODEL, max_tokens: 16000, stream: true, system: SYSTEM, tools: [TOOL], tool_choice: { type: "auto", disable_parallel_tool_use: true }, output_config: { effort: "low" }, messages: [{ role: "user", content: brief(b) }] }),
+      // Thinking runs first and counts toward max_tokens: low effort keeps it short, so the build stays inside the time limit.
+      body: JSON.stringify({ model: MODEL, max_tokens: 16000, stream: true, system: SYSTEM, output_config: { effort: "low", format: { type: "json_schema", schema: SCHEMA } }, messages: [{ role: "user", content: brief(b) }] }),
       signal: AbortSignal.timeout(timeoutMs)
     });
   } catch (e) { throw Object.assign(new Error("Couldn't reach Claude: " + e.message), { upstream: true }); }
-  if (!r.ok) { console.error("anthropic", r.status, await errType(r)); throw Object.assign(new Error(`Claude said ${r.status}`), { upstream: true }); }
+  if (!r.ok) {
+    const { type, hint } = await errInfo(r);
+    console.error("anthropic", r.status, type, hint);
+    throw Object.assign(new Error(`Claude said ${r.status}${hint ? ": " + hint : ""}`), { upstream: true });
+  }
   const reader = r.body.getReader(), dec = new TextDecoder();
   let buf = "", json = "", stop = "", beat = 0;
   for (;;) {
@@ -133,13 +138,14 @@ async function plan(b, onBeat = () => {}, timeoutMs = 280_000) {
       const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
       if (!line.startsWith("data:")) continue;
       let ev; try { ev = JSON.parse(line.slice(5)); } catch { continue; }
-      if (ev.type === "content_block_delta" && ev.delta && ev.delta.type === "input_json_delta") json += ev.delta.partial_json;
+      if (ev.type === "content_block_delta" && ev.delta && ev.delta.type === "text_delta") json += ev.delta.text; // thinking deltas are skipped
       else if (ev.type === "message_delta" && ev.delta && ev.delta.stop_reason) stop = ev.delta.stop_reason;
       else if (ev.type === "error") throw new Error((ev.error && ev.error.message) || "stream error");
     }
     if (++beat % 20 === 0) onBeat();
   }
   if (stop === "max_tokens") throw new Error("The profile was cut off at the length limit. Try again");
+  if (stop === "refusal") throw new Error("Claude declined to plan this site");
   if (!json) throw new Error(`Claude answered without a profile (${stop || "no stop reason"}). Try again`);
   let raw; try { raw = JSON.parse(json); } catch { throw new Error("Claude didn't return a usable profile. Try again"); }
   const profile = enforce(Engine.sanitize(raw), b.scan);
@@ -167,4 +173,4 @@ module.exports = async function handler(req, res) {
   }
   res.end();
 };
-module.exports.plan = plan;
+Object.assign(module.exports, { plan, SCHEMA });
