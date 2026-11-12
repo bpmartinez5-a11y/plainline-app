@@ -106,13 +106,16 @@ test("a 400 names the reason without the request text", async () => {
   assert.deepStrictEqual(logged, ["anthropic 400 invalid_request_error credit balance too low (with the response schema)"]); // an account problem: no retry
 });
 
-// A fake Claude that answers each request with the next reply in the list: {status, error} or {text} (streamed as text deltas).
+// A fake Claude that answers each request with the next reply in the list: {status, error} or {text} (streamed as
+// text deltas). delay (ms) holds a reply back; {hang: true} never answers.
 function fakeSeq(list) {
   return new Promise(resolve => {
     const srv = http.createServer((req, res) => {
-      let b = ""; req.on("data", c => b += c); req.on("end", () => {
+      let b = ""; req.on("data", c => b += c); req.on("end", async () => {
         srv.bodies.push(JSON.parse(b));
         const next = list[srv.bodies.length - 1] || list[list.length - 1];
+        if (next.delay) await new Promise(r => setTimeout(r, next.delay));
+        if (next.hang) return;
         if (next.status) { res.writeHead(next.status, { "content-type": "application/json" }); return res.end(JSON.stringify({ type: "error", error: next.error })); }
         res.writeHead(200, { "content-type": "text/event-stream" });
         const ev = o => res.write("data: " + JSON.stringify(o) + "\n\n");
@@ -154,21 +157,68 @@ test("when the plain JSON request fails too, the caller gets a plain 502 and onl
   const srv = await fakeSeq([unknown400, unknown400, { text: "{}" }]);
   process.env.STUDIO_KEY = "k"; process.env.ANTHROPIC_BASE_URL = "http://127.0.0.1:" + srv.address().port;
   delete require.cache[require.resolve("../api/studio-profile.js")];
-  const orig = console.error; console.error = () => {};
+  const logged = [], orig = console.error; console.error = (...a) => logged.push(a.join(" "));
   let res;
   try { res = await call(require("../api/studio-profile.js"), { scan }); } finally { console.error = orig; srv.close(); }
   assert.strictEqual(res.code, 502);
   assert.strictEqual(JSON.parse(res.out).error, "Claude said 400");
   assert.strictEqual(srv.bodies.length, 2);
+  assert.deepStrictEqual(logged, ["anthropic 400 invalid_request_error  (with the response schema)",
+    "studio-profile: 400 with the response schema; asking again for plain JSON", "anthropic 400 invalid_request_error  (plain JSON)"]);
 });
 
-test("a plain answer with no JSON object comes back as a plain error", async () => {
-  const srv = await fakeSeq([unknown400, { text: "Sorry, I can't." }]);
-  process.env.ANTHROPIC_BASE_URL = "http://127.0.0.1:" + srv.address().port;
+// Runs plan() against a fake and returns { result | error, requests }.
+async function planWith(list, timeoutMs) {
+  const srv = await fakeSeq(list);
+  process.env.STUDIO_KEY = "k"; process.env.ANTHROPIC_BASE_URL = "http://127.0.0.1:" + srv.address().port;
   delete require.cache[require.resolve("../api/studio-profile.js")];
   const orig = console.error; console.error = () => {};
-  try { await assert.rejects(require("../api/studio-profile.js").plan({ scan }), /didn't return a usable profile/); }
-  finally { console.error = orig; srv.close(); }
+  try { return { result: await require("../api/studio-profile.js").plan({ scan }, undefined, timeoutMs), requests: srv.bodies.length }; }
+  catch (error) { return { error, requests: srv.bodies.length }; }
+  finally { console.error = orig; srv.closeAllConnections(); srv.close(); }
+}
+const bad = message => ({ status: 400, error: { type: "invalid_request_error", message } });
+
+test("only a 400 the schema could cause asks again", async () => {
+  const retry = ["Schema is too complex for compilation", "output_config.format.schema: unsupported keyword", "something new"];
+  const once = ["Your credit balance is too low to access the Anthropic API", "You have reached your specified API usage limits",
+    "The request body is not valid JSON: no low surrogate in string", "model: claude-x not found", "messages.0.content: empty"];
+  for (const m of retry) {
+    const r = await planWith([bad(m), { text: '{"business":{"name":"Two Tries"}}' }]);
+    assert.strictEqual(r.requests, 2, m);
+    assert.strictEqual(r.result && r.result.business.name, "Two Tries", m);
+  }
+  for (const m of once) {
+    const r = await planWith([bad(m), { text: "{}" }]);
+    assert.strictEqual(r.requests, 1, m);
+    assert.ok(r.error && r.error.upstream && /^Claude said 400/.test(r.error.message), m);
+  }
+  const busy = await planWith([{ status: 529, error: { type: "overloaded_error", message: "Overloaded" } }, { text: "{}" }]);
+  assert.strictEqual(busy.requests, 1); // only a 400 asks again
+  assert.strictEqual(busy.error.message, "Claude said 529");
+});
+
+test("the plain JSON request only gets the time left over", async () => {
+  const t = Date.now();
+  const r = await planWith([{ ...unknown400, delay: 250 }, { hang: true }], 300);
+  assert.strictEqual(r.requests, 2);
+  assert.match(r.error.message, /^Couldn't reach Claude/);
+  assert.ok(Date.now() - t < 2000, "took " + (Date.now() - t) + " ms"); // 300 ms budget, then the 1 s floor
+});
+
+test("a plain answer with no whole JSON object comes back as a plain error", async () => {
+  // The last two are a cut-off and a broken object: an object nested inside them must not be taken as the profile.
+  for (const text of ["Sorry, I can't.", "} no object {", '{"business": {"name": "Half"}, "hero": {"lines": ["x"]}', '{"business": {"name": "Half"} oops}']) {
+    const r = await planWith([unknown400, { text }]);
+    assert.match(r.error.message, /didn't return a usable profile/, text);
+  }
+});
+
+test("a plain answer keeps the first whole object, even with braces in the text around it", async () => {
+  const obj = { business: { name: "Brace {Co}", tagline: 'Say "hi} there"' } };
+  const r = await planWith([unknown400, { text: "Note {draft}:\n" + JSON.stringify(obj) + "\nDone {ok} {}" }]);
+  assert.strictEqual(r.result.business.name, "Brace {Co}");
+  assert.strictEqual(r.result.business.tagline, 'Say "hi} there"');
 });
 
 test("an answer with no tool call comes back as a plain error", async () => {
