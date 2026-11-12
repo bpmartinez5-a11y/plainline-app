@@ -103,7 +103,72 @@ test("a 400 names the reason without the request text", async () => {
   const logged = [], orig = console.error; console.error = (...a) => logged.push(a.join(" "));
   try { await assert.rejects(require("../api/studio-profile.js").plan({ scan }), e => e.upstream && e.message === "Claude said 400: credit balance too low"); }
   finally { console.error = orig; srv.close(); }
-  assert.deepStrictEqual(logged, ["anthropic 400 invalid_request_error credit balance too low"]);
+  assert.deepStrictEqual(logged, ["anthropic 400 invalid_request_error credit balance too low (with the response schema)"]); // an account problem: no retry
+});
+
+// A fake Claude that answers each request with the next reply in the list: {status, error} or {text} (streamed as text deltas).
+function fakeSeq(list) {
+  return new Promise(resolve => {
+    const srv = http.createServer((req, res) => {
+      let b = ""; req.on("data", c => b += c); req.on("end", () => {
+        srv.bodies.push(JSON.parse(b));
+        const next = list[srv.bodies.length - 1] || list[list.length - 1];
+        if (next.status) { res.writeHead(next.status, { "content-type": "application/json" }); return res.end(JSON.stringify({ type: "error", error: next.error })); }
+        res.writeHead(200, { "content-type": "text/event-stream" });
+        const ev = o => res.write("data: " + JSON.stringify(o) + "\n\n");
+        ev({ type: "content_block_delta", index: 0, delta: { type: "text_delta", text: next.text } });
+        ev({ type: "message_delta", delta: { stop_reason: "end_turn" } }); res.end();
+      });
+    }).listen(0, () => resolve(srv));
+    return srv;
+  }).then(srv => { srv.bodies = []; return srv; });
+}
+const unknown400 = { status: 400, error: { type: "invalid_request_error", message: "Customer wrote: call me at 555-0100" } };
+
+test("a 400 with the response schema asks once more for plain JSON, and that answer still goes through the rules", async () => {
+  const answer = { business: { name: "Plain Pipes", tagline: "Write to owner@example.com" }, look: "grid", voice: "clean", hero: { lines: ["Pipes"], photos: [{ src: "https://stock.example/fake.jpg", alt: "" }] } };
+  const srv = await fakeSeq([unknown400, { text: "Here it is:\n```json\n" + JSON.stringify(answer) + "\n```" }]);
+  process.env.STUDIO_KEY = "k"; process.env.ANTHROPIC_BASE_URL = "http://127.0.0.1:" + srv.address().port;
+  delete require.cache[require.resolve("../api/studio-profile.js")];
+  const logged = [], orig = console.error; console.error = (...a) => logged.push(a.join(" "));
+  let res;
+  try { res = await call(require("../api/studio-profile.js"), { scan }); } finally { console.error = orig; srv.close(); }
+  assert.strictEqual(res.code, 200);
+  const { profile } = JSON.parse(res.out.trim().split("\n").pop());
+  assert.strictEqual(profile.business.name, "Plain Pipes");
+  assert.deepStrictEqual(profile.hero.photos, []); // enforce() still drops photos that were not on their site
+  assert.ok(!JSON.stringify(profile).includes("owner@example.com"));
+  const [first, second] = srv.bodies;
+  assert.strictEqual(srv.bodies.length, 2);
+  assert.strictEqual(first.output_config.format.type, "json_schema");
+  assert.deepStrictEqual(second.output_config, { effort: "low" });
+  assert.match(second.system, /A program reads your answer/);
+  assert.ok(second.system.includes(JSON.stringify(require("../api/studio-profile.js").SCHEMA)));
+  assert.strictEqual(second.messages[0].content, first.messages[0].content);
+  assert.ok(!logged.join("\n").includes("555-0100"), logged.join("\n")); // the API's message text never reaches the log
+  assert.deepStrictEqual(logged, ["anthropic 400 invalid_request_error  (with the response schema)",
+    "studio-profile: 400 with the response schema; asking again for plain JSON", "studio-profile: the plain JSON request answered"]);
+});
+
+test("when the plain JSON request fails too, the caller gets a plain 502 and only one retry was made", async () => {
+  const srv = await fakeSeq([unknown400, unknown400, { text: "{}" }]);
+  process.env.STUDIO_KEY = "k"; process.env.ANTHROPIC_BASE_URL = "http://127.0.0.1:" + srv.address().port;
+  delete require.cache[require.resolve("../api/studio-profile.js")];
+  const orig = console.error; console.error = () => {};
+  let res;
+  try { res = await call(require("../api/studio-profile.js"), { scan }); } finally { console.error = orig; srv.close(); }
+  assert.strictEqual(res.code, 502);
+  assert.strictEqual(JSON.parse(res.out).error, "Claude said 400");
+  assert.strictEqual(srv.bodies.length, 2);
+});
+
+test("a plain answer with no JSON object comes back as a plain error", async () => {
+  const srv = await fakeSeq([unknown400, { text: "Sorry, I can't." }]);
+  process.env.ANTHROPIC_BASE_URL = "http://127.0.0.1:" + srv.address().port;
+  delete require.cache[require.resolve("../api/studio-profile.js")];
+  const orig = console.error; console.error = () => {};
+  try { await assert.rejects(require("../api/studio-profile.js").plan({ scan }), /didn't return a usable profile/); }
+  finally { console.error = orig; srv.close(); }
 });
 
 test("an answer with no tool call comes back as a plain error", async () => {
