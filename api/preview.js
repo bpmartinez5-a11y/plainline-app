@@ -45,7 +45,8 @@ function notFound(res) {
 // Ben's planner questions, to-dos and "ADD:" blanks are notes for him, so they stay off what the owner sees.
 async function profileFor(slug) {
   slug = String(slug);
-  if (!/^[a-z0-9-]{12,60}$/.test(slug) || !SERVICE) return null;
+  if (!/^[a-z0-9-]{12,60}$/.test(slug)) return null;
+  if (!SERVICE) { console.error("preview: SUPABASE_SERVICE_ROLE_KEY is not set"); return null; }
   const [row] = await rest(`/rest/v1/ops_leads?preview_slug=eq.${slug}&select=preview_at,ops_previews(profile)&limit=1`, SERVICE, { method: "GET" }) || [];
   const profile = row && row.ops_previews && row.ops_previews.profile;
   if (!profile || Date.now() - new Date(row.preview_at).getTime() > KEEP_DAYS * 864e5) return null;

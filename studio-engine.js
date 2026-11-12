@@ -598,7 +598,7 @@ ${K.minors ? `<div class="check"><input type="checkbox" id="f-guardian" name="gu
       const chips = list => { chipsEl.replaceChildren(...list.slice(0, 3).map(t => { const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = t; b.onclick = () => send(t); return b; })); log.scrollTop = log.scrollHeight; };
       function fallback() {
         const a = document.createElement("a"); a.href = "#book"; a.className = "btn solid"; a.textContent = P.booking.title || P.hero.cta || "Book";
-        add("ai", `The live assistant can't answer right now. To reach ${B.name}, ${C.phone ? "call or text " + C.phone + ", or " : ""}send a request:`, a);
+        add("ai", `The live assistant can't answer right now. To reach ${B.name}, ${C.phone ? "call " + C.phone + " or " : ""}send a request:`, a);
       }
       async function send(text) {
         text = String(text || "").trim().slice(0, 500);
@@ -610,7 +610,7 @@ ${K.minors ? `<div class="check"><input type="checkbox" id="f-guardian" name="gu
         const typing = add("ai", "…");
         let r = null;
         try {
-          const res = await fetch("/api/chat", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ preview: slug, chat: chat.slice(-12) }), signal: AbortSignal.timeout ? AbortSignal.timeout(25000) : undefined });
+          const res = await fetch("/api/chat", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ preview: slug, chat: chat.slice(-12) }), signal: AbortSignal.timeout ? AbortSignal.timeout(35000) : undefined });
           if (res.ok) r = (await res.json()).result;
           else if (res.status !== 502) live = false; // off, over the limit, expired or refused: fixed answers for the rest of the visit
         } catch (e) {}
