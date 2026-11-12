@@ -114,7 +114,10 @@ async function plan(b, onBeat = () => {}, timeoutMs = 280_000) {
     r = await fetch(API, {
       method: "POST",
       headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-      body: JSON.stringify({ model: MODEL, max_tokens: 8000, stream: true, system: SYSTEM, tools: [TOOL], tool_choice: { type: "tool", name: "save_profile" }, messages: [{ role: "user", content: brief(b) }] }),
+      // Sonnet 5.5 (and Opus 5.5) answer a forced tool_choice ("tool" or "any") with a 400, so the call is "auto" and
+      // SYSTEM asks for save_profile. Thinking now runs before the call and counts toward max_tokens: low effort
+      // keeps it short, so the build stays inside the time limit.
+      body: JSON.stringify({ model: MODEL, max_tokens: 16000, stream: true, system: SYSTEM, tools: [TOOL], tool_choice: { type: "auto", disable_parallel_tool_use: true }, output_config: { effort: "low" }, messages: [{ role: "user", content: brief(b) }] }),
       signal: AbortSignal.timeout(timeoutMs)
     });
   } catch (e) { throw Object.assign(new Error("Couldn't reach Claude: " + e.message), { upstream: true }); }
@@ -137,6 +140,7 @@ async function plan(b, onBeat = () => {}, timeoutMs = 280_000) {
     if (++beat % 20 === 0) onBeat();
   }
   if (stop === "max_tokens") throw new Error("The profile was cut off at the length limit. Try again");
+  if (!json) throw new Error(`Claude answered without a profile (${stop || "no stop reason"}). Try again`);
   let raw; try { raw = JSON.parse(json); } catch { throw new Error("Claude didn't return a usable profile. Try again"); }
   const profile = enforce(Engine.sanitize(raw), b.scan);
   delete profile._tokens; delete profile._slug; // the browser re-derives these when it renders

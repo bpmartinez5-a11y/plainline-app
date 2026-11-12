@@ -10,8 +10,14 @@ function fakeClaude(input, stop = "tool_use") {
       let b = ""; req.on("data", c => b += c); req.on("end", () => {
         srv.lastBody = JSON.parse(b);
         res.writeHead(200, { "content-type": "text/event-stream" });
-        const j = JSON.stringify(input), ev = o => res.write("data: " + JSON.stringify(o) + "\n\n");
-        for (let i = 0; i < j.length; i += 50) ev({ type: "content_block_delta", index: 0, delta: { type: "input_json_delta", partial_json: j.slice(i, i + 50) } });
+        const j = input === null ? "" : JSON.stringify(input), ev = o => res.write("data: " + JSON.stringify(o) + "\n\n");
+        // With tool_choice auto the model thinks first and may write text before the call; the parser must skip both.
+        ev({ type: "content_block_start", index: 0, content_block: { type: "thinking", thinking: "" } });
+        ev({ type: "content_block_delta", index: 0, delta: { type: "thinking_delta", thinking: "Plan the profile {\"business\":" } });
+        ev({ type: "content_block_start", index: 1, content_block: { type: "text", text: "" } });
+        ev({ type: "content_block_delta", index: 1, delta: { type: "text_delta", text: "Saving the profile now." } });
+        if (j) ev({ type: "content_block_start", index: 2, content_block: { type: "tool_use", name: "save_profile", input: {} } });
+        for (let i = 0; i < j.length; i += 50) ev({ type: "content_block_delta", index: 2, delta: { type: "input_json_delta", partial_json: j.slice(i, i + 50) } });
         ev({ type: "message_delta", delta: { stop_reason: stop } }); res.end();
       });
     }).listen(0, () => resolve(srv));
@@ -38,7 +44,19 @@ test("returns a sanitized profile from Claude's tool call", async () => {
   assert.strictEqual(profile.business.domain, "example.com");
   assert.deepStrictEqual(profile.business.socials, []);
   assert.deepStrictEqual(profile.hero.photos, []);
-  assert.strictEqual(srv.lastBody.tool_choice.name, "save_profile");
+  // Sonnet 5.5 and Opus 5.5 answer a forced tool_choice ("tool" or "any") with a 400: the call must stay "auto".
+  assert.deepStrictEqual(srv.lastBody.tool_choice, { type: "auto", disable_parallel_tool_use: true });
+  assert.deepStrictEqual(srv.lastBody.tools.map(t => t.name), ["save_profile"]);
+  assert.match(srv.lastBody.system, /calling the save_profile tool once/);
+});
+
+test("an answer with no tool call comes back as a plain error", async () => {
+  const srv = await fakeClaude(null, "end_turn");
+  process.env.ANTHROPIC_BASE_URL = "http://127.0.0.1:" + srv.address().port;
+  delete require.cache[require.resolve("../api/studio-profile.js")];
+  const { out } = await call(require("../api/studio-profile.js"), { scan });
+  srv.close();
+  assert.match(JSON.parse(out.trim().split("\n").pop()).error, /without a profile \(end_turn\)/);
 });
 
 test("a cut-off answer comes back as an error, not a half profile", async () => {
