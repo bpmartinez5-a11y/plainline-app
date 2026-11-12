@@ -3,8 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0d6b71">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d6b71'/%3E%3Cpath d='M9 22V10h7a4 4 0 0 1 0 8h-7' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#c4b49f" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#3a3029" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/icons/favicon.svg" type="image/svg+xml">
 <meta name="description" content="The terms for using the Plainline website and live demo.">
 <title>Plainline · Terms of use</title>
 <link rel="canonical" href="https://plainlineops.com/terms">
@@ -13,25 +15,32 @@
 <script defer src="/_vercel/insights/script.js"></script>
 <link rel="stylesheet" href="/fonts/plainline.css">
 <style>
-:root{--bg:#eaeff1;--ink:#12222b;--muted:#5b6d76;--line:#d3dce0;--accent:#0d6b71;
+/* Plainline theme (Ben, Nov 12): the same tokens as index.html. The text sits on smoked glass over the wall. The wall
+   here is the flat room-mid tone, not the lighter top band, so the link blue keeps 4.5:1 on the glass. */
+:root{--g-room-mid:#c4b49f;--g-glass:rgba(52,41,34,.72);--g-ink:#f7f2ea;--g-ink-2:rgba(247,242,234,.82);
+  --g-line:rgba(255,255,255,.15);--g-accent-ink:#b4ccff;--g-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 30px 60px -28px rgba(20,12,6,.65);
   --f-display:"Fraunces", Georgia, "Times New Roman", serif;--f-body:"Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0c1417;--ink:#e2ebee;--muted:#8ea2aa;--line:#24353c;--accent:#43b3b8;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0c1417;--ink:#e2ebee;--muted:#8ea2aa;--line:#24353c;--accent:#43b3b8;color-scheme:dark}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;padding:0 max(16px,env(safe-area-inset-left,0px)) 48px}
-main{max-width:720px;margin:0 auto}
-a{color:var(--accent)}
-nav{padding:20px 0}
-nav a{font-family:var(--f-display);font-size:24px;font-weight:700;letter-spacing:-.02em;color:var(--ink);text-decoration:none}
-h1,h2{font-family:var(--f-display);letter-spacing:-.02em;line-height:1.2}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--g-room-mid:#3a3029;--g-glass:rgba(22,18,16,.66);color-scheme:dark}}
+:root[data-theme="dark"]{--g-room-mid:#3a3029;--g-glass:rgba(22,18,16,.66);color-scheme:dark}
+body{margin:0;background:var(--g-room-mid);color:var(--g-ink);font-family:var(--f-body);font-size:16px;line-height:1.6;
+  padding:18px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+main{max-width:720px;margin:0 auto;background:var(--g-glass);border:1px solid var(--g-line);border-radius:20px;box-shadow:var(--g-shadow);padding:4px 32px 28px}
+@media (max-width:640px){main{padding:0 18px 20px}}
+a{color:var(--g-accent-ink)}
+:focus-visible{outline:2px solid var(--g-accent-ink);outline-offset:2px}
+nav{padding:20px 0 4px}
+nav a{display:inline-block}
+nav img{display:block}
+h1,h2{font-family:var(--f-display);font-weight:400;letter-spacing:-.01em;line-height:1.2}
 h1{font-size:36px;margin:16px 0 4px}
-h2{font-size:21px;margin:32px 0 6px}
-.muted{color:var(--muted)}
+h2{font-size:22px;margin:32px 0 6px}
+.muted{color:var(--g-ink-2)}
 ul{padding-left:22px}
 </style>
 </head>
 <body>
 <main>
-  <nav><a href="/">Plainline</a></nav>
+  <nav><a href="/"><img src="/icons/plainline-wordmark-dark.svg" alt="Plainline" width="125" height="40"></a></nav>
   <h1>Terms of use</h1>
   <p class="muted">Effective November 8, 2026</p>
 
