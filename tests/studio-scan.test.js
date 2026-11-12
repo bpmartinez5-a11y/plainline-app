@@ -141,4 +141,9 @@ test("errType keeps only a plain error type", async () => {
   assert.strictEqual(await errType(bad("Schema is too complex for compilation.")), "invalid_request_error (response schema too complex)");
   assert.strictEqual(await errType(bad("Customer said: call me at 555-0100")), "invalid_request_error");
   assert.strictEqual(await errType(bad("messages.0.content.secret words here: x")), "invalid_request_error");
+  assert.strictEqual(await errType(bad("This organization has been disabled.")), "invalid_request_error (organization disabled)");
+  assert.strictEqual(await errType(bad("prompt is too long: 210000 tokens > 200000 maximum")), "invalid_request_error (prompt too long)");
+  // Otherwise only words from the fixed list leave: never the rest of the message.
+  assert.strictEqual(await errType(bad("Your API key's workspace has no access to model claude-x for Jane Doe")), "invalid_request_error (mentions workspace, model, access, key)");
+  assert.strictEqual(await errType(bad("Turkeys and donkeys")), "invalid_request_error", "a fixed word must start a word");
 });

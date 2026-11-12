@@ -58,6 +58,7 @@ Put the tier at the top of the PR body. A fresh agent that didn't write the chan
 - `sanitize` runs on the server and again in the browser. Keep it idempotent; there's a test for it.
 - Ben's decisions sit on top of the planner's profile in the Studio, never inside the API: look, type, accent and section switches (`show`, `collections[].hidden`) re-render instantly; filled-in blanks replace `ADD:` values by path; planner `questions` go back to `api/studio-profile` as `answers` on a rebuild, which keeps his earlier choices.
 - Site links route through the engine's in-page router (`go()`), not the address bar: inside the Studio's srcdoc preview a plain `#x` link would load the Studio into the frame.
+- The "Ask" chat box shows only on a concept preview sent to the business (`opts.shared`, `/preview/<slug>`): `/api/chat` answers from that preview's saved profile. Never put it on a client's live domain until the client has their own chat backend.
 - The owner dashboard saves to the viewer's browser only and has no login. It must not go on a client's live domain until it's backed by Supabase with MFA (Plainline security baseline).
 - Fixtures: `studio-examples/photographer-sample.json` (made-up photographer, the baseline layout) and `studio-examples/ridgeline-sample.json` (made-up plumber, no photos). Tests: `node --test tests/*.test.js`.
 
