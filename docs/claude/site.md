@@ -9,7 +9,7 @@
 | `api/` | Serverless endpoints. See `api/CLAUDE.md` | |
 | `tests/` | `node --test tests/*.test.js`: Studio engine and profile, and the demo chat endpoint (`chat.test.js`, fake Claude and Jev, no network). `.github/workflows/tests.yml` runs them on every PR | |
 | `appstore/` | App Store listing (`listing.md`), screenshot generator (`make_screenshots.js`, `seed.js`) and screenshots | Don't read the PNGs |
-| `icons/`, `manifest.webmanifest` | Installable web app icons and manifest | |
+| `icons/`, `manifest.webmanifest` | Logo files (Ben's pick, Nov 12: "B · Full stop"; copies of project files `plainline/brand/final/`, never redrawn): app icons, `favicon.svg` + `favicon-32.png`, the "plainline." wordmark (`plainline-wordmark-dark.svg` on glass or dark, `-light.svg` on light). `index.html` inlines the "p." mark once as `#pl-mark`. Every page uses the Plainline colors (index.html `:root`); the Studio's client previews keep their own looks | |
 | `sell.html` | The seller one-pager (plainlineops.com/sell, noindex, not in the sitemap) with 5 questions. The Engine's Send to box (jarvis-app `ops/`, Inquiries tab) texts or emails its link. Answers go to `/api/lead` as source `website · sellers`, so they land on The Engine's Inquiries tab. Its text comes from the seller kit's one page (project files `plainline/sellers/onboarding/`): no prices, no pay terms | ~12 KB |
 | `privacy.html`, `terms.html` | Legal pages. Keep in step with what the API stores or logs | |
 | `llms.txt`, `sitemap.xml`, `robots.txt`, `og.png` | Search and AI-answer discovery, share image | |

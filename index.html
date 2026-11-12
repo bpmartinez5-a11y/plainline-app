@@ -6,7 +6,8 @@
 <meta name="theme-color" content="#c4b49f" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#3a3029" media="(prefers-color-scheme: dark)">
 <meta name="description" content="Plainline is an AI agency. We build the tools your business runs on and run the work behind it: every customer answered, every follow-up done, from one front desk to a whole back office.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232d63d8'/%3E%3Cpath d='M9 22V10h7a4 4 0 0 1 0 8h-7' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+<link rel="icon" href="/icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/icons/favicon.svg" type="image/svg+xml">
 <title>Plainline · The AI agency that builds and runs your operations</title>
 <link rel="canonical" href="https://plainlineops.com/">
 <link rel="manifest" href="/manifest.webmanifest">
@@ -17,7 +18,7 @@
 <meta property="og:title" content="Plainline · The AI agency that builds and runs your operations">
 <meta property="og:description" content="Plainline is an AI agency. We build the tools your business runs on and run the work behind it: every customer answered, every follow-up done, from one front desk to a whole back office.">
 <meta property="og:image" content="https://plainlineops.com/og.png">
-<meta property="og:image:alt" content="Plainline: AI text assistants for local businesses, set up for you">
+<meta property="og:image:alt" content="Plainline: Every customer answered. Every follow-up done.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Plainline · The AI agency that builds and runs your operations">
 <meta name="twitter:description" content="Plainline is an AI agency. We build the tools your business runs on and run the work behind it: every customer answered, every follow-up done, from one front desk to a whole back office.">
@@ -85,7 +86,8 @@ h1,h2,h3{font-family:var(--f-display);font-weight:400;letter-spacing:-.01em;line
 .rail{position:sticky;top:18px;z-index:5;background:var(--rail);border:1px solid var(--g-line);border-radius:999px;padding:14px 0;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:var(--g-shadow)}
 .rail a{width:44px;height:44px;flex:none;border-radius:10px;display:grid;place-items:center;color:var(--rail-ink);text-decoration:none;position:relative;transition:background-color var(--t-fast),color var(--t-fast)}
 .rail a:hover,.rail a:focus-visible{color:var(--g-ink);background:rgba(255,255,255,.1)}
-.rail a.logo{color:var(--g-ink);font:500 17px var(--f-display);margin-bottom:6px}
+.rail a.logo{color:var(--g-ink);margin-bottom:6px}
+.rail a.logo svg{width:28px;height:28px}
 .rail a.go{color:var(--go-ink);background:linear-gradient(180deg,var(--g-accent-hi),var(--g-accent));box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
 .rail a:focus-visible{outline-color:#fff}
 .rail svg{width:20px;height:20px}
@@ -230,6 +232,7 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
 #msgs{display:contents}
 .thread-top{display:flex;align-items:center;gap:10px;padding:0 4px 10px;border-bottom:1px solid var(--g-line);margin-bottom:4px}
 .thread-top i{width:34px;height:34px;border-radius:50%;background:linear-gradient(140deg,rgba(255,255,255,.28),rgba(255,255,255,.06));border:1px solid var(--g-rim);color:var(--g-ink);display:grid;place-items:center;font:500 17px var(--f-display);font-style:normal}
+.thread-top i svg{width:20px;height:20px}
 .thread-top b{display:block;font-size:15px;line-height:1.2}
 .thread-top small{color:var(--g-ink-2);font-size:13px}
 .thread-top button{margin-left:auto;min-height:44px;min-width:44px;border:0;background:none;color:var(--g-ink-2);font:inherit;font-size:13px;cursor:pointer;border-radius:10px}
@@ -300,10 +303,12 @@ form.chat-book{gap:10px;padding:14px;border-radius:16px;background:rgba(255,255,
 </style>
 </head>
 <body>
+<!-- The "p." mark (Ben's pick, Nov 12: "B · Full stop"; source: project files plainline/brand/final/mark.svg). Dot #86a9f5: it sits on dark glass. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="pl-mark" viewBox="0 0 100 100"><path d="M34.248999999999995 20.6V25.936L34.663 26.902V76.996Q34.663 78.28399999999999 35.053999999999995 78.905Q35.44499999999999 79.526 36.227 79.71000000000001L38.757 80.17Q39.492999999999995 80.4 39.861 80.837Q40.229 81.274 40.229 81.872Q40.229 82.608 39.723 83.022Q39.217 83.436 38.113 83.436H19.345Q18.240999999999996 83.436 17.735 83.022Q17.229 82.608 17.229 81.872Q17.229 81.274 17.596999999999998 80.86Q17.964999999999996 80.446 18.700999999999997 80.17L20.586999999999996 79.71000000000001Q21.368999999999996 79.48 21.736999999999995 78.882Q22.104999999999997 78.28399999999999 22.104999999999997 76.996V27.776000000000003Q22.104999999999997 26.764000000000003 21.782999999999998 26.327Q21.461 25.89 20.770999999999997 25.752000000000002L18.240999999999996 25.613999999999997Q17.505 25.476 17.205999999999996 25.108Q16.906999999999996 24.740000000000002 16.906999999999996 24.188000000000002Q16.906999999999996 23.544000000000004 17.275 23.176000000000002Q17.642999999999997 22.808 18.700999999999997 22.394L27.717 19.174Q29.142999999999997 18.576 30.04 18.369Q30.936999999999998 18.162 31.673 18.162Q32.961 18.162 33.605 18.829Q34.248999999999995 19.496000000000002 34.248999999999995 20.6ZM32.409 31.456 30.615 29.201999999999998Q34.202999999999996 23.866 38.66499999999999 20.922Q43.126999999999995 17.978 48.601 17.978Q53.937 17.978 58.123 20.692Q62.309 23.406 64.701 28.212999999999997Q67.093 33.019999999999996 67.093 39.368Q67.093 46.636 64.26400000000001 51.972Q61.435 57.308 56.559 60.206Q51.68299999999999 63.104 45.611 63.104Q40.321 63.104 36.364999999999995 60.712Q32.409 58.32 29.833 53.674L32.547 51.466Q34.617 55.008 37.30799999999999 56.80200000000001Q39.998999999999995 58.596000000000004 43.126999999999995 58.596000000000004Q46.301 58.596000000000004 48.762 56.733000000000004Q51.223 54.87 52.649 50.914Q54.075 46.958 54.075 40.748000000000005Q54.075 34.906 52.717999999999996 31.134Q51.36099999999999 27.362000000000002 48.99199999999999 25.522000000000002Q46.62299999999999 23.682000000000002 43.586999999999996 23.682000000000002Q40.504999999999995 23.682000000000002 37.675999999999995 25.591Q34.846999999999994 27.5 32.409 31.456Z" fill="currentColor"/><circle cx="78.1" cy="52.5" r="9.5" fill="#86a9f5"/></symbol></svg>
 <div class="room" aria-hidden="true"><i class="shelf-l"></i><i class="shelf-r"></i><i class="tv"></i><i class="console"></i><i class="lamp"></i><i class="plant"></i></div>
 <div class="app">
   <nav class="rail" aria-label="Sections">
-    <a class="logo" href="#top" aria-label="Plainline, back to top">P/</a>
+    <a class="logo" href="#top" aria-label="Plainline, back to top"><svg aria-hidden="true"><use href="#pl-mark"/></svg></a>
     <a href="#plans" aria-label="Plans"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span aria-hidden="true">Plans</span></a>
     <a href="#faq" aria-label="Questions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></svg><span aria-hidden="true">Questions</span></a>
     <a href="#build" aria-label="What we build"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg><span aria-hidden="true">What we build</span></a>
@@ -338,7 +343,7 @@ form.chat-book{gap:10px;padding:14px;border-radius:16px;background:rgba(255,255,
       <p class="ask-ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/><path d="M19 15l.8 1.9 1.9.8-1.9.8L19 20.4l-.8-1.9-1.9-.8 1.9-.8z"/></svg><span>This assistant is an AI. A person from Plainline reads every walkthrough request. Please don't share passwords or payment details.</span></p>
     </div>
     <div class="chat" id="chat">
-      <div class="thread-top"><i aria-hidden="true">P/</i><div><b>Plainline assistant</b><small>AI assistant</small></div><button type="button" id="chatReset" hidden>Start over</button></div>
+      <div class="thread-top"><i aria-hidden="true"><svg aria-hidden="true"><use href="#pl-mark"/></svg></i><div><b>Plainline assistant</b><small>AI assistant</small></div><button type="button" id="chatReset" hidden>Start over</button></div>
       <div class="chat-log" id="chatLog" role="log" aria-live="polite" aria-label="Chat with Plainline's AI assistant"></div>
       <div class="chat-chips" id="chatChips"></div>
       <form class="chat-book" id="chatBook" hidden novalidate>

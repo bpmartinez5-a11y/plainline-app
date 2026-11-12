@@ -62,12 +62,12 @@
     box.id = "pl-consent";
     box.setAttribute("role", "region");
     box.setAttribute("aria-label", "Ad measurement choice");
-    box.style.cssText = "position:fixed;left:12px;right:12px;bottom:12px;z-index:50;max-width:520px;margin:0 auto;padding:14px 16px;border-radius:14px;background:#12222b;color:#e2ebee;font:14px/1.5 system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.25)";
-    box.innerHTML = '<p style="margin:0 0 10px">May ' + [google && "Google", meta && "Meta"].filter(Boolean).join(" and ") + ' measure which of our ads brought you here? It sets their cookies. <a href="/privacy#ads" style="color:#7fd3d6">Details</a></p>' +
+    box.style.cssText = "position:fixed;left:12px;right:12px;bottom:12px;z-index:50;max-width:520px;margin:0 auto;padding:14px 16px;border-radius:14px;background:#342922;color:#f7f2ea;border:1px solid rgba(255,255,255,.15);font:14px/1.5 \"Plus Jakarta Sans\",system-ui,sans-serif;box-shadow:0 6px 24px rgba(20,12,6,.45)";
+    box.innerHTML = '<p style="margin:0 0 10px">May ' + [google && "Google", meta && "Meta"].filter(Boolean).join(" and ") + ' measure which of our ads brought you here? It sets their cookies. <a href="/privacy#ads" style="color:#b4ccff">Details</a></p>' +
       '<button type="button" data-v="no">No thanks</button> <button type="button" data-v="yes">Allow</button>';
     for (const b of box.querySelectorAll("button")) {
-      b.style.cssText = "font:600 14px system-ui,sans-serif;padding:8px 16px;border-radius:999px;border:1px solid #7fd3d6;cursor:pointer;margin-right:6px;" +
-        (b.dataset.v === "yes" ? "background:#7fd3d6;color:#12222b" : "background:transparent;color:#e2ebee");
+      b.style.cssText = "font:600 14px \"Plus Jakarta Sans\",system-ui,sans-serif;min-height:44px;padding:8px 16px;border-radius:999px;cursor:pointer;margin-right:6px;" +
+        (b.dataset.v === "yes" ? "background:#2d63d8;color:#fff;border:1px solid #2d63d8" : "background:transparent;color:#f7f2ea;border:1px solid rgba(247,242,234,.45)");
       b.addEventListener("click", () => {
         store.set(b.dataset.v);
         box.remove();

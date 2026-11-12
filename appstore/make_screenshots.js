@@ -39,13 +39,13 @@ async function capture(browser){
 
 const frame = (s, img, W, H) => `<!doctype html><meta charset="utf-8"><style>
 *{margin:0;box-sizing:border-box}html,body{width:${W}px;height:${H}px;overflow:hidden}
-body{background:linear-gradient(180deg,#0d6b71 0%,#0a5357 55%,#083f43 100%);font-family:-apple-system,"SF Pro Display","Figtree","Segoe UI",system-ui,sans-serif;
+body{background:linear-gradient(180deg,#3d3029 0%,#2f241e 55%,#241b16 100%);font-family:-apple-system,"SF Pro Display","Figtree","Segoe UI",system-ui,sans-serif;
   color:#fff;display:flex;flex-direction:column;align-items:center;position:relative}
 h1{font-size:${W * .066}px;font-weight:800;letter-spacing:-.02em;line-height:1.08;text-align:center;margin-top:${H * .055}px;padding:0 ${W * .06}px}
-p{font-size:${W * .036}px;color:#CFEDEE;margin-top:${H * .012}px;text-align:center;padding:0 ${W * .08}px}
-.phone{margin-top:${H * .035}px;width:${W * .78}px;border-radius:${W * .095}px;padding:${W * .018}px;background:#0c1417;box-shadow:0 40px 120px rgba(0,0,0,.35)}
+p{font-size:${W * .036}px;color:#f7f2ea;margin-top:${H * .012}px;text-align:center;padding:0 ${W * .08}px}
+.phone{margin-top:${H * .035}px;width:${W * .78}px;border-radius:${W * .095}px;padding:${W * .018}px;background:#1a1411;box-shadow:0 40px 120px rgba(0,0,0,.35)}
 .phone img{display:block;width:100%;border-radius:${W * .078}px}
-small{position:absolute;bottom:${H * .012}px;font-size:${W * .022}px;color:#A9D6D8}
+small{position:absolute;bottom:${H * .012}px;font-size:${W * .022}px;color:#cbbba8}
 </style><h1>${s.head}</h1><p>${s.sub}</p><div class="phone"><img src="data:image/png;base64,${img}"></div><small>Sample business and customers shown</small>`;
 
 (async () => {
