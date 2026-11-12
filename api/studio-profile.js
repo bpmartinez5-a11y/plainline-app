@@ -107,25 +107,52 @@ function enforce(profile, scan) {
   return scrub(profile);
 }
 
+// The fallback when the API refuses the response schema (Nov 12: every preview got a 400 in about a second
+// with the schema on): the same request without output_config.format, with the schema in the prompt instead.
+// sanitize() and enforce() below still decide what reaches the page, so a looser answer can't break the rules.
+// A 400 these hints describe fails the same way without the schema (an account problem, bad request text,
+// or a request field other than output_config), so only the other 400s ask again.
+const NO_RETRY = /credit|usage limit|not valid JSON|organization disabled|prompt too long|^at (model|messages|system)\b/;
+const PLAIN = `\n\nA program reads your answer. Reply with the JSON object only: no other text and no code fence. It must match this JSON schema:\n${JSON.stringify(SCHEMA)}`;
+
 // Ask Claude for the profile and enforce the rules on it. onBeat runs every few stream events, so a caller
 // that holds a browser connection can send a heartbeat. Throws with a message a person can read.
 // Shared with /api/preview (The Engine's website previews).
 async function plan(b, onBeat = () => {}, timeoutMs = 280_000) {
+  const end = Date.now() + timeoutMs;
+  let json;
+  try { json = await ask(b, onBeat, end, true); }
+  catch (e) {
+    if (!e.schemaRefused) throw e;
+    console.error("studio-profile: 400 with the response schema; asking again for plain JSON");
+    json = await ask(b, onBeat, end, false);
+    console.error("studio-profile: the plain JSON request answered");
+  }
+  let raw; try { raw = JSON.parse(json); } catch { throw new Error("Claude didn't return a usable profile. Try again"); }
+  const profile = enforce(Engine.sanitize(raw), b.scan);
+  delete profile._tokens; delete profile._slug; // the browser re-derives these when it renders
+  return profile;
+}
+
+// One streamed call. With structured true the schema goes in output_config.format; without it, in the prompt.
+// Returns the JSON text of the answer. A 400 on the structured call that the schema could cause is marked schemaRefused, so plan() can retry.
+async function ask(b, onBeat, end, structured) {
   const key = process.env.ANTHROPIC_API_KEY;
+  // Thinking runs first and counts toward max_tokens: low effort keeps it short, so the build stays inside the time limit.
+  const output_config = structured ? { effort: "low", format: { type: "json_schema", schema: SCHEMA } } : { effort: "low" };
   let r;
   try {
     r = await fetch(API, {
       method: "POST",
       headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-      // Thinking runs first and counts toward max_tokens: low effort keeps it short, so the build stays inside the time limit.
-      body: JSON.stringify({ model: MODEL, max_tokens: 16000, stream: true, system: SYSTEM, output_config: { effort: "low", format: { type: "json_schema", schema: SCHEMA } }, messages: [{ role: "user", content: brief(b) }] }),
-      signal: AbortSignal.timeout(timeoutMs)
+      body: JSON.stringify({ model: MODEL, max_tokens: 16000, stream: true, system: structured ? SYSTEM : SYSTEM + PLAIN, output_config, messages: [{ role: "user", content: brief(b) }] }),
+      signal: AbortSignal.timeout(Math.max(1000, end - Date.now()))
     });
   } catch (e) { throw Object.assign(new Error("Couldn't reach Claude: " + e.message), { upstream: true }); }
   if (!r.ok) {
     const { type, hint } = await errInfo(r);
-    console.error("anthropic", r.status, type, hint);
-    throw Object.assign(new Error(`Claude said ${r.status}${hint ? ": " + hint : ""}`), { upstream: true });
+    console.error("anthropic", r.status, type, hint, structured ? "(with the response schema)" : "(plain JSON)");
+    throw Object.assign(new Error(`Claude said ${r.status}${hint ? ": " + hint : ""}`), { upstream: true, schemaRefused: structured && r.status === 400 && !NO_RETRY.test(hint) });
   }
   const reader = r.body.getReader(), dec = new TextDecoder();
   let buf = "", json = "", stop = "", beat = 0;
@@ -150,10 +177,25 @@ async function plan(b, onBeat = () => {}, timeoutMs = 280_000) {
   if (stop === "max_tokens") throw new Error("The profile was cut off at the length limit. Try again");
   if (stop === "refusal") throw new Error("Claude declined to plan this site");
   if (!json) throw new Error(`Claude answered without a profile (${stop || "no stop reason"}). Try again`);
-  let raw; try { raw = JSON.parse(json); } catch { throw new Error("Claude didn't return a usable profile. Try again"); }
-  const profile = enforce(Engine.sanitize(raw), b.scan);
-  delete profile._tokens; delete profile._slug; // the browser re-derives these when it renders
-  return profile;
+  return structured ? json : firstObject(json);
+}
+
+// Without the schema the model may still wrap the object in a code fence or a line of text. Returns the first
+// top-level {...} that parses as JSON, or "". It never returns an object nested inside a broken one.
+function firstObject(text) {
+  for (let s = text.indexOf("{"); s >= 0;) {
+    let depth = 0, str = false, esc = false, end = -1;
+    for (let i = s; i < text.length && end < 0; i++) {
+      const c = text[i];
+      if (str) { if (esc) esc = false; else if (c === "\\") esc = true; else if (c === '"') str = false; }
+      else if (c === '"') str = true;
+      else if (c === "{") depth++;
+      else if (c === "}" && --depth === 0) end = i + 1;
+    }
+    if (end < 0) return "";
+    try { JSON.parse(text.slice(s, end)); return text.slice(s, end); } catch { s = text.indexOf("{", end); }
+  }
+  return "";
 }
 
 module.exports = async function handler(req, res) {
