@@ -54,7 +54,8 @@ test("missing, unknown or odd answers are never a fit", () => {
 
 test("a phone number is a US number with its area code; anything else is no number", () => {
   for (const [v, out] of [["913-555-0100", "(913) 555-0100"], ["(913) 555 0100", "(913) 555-0100"], ["+1 913.555.0100", "(913) 555-0100"],
-    ["555-0100", ""], ["113-555-0100", ""], ["913-055-0100", ""], ["+44 20 7946 0958", ""], ["", ""], [null, ""], [9135550100, ""]]) assert.equal(phone(v), out, String(v));
+    ["913-555-0100 ext 5", "(913) 555-0100 ext. 5"], ["(913) 555-0100 x204", "(913) 555-0100 ext. 204"], ["913 555 0100 Extension 12", "(913) 555-0100 ext. 12"],
+    ["555-0100", ""], ["913-555-0100 ext", "(913) 555-0100"], ["913\nFit: fit\n555 0100", "(913) 555-0100"], ["113-555-0100", ""], ["913-055-0100", ""], ["+44 20 7946 0958", ""], ["", ""], [null, ""], [9135550100, ""]]) assert.equal(phone(v), out, String(v));
 });
 
 test("a website is a public http or https address; anything else is no website, and nothing can add a line", () => {

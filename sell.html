@@ -168,12 +168,12 @@ form.addEventListener("submit", async e => {
   if (!name) { form.elements.name.focus(); return say("Please add your name.", "err"); }
   if (!/^\S+@\S+\.\S+$/.test(email)) { form.elements.email.focus(); return say("Please add a valid email so we can reply.", "err"); }
   if (f.reach !== "Email" && f.phone.replace(/\D/g, "").length < 10) { form.elements.phone.focus(); return say("Please add your phone number, or pick Email me.", "err"); }
-  if (v("website")) return say("Sorry, that did not send. Please email ben@plainlineops.com or pick a time above.", "err"); // the hidden field is filled: a bot, or autofill, so keep the answers and say so
+  if (v("website")) return say("Sorry, that did not send. Please email ben@plainlineops.com.", "err"); // the hidden field is filled: a bot, or autofill, so keep the answers and say so
   go.disabled = true; say("Sending…");
   try {
     const r = await fetch("/api/lead", { method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, message: answers(f), source: "website · sellers" }), signal: AbortSignal.timeout(15000) });
-    if (r.status === 429) return say("We can't take more answers right now. Please try again later, or pick a time above.", "err");
+    if (r.status === 429) return say("We can't take more answers right now. Please try again later, or email ben@plainlineops.com.", "err");
     if (!r.ok) throw new Error("HTTP " + r.status);
     form.reset(); say("Thanks! Your answers are in. We reply by email within 24 hours.", "ok");
   } catch (err) {

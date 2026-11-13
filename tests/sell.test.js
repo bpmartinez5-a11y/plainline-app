@@ -35,6 +35,7 @@ test("the page is public now, so it keeps the seller details for the seller kit:
   const text = html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<!--[\s\S]*?-->/g, " ").replace(/<[^>]+>/g, " ");
   assert.doesNotMatch(text, /How a lead moves|The rules|How you get paid|90 days|earn a share|pays you|you get paid|intro call/i);
   assert.ok(!html.includes("calendar.app.google"), "no booking link");
+  assert.doesNotMatch(html, /pick a time/i, "no message points at a booking link that is gone");
   assert.match(text, /5 quick questions/);
 });
 

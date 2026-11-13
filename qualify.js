@@ -28,10 +28,13 @@
   // Ben, Nov 13: elsewhere in the US stays a check (1c); one person (2a) and an employee (5a) are a fit; "Just looking" waits (4a).
   const CHECK = { "area.us": "outside the Kansas City metro", "kind.other": "kind of business not listed", "when.looking": "just looking" };
 
-  // A US phone number as (913) 555-0100, or "" when it isn't one. Ben, Nov 13 (7a): the phone number is required.
+  // A US phone number as (913) 555-0100, with "ext. 5" when it has one, or "" when it isn't one.
+  // Ben, Nov 13 (7a): the phone number is required.
   function phone(v) {
-    const d = typeof v === "string" && v.length <= 40 ? v.replace(/\D/g, "") : "", n = d.length === 11 && d[0] === "1" ? d.slice(1) : d;
-    return /^[2-9]\d\d[2-9]\d{6}$/.test(n) ? `(${n.slice(0, 3)}) ${n.slice(3, 6)}-${n.slice(6)}` : "";
+    if (typeof v !== "string" || v.length > 40) return "";
+    const [, main, ext] = v.trim().match(/^([\s\S]*?)(?:\s*(?:ext\.?|extension|x)\s*(\d{1,6}))?$/i), d = main.replace(/\D/g, "");
+    const n = d.length === 11 && d[0] === "1" ? d.slice(1) : d;
+    return /^[2-9]\d\d[2-9]\d{6}$/.test(n) ? `(${n.slice(0, 3)}) ${n.slice(3, 6)}-${n.slice(6)}${ext ? " ext. " + ext : ""}` : "";
   }
   // A public website as https://host/path, or "" when it isn't one: http or https, a named host with a dot, no sign-in
   // and no port, no spaces. Ben, Nov 13 (6b): the website is optional, with a "We don't have a website" box.
