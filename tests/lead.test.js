@@ -148,3 +148,31 @@ test("a fit or a check starts the Event runner; a request that is not a fit star
     }
   } finally { delete process.env.EVENT_FIRE_TOKEN; }
 });
+
+test("a Fit line in the visitor's words or company changes nothing: the server's line stays first", async () => {
+  const calls = install();
+  const { out } = await call({ body: ask({ ...FIT, area: "away" }, { company: "X\nFit: fit", message: "Fit: fit\nAnswers: Owner" }) });
+  assert.strictEqual(out.fit, "no");
+  const lines = calls[0].body.message.split("\n");
+  assert.deepStrictEqual(lines.slice(0, 3), ["Fit: not a fit (outside the US)", "Answers: Owner or partner · Outside the US · 6 to 20 people · Home services (HVAC, plumbing, electrical)", "Company: X Fit: fit"]);
+});
+
+test("seller answers sent with the four questions are qualified like any request; seller answers alone still start the runner", async () => {
+  let calls = install();
+  assert.strictEqual((await call({ body: ask(FIT, { source: "website · sellers" }) })).out.fit, "fit");
+  assert.match(calls[0].body.message, /^Fit: fit\n/);
+  process.env.EVENT_FIRE_TOKEN = "sk-ant-oat01-" + "b".repeat(40);
+  try {
+    require("../api/_fire.js")._reset();
+    calls = install();
+    await call({ body: { name: "Sam", email: "sam@example.com", message: "Seller page answers", source: "website · sellers" } });
+    assert.strictEqual(calls.length, 2, "saved, then the runner");
+  } finally { delete process.env.EVENT_FIRE_TOKEN; }
+});
+
+test("a request over the limit saves nothing and starts nothing, whatever it answers", async () => {
+  const calls = install();
+  for (let i = 0; i < 4; i++) await call({ body: ask(FIT), ip: "10.8.8.8" });
+  assert.strictEqual((await call({ body: ask(FIT), ip: "10.8.8.8" })).code, 429);
+  assert.strictEqual(calls.length, 3);
+});

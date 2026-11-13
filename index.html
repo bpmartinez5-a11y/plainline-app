@@ -155,6 +155,7 @@ input,textarea,select{min-height:44px;font:inherit;color:var(--g-ink);border:1px
 input::placeholder,textarea::placeholder{color:rgba(247,242,234,.68)}
 input:focus,textarea:focus,select:focus{outline:none;border-color:var(--g-accent-hi);box-shadow:0 0 0 4px rgba(76,140,246,.25)}
 textarea{min-height:120px;resize:vertical}
+fieldset.qual{border:0;margin:0;padding:0;min-width:0}
 .qual{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 @media (max-width:520px){.qual{grid-template-columns:minmax(0,1fr)}}
 .qual select{width:100%;min-width:0;text-overflow:ellipsis}
@@ -354,7 +355,7 @@ form.chat-book{gap:10px;padding:14px;border-radius:16px;background:rgba(255,255,
         <h3>Book a walkthrough</h3>
         <p class="fine">Four quick questions. When Plainline is a fit, you pick your walkthrough time right away. We send this chat with your request.</p>
         <div class="row"><label>Your name<input name="name" required maxlength="200" autocomplete="name"></label><label>Email<input name="email" type="email" required maxlength="320" autocomplete="email"></label></div>
-        <div class="qual" role="group" aria-label="Four quick questions"></div>
+        <fieldset class="qual"><legend class="sr">Four quick questions</legend></fieldset>
         <label class="hp" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
         <button class="btn" id="bookBtn">Book a walkthrough</button>
         <p id="bookMsg" role="status" aria-live="polite"></p>
@@ -496,8 +497,8 @@ form.chat-book{gap:10px;padding:14px;border-radius:16px;background:rgba(255,255,
       <label>Your name<input name="name" required maxlength="200" autocomplete="name"></label>
       <label>Email<input name="email" type="email" required maxlength="320" autocomplete="email"></label>
       <label>Company name<input name="company" required maxlength="200" autocomplete="organization" placeholder="e.g. Corner Cuts"></label>
-      <div class="qual" role="group" aria-label="Four quick questions"></div>
-      <label>What would you like us to run?<textarea name="message" maxlength="4500"></textarea></label>
+      <fieldset class="qual"><legend class="sr">Four quick questions</legend></fieldset>
+      <label>What would you like us to run?<textarea name="message" maxlength="4400"></textarea></label>
       <label class="hp" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
       <button class="btn" id="sendBtn">Book a walkthrough</button>
       <p id="formMsg" role="status" aria-live="polite"></p>
@@ -528,15 +529,17 @@ const leadSource = () => { const q = new URLSearchParams(location.search), tag =
 /* The four quick questions come from qualify.js, so the page and the server use one list and one rule. Without it
    (a blocked script) the forms still send, and the server answers "check": a person reads it, nobody gets the calendar. */
 const Q = window.Qualify;
-document.querySelectorAll(".qual").forEach(box => Q && box.replaceChildren(...Q.ASK.map(([key, label, opts]) => {
+if (!Q) console.error("qualify.js didn't load: the forms send without the four questions");
+document.querySelectorAll(".qual").forEach(box => Q && box.append(...Q.ASK.map(([key, label, opts]) => {
   const l = document.createElement("label"), s = Object.assign(document.createElement("select"), { name: key, required: true });
   s.append(new Option("Choose one", ""), ...Object.entries(opts).map(([v, t]) => new Option(t, v)));
+  s.addEventListener("change", () => s.removeAttribute("aria-invalid"));
   l.append(label, s); return l;
 })));
 /* A form's answers, its first unanswered question and qualify()'s answer: fit, check or no */
 const answersOf = f => {
   const a = {}; let miss = null;
-  for (const s of f.querySelectorAll(".qual select")) { a[s.name] = s.value; if (!s.value && !miss) miss = s; }
+  for (const s of f.querySelectorAll(".qual select")) { a[s.name] = s.value; if (!s.value) { s.setAttribute("aria-invalid", "true"); miss = miss || s; } }
   return { a, miss, ...(Q ? Q.qualify(a) : { fit: "check", note: "" }) };
 };
 const FITS = ["fit", "check", "no"];

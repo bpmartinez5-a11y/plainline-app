@@ -40,6 +40,8 @@ test("what each answer reads: a fit picks a time, a check hears back in 24 hours
   assert.match(html, /: q\.fit === "no" \? `Thanks for reaching out\$\{n\}\. \$\{q\.note\}`\.trim\(\)/);
   assert.match(html, /: `Thanks\$\{n\}! Your request is in\. Plainline reads it and replies by email within 24 hours\.`;/);
   assert.match(html, /if \(f\.website\) return finish\("check"\); \/\/ a bot filled the hidden field: no booking page/);
+  assert.match(html, /if \(f\.website\)\{ form\.reset\(\); return say\("Thanks! We'll be in touch\.", "ok"\); \}/, "the form's honeypot gets no link");
+  assert.equal(lines(/FITS\.includes\(d\.fit\) \? d\.fit : q\.fit/).length, 2, "both forms take the server's answer when it sends one");
 });
 
 test("only our own limit says 'a few requests'; the spam check gets the failed-send message", () => {

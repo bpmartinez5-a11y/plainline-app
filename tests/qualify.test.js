@@ -53,7 +53,7 @@ test("every answer has exactly one outcome and every key has a label", () => {
 });
 
 test("no question, answer or note shows a price, rate or amount", () => {
-  const words = JSON.stringify(ASK) + read("qualify.js").match(/const NO = \{[\s\S]*?\};/)[0];
+  const src = read("qualify.js"), words = JSON.stringify(ASK) + src.match(/const NO = \{[\s\S]*?\};/)[0] + src.match(/const CHECK = \{[^\n]*\};/)[0];
   assert.doesNotMatch(words, /[$€£]\s?\d|\b\d+\s?(%|k\b|dollars)|\b(per|a) (month|year|hour)\b|\bprice|\bcost/i);
 });
 
@@ -61,7 +61,8 @@ test("the home page and the server load the same file, and both forms ask the qu
   const html = read("index.html");
   assert.match(html, /<script src="\/qualify\.js"><\/script>\n<script>\n\/\* Contact form/, "loaded before the forms' script");
   assert.match(read("api/lead.js"), /const \{ qualify \} = require\("\.\.\/qualify\.js"\)/);
-  assert.equal((html.match(/<div class="qual" role="group" aria-label="Four quick questions"><\/div>/g) || []).length, 2, "the contact form and the chat");
+  assert.equal((html.match(/<fieldset class="qual"><legend class="sr">Four quick questions<\/legend><\/fieldset>/g) || []).length, 2, "the contact form and the chat");
+  assert.match(html, /if \(!Q\) console\.error\(/, "a blocked qualify.js shows in the console");
   const form = html.slice(html.indexOf('<form id="leadForm"'), html.indexOf("</form>", html.indexOf('<form id="leadForm"')));
   assert.match(form, /<input name="company" required/);
   assert.match(html, /body: JSON\.stringify\(\{name, email, company, message: f\.message\.trim\(\), q: q\.a, source: leadSource\(\)\}\)/);
