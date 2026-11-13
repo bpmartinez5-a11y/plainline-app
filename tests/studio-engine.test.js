@@ -137,10 +137,17 @@ test("site data uses the business type that matches the kind", () => {
   assert.strictEqual(ld("Wheelchair repair"), "LocalBusiness");
   assert.strictEqual(ld("Sports & portrait photographer"), "LocalBusiness");
   assert.strictEqual(ld(""), "LocalBusiness");
+  for (const k of ["Mechanical contractor", "Automation consulting", "Auto insurance agency", "Fitness equipment store", "Pet grooming salon", "Hair transplant clinic", "Rooftop bar"]) assert.strictEqual(ld(k), "LocalBusiness", k);
+  assert.strictEqual(ld("Auto dealership"), "AutoDealer");
+  assert.strictEqual(ld("Roofing contractor"), "RoofingContractor");
+  assert.strictEqual(ld("Auto repair"), "AutoRepair");
 });
 
 test("site data names the service area when the profile has one", () => {
   const site = E.render({ business: { name: "X", kind: "Plumber", city: "Olathe" }, contact: { serviceArea: "Olathe, Lenexa and Overland Park" } }).site;
   const ld = JSON.parse(site.match(/<script type="application\/ld\+json">([^<]*)<\/script>/)[1]);
   assert.strictEqual(ld.areaServed, "Olathe, Lenexa and Overland Park");
+  const area = c => JSON.parse(E.render({ business: { name: "X", city: "Olathe" }, contact: c }).site.match(/<script type="application\/ld\+json">([^<]*)<\/script>/)[1]).areaServed;
+  assert.strictEqual(area({}), "Olathe");
+  assert.strictEqual(area({ serviceArea: "ADD: service area" }), "Olathe");
 });

@@ -1003,15 +1003,17 @@ ${isSite ? SITE_CSS : DASH_CSS}
   // First match wins; the playbook's industry blocks use the same types
   // (project files plainline/playbook/2026-11-13-client-marketing.md, part 3).
   const BIZ_TYPES = [
+    [/insurance|agency|consult|equipment|transplant|\bpet|groom/i, "LocalBusiness"],
     [/hvac|heating|air condition|furnace|heat pump/i, "HVACBusiness"],
     [/plumb|drain|water heater|sewer/i, "Plumber"],
     [/electrician|electrical contractor/i, "Electrician"],
-    [/\broof/i, "RoofingContractor"],
+    [/\broof(ing|er)s?\b/i, "RoofingContractor"],
     [/body shop|collision|dent repair/i, "AutoBodyShop"],
     [/auto ?parts|parts store/i, "AutoPartsStore"],
     [/\btires?\b/i, "TireShop"],
     [/\bdetail/i, "AutomotiveBusiness"],
-    [/\bauto|mechanic|car repair|oil change/i, "AutoRepair"],
+    [/dealer/i, "AutoDealer"],
+    [/\bauto(motive|mobile)?\b|\bmechanics?\b|car repair|oil change/i, "AutoRepair"],
     [/golf course|country club/i, "GolfCourse"],
     [/golf|driving range|simulator|shooting range/i, "SportsActivityLocation"],
     [/\bmed ?spa|medical spa/i, "MedicalBusiness"],
@@ -1026,7 +1028,8 @@ ${isSite ? SITE_CSS : DASH_CSS}
     if (B.domain) o.url = "https://" + B.domain + "/";
     if (C.phone) o.telephone = C.phone;
     if (C.address) o.address = C.address;
-    if (C.serviceArea || B.city) o.areaServed = C.serviceArea || B.city;
+    const area = [C.serviceArea, B.city].find(x => x && !/^ADD:/i.test(x));
+    if (area) o.areaServed = area;
     if (p.hero.photos[0]) o.image = p.hero.photos[0].src;
     if (B.socials.length) o.sameAs = B.socials.map(s => s.url);
     return o;
