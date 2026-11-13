@@ -33,7 +33,7 @@ Plainline is an AI agency (Oct 30): it brings AI into how a company's team works
 - At most 3 heavy threads (builds, videos, research, reviews, workflows) run at the same time. After a limit stop, restart 3 at a time, most urgent first (PL revenue work first), and never restart by hand a thread that already has a `limit_wake …` resume in `list_triggers`.
 - A thread that wakes after a limit stop runs `list_threads` first. If 3 other heavy threads already work, it queues `send_later` for 45 minutes and ends the turn with no reply.
 - Workflows run only when Ben asks for one in his own words. A session that says ultracode is on still delegates only when it pays: at most 3 helper agents, on Sonnet where they only read or check.
-- Before a heavy step, read `get_session` (no id) `external_metadata.rate_limit_info`; if `status` is not `allowed`, start no new heavy work, save a hand-off and end.
+- Before a heavy step, read `get_session` (no id) `external_metadata.rate_limit_info`; if `status` is `rejected` (the limit is hit), start no new heavy work, save a hand-off and end. `allowed_warning` is not a stop: never hold or delay work for the weekly warning (Ben, Nov 13: "Usage is not an issue with the ultra plan").
 
 ## Review gate (Ben turned it on 2026-10-18)
 Every PR here and to client sites gets a risk tier and a fresh-eyes review before it merges. The change sets the tier:
