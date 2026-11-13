@@ -151,10 +151,14 @@ section > h2{font-size:28px;margin-bottom:20px}
 @media (max-width:760px){.contact{grid-template-columns:minmax(0,1fr)}}
 form{display:flex;flex-direction:column;gap:12px}
 label{display:flex;flex-direction:column;gap:4px;font-size:15px;font-weight:600;color:var(--g-ink-2)}
-input,textarea{min-height:44px;font:inherit;color:var(--g-ink);border:1px solid var(--g-line);border-radius:20px;padding:10px 14px;background:var(--surface);font-weight:400;transition:border-color var(--t-fast),box-shadow var(--t-fast)}
+input,textarea,select{min-height:44px;font:inherit;color:var(--g-ink);border:1px solid var(--g-line);border-radius:20px;padding:10px 14px;background:var(--surface);font-weight:400;transition:border-color var(--t-fast),box-shadow var(--t-fast)}
 input::placeholder,textarea::placeholder{color:rgba(247,242,234,.68)}
-input:focus,textarea:focus{outline:none;border-color:var(--g-accent-hi);box-shadow:0 0 0 4px rgba(76,140,246,.25)}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--g-accent-hi);box-shadow:0 0 0 4px rgba(76,140,246,.25)}
 textarea{min-height:120px;resize:vertical}
+.qual{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+@media (max-width:520px){.qual{grid-template-columns:minmax(0,1fr)}}
+.qual select{width:100%;min-width:0;text-overflow:ellipsis}
+.book-now{display:flex;width:max-content;max-width:100%;margin-top:10px}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 #formMsg{font-size:15px;min-height:1.5em;margin:0}
 #formMsg.ok{color:var(--ok)} #formMsg.err{color:var(--g-warn-ink)}
@@ -348,8 +352,9 @@ form.chat-book{gap:10px;padding:14px;border-radius:16px;background:rgba(255,255,
       <div class="chat-chips" id="chatChips"></div>
       <form class="chat-book" id="chatBook" hidden novalidate>
         <h3>Book a walkthrough</h3>
-        <p class="fine">We send this chat with your request. We reply by email within 24 hours.</p>
+        <p class="fine">Four quick questions. When Plainline is a fit, you pick your walkthrough time right away. We send this chat with your request.</p>
         <div class="row"><label>Your name<input name="name" required maxlength="200" autocomplete="name"></label><label>Email<input name="email" type="email" required maxlength="320" autocomplete="email"></label></div>
+        <div class="qual" role="group" aria-label="Four quick questions"></div>
         <label class="hp" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
         <button class="btn" id="bookBtn">Book a walkthrough</button>
         <p id="bookMsg" role="status" aria-live="polite"></p>
@@ -484,16 +489,17 @@ form.chat-book{gap:10px;padding:14px;border-radius:16px;background:rgba(255,255,
   <section id="contact" class="contact">
     <div>
       <h2 style="font-size:28px;margin-bottom:12px">Book a walkthrough</h2>
-      <p style="color:var(--g-ink-2);margin:0">Tell us a little about your business. We reply by email within 24 hours. Or <a href="https://calendar.app.google/hZbyd1vnBrK6uEwKA" target="_blank" rel="noopener">pick a time</a> for your walkthrough now<span class="sr"> (opens in a new tab)</span>.</p>
+      <p style="color:var(--g-ink-2);margin:0">Tell us about your business in four quick questions. When Plainline is a fit, you pick your walkthrough time right away.</p>
       <p class="billing">After you approve a quote, you pay by invoice through Stripe. <a href="https://stripe.com/@plainline" target="_blank" rel="noopener">Plainline on Stripe ↗</a></p>
     </div>
     <form id="leadForm" novalidate>
       <label>Your name<input name="name" required maxlength="200" autocomplete="name"></label>
       <label>Email<input name="email" type="email" required maxlength="320" autocomplete="email"></label>
-      <label>Company name and size<input name="business" maxlength="200" placeholder="e.g. Corner Cuts, 1 location"></label>
+      <label>Company name<input name="company" required maxlength="200" autocomplete="organization" placeholder="e.g. Corner Cuts"></label>
+      <div class="qual" role="group" aria-label="Four quick questions"></div>
       <label>What would you like us to run?<textarea name="message" maxlength="4500"></textarea></label>
       <label class="hp" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
-      <button class="btn" id="sendBtn">Send</button>
+      <button class="btn" id="sendBtn">Book a walkthrough</button>
       <p id="formMsg" role="status" aria-live="polite"></p>
       <p class="fine">We only use what you send here to reply to you. We never sell it. By sending, you confirm you're 18 or older and agree to our <a href="/terms">Terms</a>. See our <a href="/privacy">privacy policy</a>.</p>
     </form>
@@ -505,43 +511,66 @@ form.chat-book{gap:10px;padding:14px;border-radius:16px;background:rgba(255,255,
 </div>
 </div>
 
+<script src="/qualify.js"></script>
 <script>
 /* Contact form: sends one walkthrough request to /api/lead, which saves it to the "leads" table (The Engine's Inquiries tab) with limits per visitor. */
 const form = document.getElementById("leadForm"), msg = document.getElementById("formMsg"), btn = document.getElementById("sendBtn");
-/* The walkthrough booking page (Google Calendar). Offered after every request and whenever a send fails (a busy connection,
-   the spam check or no signal), so a visitor always has a way to book. The chat below uses it too. */
+/* The walkthrough booking page (Google Calendar). Ben, Nov 13: the site qualifies every request before he sees it, so
+   only a visitor whose answers make Plainline a fit sees it: after the request, or when a send fails. The chat uses it too. */
 const BOOK_URL = "https://calendar.app.google/hZbyd1vnBrK6uEwKA";
-const bookLink = () => {
-  const a = Object.assign(document.createElement("a"), { href: BOOK_URL, target: "_blank", rel: "noopener", textContent: "Pick a time" });
+const bookLink = big => {
+  const a = Object.assign(document.createElement("a"), { href: BOOK_URL, target: "_blank", rel: "noopener", textContent: big ? "Pick your walkthrough time" : "Pick a time", className: big ? "btn book-now" : "" });
   a.append(Object.assign(document.createElement("span"), { className: "sr", textContent: " (opens in a new tab)" })); return a;
 };
-const say = (text, cls, link) => { msg.textContent = text; msg.className = cls; if (link) msg.append(" ", bookLink(), "."); };
+const say = (text, cls, link) => { msg.textContent = text; msg.className = cls; if (link) msg.append(" ", bookLink(link === "big"), link === "big" ? "" : "."); };
 /* Where the visitor came from, so walkthrough rates can be counted per campaign: "website", or "website · <utm_source>/<utm_campaign>", at most 50 characters (the table's limit). */
 const leadSource = () => { const q = new URLSearchParams(location.search), tag = [q.get("utm_source"), q.get("utm_campaign")].filter(Boolean).join("/").replace(/[^\w.\/-]/g, "").slice(0, 40); return tag ? "website · " + tag : "website"; }; // the leads table caps source at 50 characters
+/* The four quick questions come from qualify.js, so the page and the server use one list and one rule. Without it
+   (a blocked script) the forms still send, and the server answers "check": a person reads it, nobody gets the calendar. */
+const Q = window.Qualify;
+document.querySelectorAll(".qual").forEach(box => Q && box.replaceChildren(...Q.ASK.map(([key, label, opts]) => {
+  const l = document.createElement("label"), s = Object.assign(document.createElement("select"), { name: key, required: true });
+  s.append(new Option("Choose one", ""), ...Object.entries(opts).map(([v, t]) => new Option(t, v)));
+  l.append(label, s); return l;
+})));
+/* A form's answers, its first unanswered question and qualify()'s answer: fit, check or no */
+const answersOf = f => {
+  const a = {}; let miss = null;
+  for (const s of f.querySelectorAll(".qual select")) { a[s.name] = s.value; if (!s.value && !miss) miss = s; }
+  return { a, miss, ...(Q ? Q.qualify(a) : { fit: "check", note: "" }) };
+};
+const FITS = ["fit", "check", "no"];
+const after = (q, n) => q.fit === "fit" ? `Thanks${n}! Plainline is a fit for your business. Pick your walkthrough time now:`
+  : q.fit === "no" ? `Thanks for reaching out${n}. ${q.note}`.trim()
+  : `Thanks${n}! Your request is in. Plainline reads it and replies by email within 24 hours.`;
+const LIMIT = { fit: "We already have your request. To book your walkthrough now:", other: "We already have a few requests from this connection. We reply by email within 24 hours." };
+const FAILED = { fit: "Sorry, that didn't send. You can book your walkthrough here instead:", other: "Sorry, that didn't send. Please try again in a few minutes." };
 
 form.addEventListener("submit", async e => {
   e.preventDefault();
-  const f = Object.fromEntries(new FormData(form));
-  const name = f.name.trim(), email = f.email.trim();
+  const f = Object.fromEntries(new FormData(form)), q = answersOf(form);
+  const name = f.name.trim(), email = f.email.trim(), company = f.company.trim(), fit = q.fit === "fit";
   if (!name){ form.name.focus(); return say("Please add your name.", "err"); }
   if (!/^\S+@\S+\.\S+$/.test(email)){ form.email.focus(); return say("Please add a valid email so we can reply.", "err"); }
+  if (!company){ form.company.focus(); return say("Please add your company's name.", "err"); }
+  if (q.miss){ q.miss.focus(); return say("Please answer the four quick questions.", "err"); }
   if (f.website){ form.reset(); return say("Thanks! We'll be in touch.", "ok"); } // bot filled the hidden field
-  const message = [f.business.trim() && "Business: " + f.business.trim(), f.message.trim()].filter(Boolean).join("\n\n");
   btn.disabled = true; say("Sending…", "");
   try {
     const r = await fetch("/api/lead", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({name, email, message, source: leadSource()}),
+      body: JSON.stringify({name, email, company, message: f.message.trim(), q: q.a, source: leadSource()}),
       signal: AbortSignal.timeout(15000)
     });
     // Our own limit says 429 with no firewall header; the spam check (x-vercel-mitigated) and other errors go to the catch.
-    if (r.status === 429 && !r.headers.get("x-vercel-mitigated")) return say("We already have a few requests from this connection. To book your walkthrough now:", "err", true);
+    if (r.status === 429 && !r.headers.get("x-vercel-mitigated")) return say(fit ? LIMIT.fit : LIMIT.other, "err", fit);
     if (!r.ok) throw new Error("HTTP " + r.status);
-    form.reset(); say("Thanks! Your message is in. We reply by email within 24 hours. To book your walkthrough now:", "ok", true);
+    const d = await r.json().catch(() => ({})), got = FITS.includes(d.fit) ? d.fit : q.fit; // the server's answer wins
+    form.reset(); say(after({ ...q, fit: got }, ""), got === "no" ? "" : "ok", got === "fit" && "big");
   } catch (err) {
     console.error("lead submit failed", err);
-    say("Sorry, that didn't send. You can book your walkthrough here instead:", "err", true);
+    say(fit ? FAILED.fit : FAILED.other, "err", fit);
   } finally { btn.disabled = false; }
 });
 </script>
@@ -650,16 +679,19 @@ form.addEventListener("submit", async e => {
 
   book.addEventListener("submit", async e => {
     e.preventDefault();
-    const f = Object.fromEntries(new FormData(book)), name = f.name.trim(), email = f.email.trim(), btn = $("bookBtn");
+    const f = Object.fromEntries(new FormData(book)), name = f.name.trim(), email = f.email.trim(), btn = $("bookBtn"), q = answersOf(book), fit = q.fit === "fit";
     const err = (t, link) => { bookMsg.textContent = t; bookMsg.className = "err"; if (link) bookMsg.append(" ", bookLink(), "."); };
     if (!name) { book.name.focus(); return err("Please add your name."); }
     if (!/^\S+@\S+\.\S+$/.test(email)) { book.email.focus(); return err("Please add a valid email so we can reply."); }
-    const finish = () => {
+    if (q.miss) { q.miss.focus(); return err("Please answer the four quick questions."); }
+    const finish = got => {
       done = true; book.hidden = true; lock(true); chips([], false);
-      say("in", `Thanks, ${name.split(" ")[0]}. Your walkthrough request is in. We reply by email within 24 hours. To book now:`).append(" ", bookLink(), ".");
+      const m = say("in", after({ ...q, fit: got }, ", " + name.split(" ")[0]));
+      if (got === "no") return;
+      if (got === "fit") m.append(" ", bookLink(), ".");
       const b = document.createElement("div"); b.className = "booked pop"; b.textContent = "Walkthrough requested"; logEl.append(b); scroll();
     };
-    if (f.website) return finish(); // a bot filled the hidden field
+    if (f.website) return finish("check"); // a bot filled the hidden field: no booking page
     const words = log.filter(m => m.role === "visitor").map(m => "- " + m.text).join("\n");
     const message = ["Walkthrough chat on the website.", summary && "AI summary (check it against their words): " + summary,
       site && "Website: " + site, siteNote && "What the assistant read on it: " + siteNote, "Their words:\n" + words].filter(Boolean).join("\n\n").slice(0, 4000);
@@ -668,15 +700,16 @@ form.addEventListener("submit", async e => {
       const r = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, message, source: leadSource().replace(/^website/, "website chat").slice(0, 50) }),
+        body: JSON.stringify({ name, email, message, q: q.a, source: leadSource().replace(/^website/, "website chat").slice(0, 50) }),
         signal: AbortSignal.timeout(15000)
       });
-      if (r.status === 429 && !r.headers.get("x-vercel-mitigated")) return err("We already have a few requests from this connection. To book your walkthrough now:", true);
+      if (r.status === 429 && !r.headers.get("x-vercel-mitigated")) return err(fit ? LIMIT.fit : LIMIT.other, fit);
       if (!r.ok) throw new Error("HTTP " + r.status);
-      bookMsg.textContent = ""; finish();
+      const d = await r.json().catch(() => ({}));
+      bookMsg.textContent = ""; finish(FITS.includes(d.fit) ? d.fit : q.fit); // the server's answer wins
     } catch (er) {
       console.error("walkthrough request failed", er);
-      err("Sorry, that didn't send. You can book your walkthrough here instead:", true);
+      err(fit ? FAILED.fit : FAILED.other, fit);
     } finally { btn.disabled = false; }
   });
 

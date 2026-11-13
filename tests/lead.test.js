@@ -4,6 +4,7 @@
 const test = require("node:test");
 const assert = require("node:assert");
 const handler = require("../api/lead.js");
+const { qualify } = require("../qualify.js");
 
 const realFetch = globalThis.fetch;
 const URL_OK = "https://mtpaaizladkfjtpnkdao.supabase.co";
@@ -30,10 +31,10 @@ test.after(() => { delete process.env.SUPABASE_URL; delete process.env.SUPABASE_
 
 test("saves only the four columns, with the server key", async () => {
   const calls = install();
-  const { code } = await call({ body: { name: " Ana ", email: "ana@example.com", message: "", source: "website chat · google/kc", extra: "x", created_at: "2000-01-01" } });
+  const { code } = await call({ body: { name: " Ana ", email: "ana@example.com", message: "", source: "website chat · google/kc", extra: "x", created_at: "2000-01-01", fit: "fit" } });
   assert.strictEqual(code, 200);
   assert.strictEqual(calls[0].url, URL_OK + "/rest/v1/leads");
-  assert.deepStrictEqual(calls[0].body, { name: "Ana", email: "ana@example.com", message: null, source: "website chat · google/kc" });
+  assert.deepStrictEqual(calls[0].body, { name: "Ana", email: "ana@example.com", message: qualify({}).line, source: "website chat · google/kc" });
   assert.strictEqual(calls[0].opts.headers.apikey, "sb_secret_test");
   assert.strictEqual(calls[0].opts.headers.Authorization, undefined);
 });
@@ -98,4 +99,52 @@ test("no key, or a key for another project, is 501", async () => {
   assert.strictEqual((await call()).code, 501);
   process.env.SUPABASE_SECRET_KEY = "sb_secret_test"; process.env.SUPABASE_URL = "https://other.supabase.co";
   assert.strictEqual((await call()).code, 501);
+});
+
+// The qualifier (qualify.js): the server writes the answer on top of the request and sends it back to the page.
+const FIT = { role: "owner", area: "kc", size: "mid", kind: "home" };
+const ask = (q, extra = {}) => ({ name: "Ana", email: "ana@example.com", company: " Corner   Cuts ", message: "Quotes pile up", source: "website", q, ...extra });
+
+test("a walkthrough request is saved under its Fit and Answers lines, and the page gets the answer back", async () => {
+  const calls = install();
+  const { code, out } = await call({ body: ask(FIT) });
+  assert.deepStrictEqual([code, out], [200, { ok: true, fit: "fit" }]);
+  assert.strictEqual(calls[0].body.message, "Fit: fit\nAnswers: Owner or partner · Kansas City metro · 6 to 20 people · Home services (HVAC, plumbing, electrical)\nCompany: Corner Cuts\n\nQuotes pile up");
+  install();
+  assert.deepStrictEqual((await call({ body: ask({ ...FIT, area: "us" }) })).out, { ok: true, fit: "check" });
+  install();
+  assert.deepStrictEqual((await call({ body: ask({ ...FIT, kind: "money" }) })).out, { ok: true, fit: "no" });
+});
+
+test("the page can't make itself a fit: the server answers from the four answers only", async () => {
+  install();
+  assert.strictEqual((await call({ body: ask({ ...FIT, role: "admin" }, { fit: "fit" }) })).out.fit, "check");
+  install();
+  assert.strictEqual((await call({ body: ask("fit") })).out.fit, "check");
+});
+
+test("a long request still fits the 5000-character column with its Fit line on top", async () => {
+  const calls = install();
+  assert.strictEqual((await call({ body: ask(FIT, { message: "x".repeat(5000) }) })).code, 200);
+  assert.strictEqual(calls[0].body.message.length, 5000);
+  assert.match(calls[0].body.message, /^Fit: fit\n/);
+});
+
+test("the seller page's answers are saved as they are, with no Fit line", async () => {
+  const calls = install();
+  const { out } = await call({ body: { name: "Sam", email: "sam@example.com", message: "Seller page answers", source: "website · sellers" } });
+  assert.deepStrictEqual(out, { ok: true });
+  assert.strictEqual(calls[0].body.message, "Seller page answers");
+});
+
+test("a fit or a check starts the Event runner; a request that is not a fit starts nothing", async () => {
+  process.env.EVENT_FIRE_TOKEN = "sk-ant-oat01-" + "b".repeat(40);
+  try {
+    for (const [q, fires] of [[FIT, 2], [{ ...FIT, size: "solo" }, 2], [{ ...FIT, area: "away" }, 1]]) {
+      require("../api/_fire.js")._reset();
+      const calls = install();
+      assert.strictEqual((await call({ body: ask(q) })).code, 200);
+      assert.strictEqual(calls.length, fires, JSON.stringify(q));
+    }
+  } finally { delete process.env.EVENT_FIRE_TOKEN; }
 });

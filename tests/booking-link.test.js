@@ -1,6 +1,7 @@
-// A visitor always has a way to book (Nov 11 booking test): the contact section links the booking page,
-// and every failed send (our limit, the spam check, no signal) offers it instead of a dead end.
-// The page has no build step and CI runs no browser, so these read the page's own script lines.
+// Only a fit sees the booking page (Ben, Nov 13: the site qualifies every request before he sees it). The Nov 11
+// booking test said a visitor always has a way to book; now a visitor whose answers make Plainline a fit always has one
+// (after the request, and when a send fails), and nobody else gets the calendar from the home page or the trade pages.
+// The page has no build step and CI runs no browser, so these read the page's own script lines; the PR has the browser check.
 const test = require("node:test");
 const assert = require("node:assert");
 const fs = require("fs"), path = require("path");
@@ -10,38 +11,46 @@ const html = read("index.html");
 const BOOK = (html.match(/const BOOK_URL = "([^"]+)"/) || [])[1];
 const lines = (re) => html.split("\n").filter((l) => re.test(l));
 
-test("the home page names one booking page, the same one the other pages use", () => {
+test("the home page names one booking page, the same one the seller page uses", () => {
   assert.match(BOOK || "", /^https:\/\/calendar\.app\.google\/\w+$/);
-  for (const f of ["sell.html", "hvac-plumbing.html"]) assert.ok(read(f).includes(BOOK), f);
+  assert.ok(read("sell.html").includes(BOOK), "sell.html: the seller intro call keeps its own link");
   assert.match(html, /const bookLink = [^\n]*\n[^\n]*href: BOOK_URL/);
 });
 
-test("the contact section links the booking page", () => {
-  const contact = html.slice(html.indexOf('id="contact"'), html.indexOf('id="leadForm"'));
-  assert.ok(contact.includes(`href="${BOOK}"`));
+test("the booking page is never one click from the home page or a trade page", () => {
+  assert.equal(html.split("calendar.app.google").length - 1, 1, "only the script's BOOK_URL");
+  for (const f of ["hvac-plumbing.html", "auto-repair.html"]) assert.ok(!read(f).includes("calendar.app.google"), f);
 });
 
-test("the form and chat messages add the link only when asked", () => {
-  assert.match(html, /const say = \(text, cls, link\) => \{[^\n]*if \(link\) msg\.append\(" ", bookLink\(\)/);
-  assert.match(html, /const err = \(t, link\) => \{[^\n]*if \(link\) bookMsg\.append\(" ", bookLink\(\)/);
+test("the script shows the booking link in three places, each only for a fit", () => {
+  const calls = lines(/bookLink\(/).filter((l) => !/const bookLink = /.test(l)).map((l) => l.trim());
+  assert.deepStrictEqual(calls, [
+    'const say = (text, cls, link) => { msg.textContent = text; msg.className = cls; if (link) msg.append(" ", bookLink(link === "big"), link === "big" ? "" : "."); };',
+    'const err = (t, link) => { bookMsg.textContent = t; bookMsg.className = "err"; if (link) bookMsg.append(" ", bookLink(), "."); };',
+    'if (got === "fit") m.append(" ", bookLink(), ".");'
+  ]);
+  const gated = lines(/\b(say|err)\(fit \? (LIMIT|FAILED)\.fit : \2\.other, ("err", )?fit\);/);
+  assert.equal(gated.length, 4, "form: limit and failed send; chat: limit and failed send");
+  assert.equal(lines(/say\(after\(\{ \.\.\.q, fit: got \}, ""\), got === "no" \? "" : "ok", got === "fit" && "big"\);/).length, 1, "form thank-you");
+  assert.equal(lines(/\b(say|err)\([^;()]*, true\);/).length, 0, "no booking link that skips the answer");
 });
 
-test("every thank-you and every failed send offers the booking link", () => {
-  assert.ok(!/try again in an hour/i.test(html), "the old dead-end message is back");
-  const offers = lines(/\b(say|err)\("(Sorry, that didn't send|We already have a few requests|Thanks! Your message is in)/);
-  assert.equal(offers.length, 5, "form: thanks, limit, failed; chat: limit, failed");
-  for (const l of offers) assert.match(l, /, true\);(\s*\/\/.*)?$/, l.trim());
-  assert.equal(lines(/say\("in", `Thanks, \$\{name[^\n]*\.append\(" ", bookLink\(\), "\."\);$/).length, 1, "chat thank-you");
+test("what each answer reads: a fit picks a time, a check hears back in 24 hours, not a fit reads why", () => {
+  assert.match(html, /q\.fit === "fit" \? `Thanks\$\{n\}! Plainline is a fit for your business\. Pick your walkthrough time now:`/);
+  assert.match(html, /: q\.fit === "no" \? `Thanks for reaching out\$\{n\}\. \$\{q\.note\}`\.trim\(\)/);
+  assert.match(html, /: `Thanks\$\{n\}! Your request is in\. Plainline reads it and replies by email within 24 hours\.`;/);
+  assert.match(html, /if \(f\.website\) return finish\("check"\); \/\/ a bot filled the hidden field: no booking page/);
 });
 
 test("only our own limit says 'a few requests'; the spam check gets the failed-send message", () => {
   const limits = lines(/r\.status === 429[^\n]*return (say|err)\(/);
   assert.equal(limits.length, 2);
   for (const l of limits) assert.ok(l.includes('r.status === 429 && !r.headers.get("x-vercel-mitigated")'), l.trim());
+  assert.ok(!/try again in an hour/i.test(html), "the old dead-end message is back");
 });
 
-test("the chat's name and email hints stay plain", () => {
-  const hints = lines(/return err\("Please add/);
-  assert.equal(hints.length, 2);
-  for (const l of hints) assert.ok(!l.includes(", true)"), l.trim());
+test("the chat's name, email and question hints stay plain", () => {
+  const hints = lines(/return err\("Please (add|answer)/);
+  assert.equal(hints.length, 3);
+  for (const l of hints) assert.ok(!/, (true|fit)\)/.test(l), l.trim());
 });
