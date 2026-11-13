@@ -5,6 +5,7 @@
 const { sameSite, clientIp, limiter, jsonBody } = require("./_public");
 const { fireEvent } = require("./_fire"); // starts the Event runner, which sends the booking-link reply in minutes
 const { qualify } = require("../qualify.js"); // the same rules the page uses: fit, check or not a fit
+const ENGINE = "https://ops.plainlineops.com/api/check"; // The Engine's phone alerts (jarvis-app ops/api/check.js, pushInquiries)
 
 const PROJECT = "mtpaaizladkfjtpnkdao"; // Plainline's Supabase project; any other URL in env is a setup mistake
 const overLimit = limiter(3, 200); // requests per IP per hour; per warm instance per hour
@@ -27,6 +28,15 @@ function lead(b) {
   return { name, email, message: (message ? head + "\n\n" + message : head).slice(0, 5000), source, fit: q.fit };
 }
 
+// Tells The Engine a request came in, so Ben's phone gets an alert in seconds (Ben, Nov 13: "yep let's get them").
+// Only the word "inquiries" goes; The Engine reads the new row itself and alerts once per row. Never fails the request.
+async function alertEngine() {
+  try {
+    const r = await fetch(ENGINE, { method: "POST", headers: { "content-type": "application/json" }, body: '{"push":"inquiries"}', signal: AbortSignal.timeout(3000) });
+    if (!r.ok) console.error("engine alert", r.status);
+  } catch (e) { console.error("engine alert", e.name); }
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
   if (req.method !== "POST") return res.status(405).json({ error: "Use POST" });
@@ -45,8 +55,8 @@ module.exports = async function handler(req, res) {
   if (key.startsWith("eyJ")) headers.Authorization = "Bearer " + key; // the older service-role key is a JWT
   try {
     const r = await fetch(url.replace(/\/$/, "") + "/rest/v1/leads", { method: "POST", headers, body: JSON.stringify(row), signal: AbortSignal.timeout(10000) });
-    if (r.ok) { // the page shows the booking page only for a fit; no agent works on a request that is not a fit
-      if (fit !== "no") await fireEvent("inquiry"); // never fails the request (_fire.js)
+    if (r.ok) { // the page shows the booking page only for a fit; a request that is not a fit starts no agent and pings no phone
+      if (fit !== "no") await Promise.all([fireEvent("inquiry"), alertEngine()]); // neither fails the request
       return res.status(200).json(fit ? { ok: true, fit } : { ok: true });
     }
     console.error("lead: supabase", r.status); // never the visitor's name, email or words
