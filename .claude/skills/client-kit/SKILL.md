@@ -15,4 +15,4 @@ description: "Build a Plainline client profile and card kit from a business's we
    - `img`: a one-line photo brief from `intake`, e.g. "tow truck on a rainy highway shoulder at night". The main session generates it with Higgsfield after quoting the credits to Ben. Documentary style, no people, text or logos.
 3. No price, period or plan cost anywhere. The CTA is "Book a walkthrough".
 4. Label example numbers "values illustrative" until the client confirms them.
-5. Run the review gate on the result (`reviewer`, then `refuter`). At handoff, the client gets a one-page explainer of how their site works (Constellation star `sitereview`).
+5. Run the review gate on the result (`reviewer`, then `refuter`). At handoff, the client gets a one-page explainer of how their site works (roster agent `sitereview`).
