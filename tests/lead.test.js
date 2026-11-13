@@ -65,7 +65,7 @@ test("one IP gets 3 an hour", async () => {
   const codes = [];
   for (let i = 0; i < 5; i++) codes.push((await call({ ip: "10.9.9.9" })).code);
   assert.deepStrictEqual(codes, [200, 200, 200, 429, 429]);
-  assert.strictEqual(calls.length, 3);
+  assert.strictEqual(calls.filter((c) => c.url.startsWith(URL_OK)).length, 3);
 });
 
 test("the database cap shows as 429, other failures as 502", async () => {
@@ -83,13 +83,28 @@ test("a saved request starts the Event runner once; a failed save starts nothing
   try {
     let calls = install();
     assert.strictEqual((await call()).code, 200);
-    assert.deepStrictEqual(calls.map((c) => c.url), [URL_OK + "/rest/v1/leads", "https://api.anthropic.com/v1/claude_code/routines/trig_01QPPFmh4MwZEEjbd367YqaB/fire"]);
+    assert.deepStrictEqual(calls.map((c) => c.url), [URL_OK + "/rest/v1/leads", "https://api.anthropic.com/v1/claude_code/routines/trig_01QPPFmh4MwZEEjbd367YqaB/fire", "https://ops.plainlineops.com/api/check"]);
     assert.deepStrictEqual(calls[1].body, { text: "inquiry" }); // never the visitor's name, email or words
     require("../api/_fire.js")._reset();
     calls = install(500);
     assert.strictEqual((await call()).code, 502);
     assert.strictEqual(calls.length, 1);
   } finally { delete process.env.EVENT_FIRE_TOKEN; }
+});
+
+test("a saved request tells The Engine to alert Ben, with no visitor words; a failed save or a down Engine changes nothing", async () => {
+  let calls = install();
+  assert.strictEqual((await call({ body: { name: "Ana", email: "ana@example.com", message: "Call me", source: "website" } })).code, 200);
+  const engine = calls.filter((c) => c.url === "https://ops.plainlineops.com/api/check");
+  assert.strictEqual(engine.length, 1);
+  assert.deepStrictEqual(engine[0].body, { push: "inquiries" }); // never the visitor's name, email or words
+  assert.strictEqual(engine[0].opts.method, "POST");
+  assert.ok(engine[0].opts.signal); // a slow Engine can't hold the visitor's request
+  calls = install(500);
+  assert.strictEqual((await call()).code, 502);
+  assert.strictEqual(calls.filter((c) => c.url.startsWith("https://ops.")).length, 0);
+  globalThis.fetch = async (url, opts) => { if (String(url).startsWith("https://ops.")) throw new TypeError("network"); return new Response("", { status: 201 }); };
+  assert.strictEqual((await call()).code, 200); // The Engine down: the visitor still gets their thank-you
 });
 
 test("no key, or a key for another project, is 501", async () => {
