@@ -15,5 +15,9 @@ test("the privacy policy names phone calls, the recording, ElevenLabs and the 90
   assert.match(p, /deleted after 90 days/);
   assert.match(p, /your email if you give it, the time you picked, why you asked for a person/);
   assert.match(p, /When you call us, it holds your phone number the same way/);
+  assert.match(p, /a short note and a call reference number/);
+  assert.match(p, /or no one picks up when it connects you, we save the number you called from/);
+  assert.match(p, /during our hours \(8 AM to 8 PM Central\)/);
+  assert.match(p, /a short summary of the call for 90 days/);
   assert.match(read("docs/subprocessors.md"), /^\| ElevenLabs \(added Nov 13, 2026\)/m);
 });
