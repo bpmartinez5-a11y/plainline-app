@@ -4,6 +4,7 @@
 // requests (here and in the Vercel firewall rule on /api/lead), and the database keeps a last-resort cap for everyone.
 const { sameSite, clientIp, limiter, jsonBody } = require("./_public");
 const { fireEvent } = require("./_fire"); // starts the Event runner, which sends the booking-link reply in minutes
+const ENGINE = "https://ops.plainlineops.com/api/check"; // The Engine's phone alerts (jarvis-app ops/api/check.js, pushInquiries)
 
 const PROJECT = "mtpaaizladkfjtpnkdao"; // Plainline's Supabase project; any other URL in env is a setup mistake
 const overLimit = limiter(3, 200); // requests per IP per hour; per warm instance per hour
@@ -19,6 +20,15 @@ function lead(b) {
   if (!name || name.length > 200 || email.length > 320 || !EMAIL.test(email) || message.length > 5000) return null;
   if (!/^website( chat)?( · |$)/.test(source)) return null; // only the site's own sources (lead-source.test.js)
   return { name, email, message: message || null, source };
+}
+
+// Tells The Engine a request came in, so Ben's phone gets an alert in seconds (Ben, Nov 13: "yep let's get them").
+// Only the word "inquiries" goes; The Engine reads the new row itself and alerts once per row. Never fails the request.
+async function alertEngine() {
+  try {
+    const r = await fetch(ENGINE, { method: "POST", headers: { "content-type": "application/json" }, body: '{"push":"inquiries"}', signal: AbortSignal.timeout(3000) });
+    if (!r.ok) console.error("engine alert", r.status);
+  } catch (e) { console.error("engine alert", e.name); }
 }
 
 module.exports = async function handler(req, res) {
@@ -38,7 +48,7 @@ module.exports = async function handler(req, res) {
   if (key.startsWith("eyJ")) headers.Authorization = "Bearer " + key; // the older service-role key is a JWT
   try {
     const r = await fetch(url.replace(/\/$/, "") + "/rest/v1/leads", { method: "POST", headers, body: JSON.stringify(row), signal: AbortSignal.timeout(10000) });
-    if (r.ok) { await fireEvent("inquiry"); return res.status(200).json({ ok: true }); } // never fails the request (_fire.js)
+    if (r.ok) { await Promise.all([fireEvent("inquiry"), alertEngine()]); return res.status(200).json({ ok: true }); } // neither fails the request
     console.error("lead: supabase", r.status); // never the visitor's name, email or words
     return res.status(r.status === 400 && /too many inquiries/.test(await r.text()) ? 429 : 502).json({ error: "Save failed" });
   } catch (e) {
