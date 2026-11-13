@@ -121,3 +121,26 @@ test("client sites load self-hosted fonts, never Google's", () => {
     assert.ok(fs.existsSync(path.join(__dirname, "..", "fonts", css[1])), `${css[1]} exists`);
   }
 });
+
+test("site data uses the business type that matches the kind", () => {
+  const ld = kind => JSON.parse(E.render({ business: { name: "X", kind } }).site.match(/<script type="application\/ld\+json">([^<]*)<\/script>/)[1])["@type"];
+  assert.strictEqual(ld("Heating and air"), "HVACBusiness");
+  assert.strictEqual(ld("Plumber"), "Plumber");
+  assert.strictEqual(ld("Collision and body shop"), "AutoBodyShop");
+  assert.strictEqual(ld("Tire and auto repair"), "TireShop");
+  assert.strictEqual(ld("Indoor golf simulator"), "SportsActivityLocation");
+  assert.strictEqual(ld("Nail salon"), "NailSalon");
+  assert.strictEqual(ld("Med spa"), "MedicalBusiness");
+  assert.strictEqual(ld("Mobile car detailing"), "AutomotiveBusiness");
+  assert.strictEqual(ld("Gun shop"), "SportingGoodsStore");
+  assert.strictEqual(ld("Retirement home"), "LocalBusiness");
+  assert.strictEqual(ld("Wheelchair repair"), "LocalBusiness");
+  assert.strictEqual(ld("Sports & portrait photographer"), "LocalBusiness");
+  assert.strictEqual(ld(""), "LocalBusiness");
+});
+
+test("site data names the service area when the profile has one", () => {
+  const site = E.render({ business: { name: "X", kind: "Plumber", city: "Olathe" }, contact: { serviceArea: "Olathe, Lenexa and Overland Park" } }).site;
+  const ld = JSON.parse(site.match(/<script type="application\/ld\+json">([^<]*)<\/script>/)[1]);
+  assert.strictEqual(ld.areaServed, "Olathe, Lenexa and Overland Park");
+});
