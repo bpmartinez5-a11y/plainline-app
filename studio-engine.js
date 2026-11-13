@@ -999,12 +999,37 @@ ${isSite ? SITE_CSS : DASH_CSS}
 <!-- Built by Plainline Studio from a site profile. Placeholders marked "ADD:" must be filled before launch. -->
 `;
   }
+  // The schema.org business type Google and AI answer tools read, picked from the business kind.
+  // First match wins; the playbook's industry blocks use the same types
+  // (project files plainline/playbook/2026-11-13-client-marketing.md, part 3).
+  const BIZ_TYPES = [
+    [/insurance|agency|consult|equipment|transplant|\bpet|groom/i, "LocalBusiness"],
+    [/hvac|heating|air condition|furnace|heat pump/i, "HVACBusiness"],
+    [/plumb|drain|water heater|sewer/i, "Plumber"],
+    [/electrician|electrical contractor/i, "Electrician"],
+    [/\broof(ing|er)s?\b/i, "RoofingContractor"],
+    [/body shop|collision|dent repair/i, "AutoBodyShop"],
+    [/auto ?parts|parts store/i, "AutoPartsStore"],
+    [/\btires?\b/i, "TireShop"],
+    [/\bdetail/i, "AutomotiveBusiness"],
+    [/dealer/i, "AutoDealer"],
+    [/\bauto(motive|mobile)?\b|\bmechanics?\b|car repair|oil change/i, "AutoRepair"],
+    [/golf course|country club/i, "GolfCourse"],
+    [/golf|driving range|simulator|shooting range/i, "SportsActivityLocation"],
+    [/\bmed ?spa|medical spa/i, "MedicalBusiness"],
+    [/\bnail/i, "NailSalon"],
+    [/barber|\bhair|salon/i, "HairSalon"],
+    [/gym|fitness|crossfit|yoga|pilates/i, "ExerciseGym"],
+    [/\bguns?\b|firearm/i, "SportingGoodsStore"]
+  ];
+  function bizType(kind) { const hit = BIZ_TYPES.find(([re]) => re.test(kind || "")); return hit ? hit[1] : "LocalBusiness"; }
   function ldJson(p) {
-    const B = p.business, C = p.contact, o = { "@context": "https://schema.org", "@type": "LocalBusiness", name: B.name };
+    const B = p.business, C = p.contact, o = { "@context": "https://schema.org", "@type": bizType(B.kind), name: B.name };
     if (B.domain) o.url = "https://" + B.domain + "/";
     if (C.phone) o.telephone = C.phone;
     if (C.address) o.address = C.address;
-    if (B.city) o.areaServed = B.city;
+    const area = [C.serviceArea, B.city].find(x => x && !/^ADD:/i.test(x));
+    if (area) o.areaServed = area;
     if (p.hero.photos[0]) o.image = p.hero.photos[0].src;
     if (B.socials.length) o.sameAs = B.socials.map(s => s.url);
     return o;
