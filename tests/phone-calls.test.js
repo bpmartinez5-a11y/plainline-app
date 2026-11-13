@@ -13,5 +13,7 @@ test("the privacy policy names phone calls, the recording, ElevenLabs and the 90
   assert.match(p, /<li><b>ElevenLabs<\/b>/);
   assert.match(p, /We never call you with an AI voice\./);
   assert.match(p, /deleted after 90 days/);
+  assert.match(p, /your email if you give it, the time you picked, why you asked for a person/);
+  assert.match(p, /When you call us, it holds your phone number the same way/);
   assert.match(read("docs/subprocessors.md"), /^\| ElevenLabs \(added Nov 13, 2026\)/m);
 });
