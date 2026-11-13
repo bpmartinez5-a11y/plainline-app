@@ -45,7 +45,7 @@ button:hover{background:rgba(255,255,255,.14)}
 <main>
   <nav><a href="/"><img src="/icons/plainline-wordmark-dark.svg" alt="Plainline" width="125" height="40"></a></nav>
   <h1>Privacy policy</h1>
-  <p class="muted">Effective November 11, 2026</p>
+  <p class="muted">Effective November 13, 2026</p>
 
   <p>Plainline is operated by Plainlineops LLC, a Kansas limited liability company ("we", "us"). This policy explains what Plainline collects on this website, why, who helps us handle it, and how you can have it deleted. We collect as little as we can.</p>
 
@@ -55,6 +55,7 @@ button:hover{background:rgba(255,255,255,.14)}
     <li><b>Seller questions.</b> If you answer the questions on our seller page, we save your name, email, your phone number if you give one, and your answers, the same way as the contact form. We use them only to reply to you about selling with Plainline.</li>
     <li><b>Walkthrough chat.</b> The chat on our home page is an AI assistant. What you type in it is sent through our server to our AI provider to write the next reply. If you share your website's address, our server reads that site's public home page and sends that text to our AI provider too. We don't save the chat on our server. Anthropic handles those messages under its own API terms and may keep them for a limited time for safety and abuse monitoring. If you book a walkthrough from the chat, we save your name, email, the messages you typed, the website address and a short summary the assistant wrote, the same way as the contact form, and we use them only to reply to you and to talk with you about a setup.</li>
     <li><b>Live demo.</b> Messages and details you type into the demo stay in your browser tab and are gone when you refresh or close it. If the demo's AI replies are turned on, the messages in that chat are sent through our server to our AI provider to write the next reply. We don't save them. Anthropic handles those messages under its own API terms and may keep them for a limited time for safety and abuse monitoring; we don't control that, which is one more reason to use made-up details in the demo. If message sorting is turned on, your last few demo messages also go to TypeSafe AI, which only labels them (for example, a booking request or something urgent) so a person can be brought in; we don't save its answers. Settings you change on the demo's setup screen are saved only in your own browser.</li>
+    <li><b>Phone calls.</b> When you call our business number, an automated AI assistant answers. Its first sentence says it is an automated assistant and that the call is recorded. ElevenLabs runs the assistant's voice: it turns what you say into text and the replies into speech, and an AI model (Claude, made by Anthropic) that ElevenLabs runs for us writes the replies. ElevenLabs keeps the call recording and its transcript for 90 days, then deletes them. If you ask for a walkthrough or a call back, we save your name, the number you called from or asked us to use, your business name, the time you picked and a short note, the same way as the contact form, and we use them only to reply to you and to talk with you about a setup. If you ask for a person during our hours, we connect your call to someone at Plainline. We never call you with an AI voice.</li>
     <li><b>Technical data.</b> Like any website, our host receives your IP address and basic browser information when you visit. Our server also holds your IP address in memory, never on disk, for up to a day (a little longer if the server stays running), only to limit how many AI replies and form sends one visitor can make in the demo, the walkthrough chat, the contact form and the seller questions. We count page visits with Vercel's cookieless analytics, which shows us totals like visits per page and where visitors came from, never who you are.</li>
   </ul>
 
@@ -71,11 +72,12 @@ button:hover{background:rgba(255,255,255,.14)}
   <p>These companies help us run the site. Each handles data under its own terms, as described below:</p>
   <ul>
     <li><b>Vercel</b> hosts the website and the demo server, and counts page visits.</li>
-    <li><b>Supabase</b> stores contact form messages, walkthrough requests from the chat, and the texts we send and receive.</li>
+    <li><b>Supabase</b> stores contact form messages, walkthrough requests from the chat and from phone calls, and the texts we send and receive.</li>
     <li><b>Stripe</b> sends our invoices and takes payments from clients. We never see or store full card or bank numbers.</li>
-    <li><b>Anthropic</b> provides the AI model that writes demo replies, walkthrough chat replies and automated text replies, when AI replies are turned on.</li>
+    <li><b>Anthropic</b> provides the AI model that writes demo replies, walkthrough chat replies, automated text replies and the phone assistant's replies, when AI replies are turned on.</li>
+    <li><b>ElevenLabs</b> runs the phone assistant: its voice, the speech-to-text and the AI model that answers. It keeps call recordings and transcripts for 90 days.</li>
     <li><b>TypeSafe AI</b> sorts your latest demo messages (for example, a booking request or something urgent) so a person can be brought in, when message sorting is turned on.</li>
-    <li><b>Twilio</b> sends and receives our text messages.</li>
+    <li><b>Twilio</b> sends and receives our text messages and carries our phone calls.</li>
     <li><b>Google Workspace</b> runs our email, so our replies to you go through it, and our walkthrough booking page (Google Calendar), where you pick a time.</li>
     <li><b>Google Ads</b> and <b>Meta</b> measure which of our ads bring visitors, only if you choose "Allow" (see <a href="#ads">Ad measurement</a>).</li>
     <li><b>Google Fonts</b> serves the site's fonts, which means your browser connects to Google to load them.</li>
@@ -91,7 +93,7 @@ button:hover{background:rgba(255,255,255,.14)}
   <p>We don't sell your mobile number, and we don't share it or your consent to get texts with anyone for their marketing. We keep a record of each text we send you and of how you agreed to get texts, so we can show we had your OK.</p>
 
   <h2>How long we keep it</h2>
-  <p>We keep contact form messages for as long as we need them to reply to you and follow up about a setup, then delete them. You can ask us to delete yours sooner at any time.</p>
+  <p>We keep contact form messages and requests from phone calls for as long as we need them to reply to you and follow up about a setup, then delete them. Call recordings and transcripts are deleted after 90 days. You can ask us to delete yours sooner at any time.</p>
 
   <h2>Your choices</h2>
   <p>You can ask to see, correct or delete the information you've sent us. Send the request through the <a href="/#contact">contact form</a> and say what you'd like us to do. We'll confirm when it's done. Depending on where you live, you may have more rights under local law, and we'll honor them.</p>
