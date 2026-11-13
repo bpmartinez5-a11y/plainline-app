@@ -41,4 +41,4 @@ No protected health information reaches a provider unless its BAA column says ye
 
 ## Safeguards summary (agreement §7.10)
 
-The Access keeper (Constellation `access`) fills this each quarter: per provider, whether data is encrypted at rest, whether MFA is on for Plainline's admin accounts, and any exception. Until filled, say "not yet confirmed" when a client asks.
+The Access keeper (roster agent `access`) fills this each quarter: per provider, whether data is encrypted at rest, whether MFA is on for Plainline's admin accounts, and any exception. Until filled, say "not yet confirmed" when a client asks.

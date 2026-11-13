@@ -38,4 +38,4 @@ Plainline runs on Vercel: static pages plus serverless functions in `api/`. Verc
 - Vercel Analytics for page speed.
 - An uptime check on `/` and `GET /api/chat` (returns `{ai:true}`), using a free monitor that emails Ben.
 
-**After deploy:** open production, send one demo message, and confirm the reply. Note the deployment in the PR. If anything broke, roll back first, then add it as an incident eval case (Constellation star `evals`).
+**After deploy:** open production, send one demo message, and confirm the reply. Note the deployment in the PR. If anything broke, roll back first, then add it as an incident eval case (roster agent `evals`).
