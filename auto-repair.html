@@ -107,7 +107,7 @@ footer a{color:var(--g-ink-2)}
   <h1 id="h1">Answer the calls you miss under a car</h1>
   <p class="lede">For auto repair, tire, body and detail shops in the Kansas City metro. When your hands are full, Plainline's AI front desk texts the caller back and answers their texts. It books the job, or it sends the urgent ones to you in under 5 minutes. It always says it is automated.</p>
   <p class="fine">Texting on your business number starts once the phone carriers approve it.</p>
-  <div class="cta"><a class="btn" href="https://calendar.app.google/hZbyd1vnBrK6uEwKA" target="_blank" rel="noopener">Book a walkthrough<span class="sr"> (opens in a new tab)</span></a><a class="btn ghost" href="/demo">Try the live demo</a></div>
+  <div class="cta"><a class="btn" href="/#contact">Book a walkthrough</a><a class="btn ghost" href="/demo">Try the live demo</a></div>
 </section>
 
 <section aria-labelledby="h-miss">
@@ -175,11 +175,13 @@ footer a{color:var(--g-ink-2)}
 <section aria-labelledby="h-go">
   <h2 id="h-go">Try it in your browser</h2>
   <p>Write to the demo like a customer would. It runs on a sample business. Then book 20 minutes with Ben Martinez, Plainline's founder, and he shows you what it would say for your shop.</p>
-  <div class="cta"><a class="btn" href="https://calendar.app.google/hZbyd1vnBrK6uEwKA" target="_blank" rel="noopener">Book a walkthrough<span class="sr"> (opens in a new tab)</span></a><a class="btn ghost" href="/demo">Try the live demo</a></div>
-  <p class="fine" style="margin-top:12px">Rather write? Use the <a href="/#contact">form on our home page</a>. We reply by email within 24 hours.</p>
+  <div class="cta"><a class="btn" href="/#contact">Book a walkthrough</a><a class="btn ghost" href="/demo">Try the live demo</a></div>
+  <p class="fine" style="margin-top:12px">Five quick questions about your shop. When Plainline is a fit, you pick your walkthrough time right away.</p>
 </section>
 
 <footer>© 2026 Plainlineops LLC · Kansas City metro · <a href="/">Home</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></footer>
 </main>
+<script>/* The ad tags ride along to the walkthrough form, so a request still counts for its campaign (index.html leadSource). */
+for (const a of document.querySelectorAll('a[href="/#contact"]')) a.search = location.search;</script>
 </body>
 </html>

@@ -59,7 +59,7 @@ for (const slug of ["hvac-plumbing", "auto-repair"]) {
   test(`${slug}: the first screen says it is automated and offers the walkthrough and the demo`, () => {
     const hero = html.slice(html.indexOf('<section aria-labelledby="h1">'), html.indexOf("</section>"));
     assert.match(hero, /<p class="lede">[^<]*It always says it is automated\.<\/p>/);
-    assert.match(hero, /href="https:\/\/calendar\.app\.google\/[\w]+"[^>]*>Book a walkthrough</);
+    assert.match(hero, /<a class="btn" href="\/#contact">Book a walkthrough<\/a>/, "the walkthrough starts with the five questions");
     assert.match(hero, /href="\/demo"/);
     assert.match(hero, /Texting on your business number starts once the phone carriers approve it\./);
   });
@@ -67,10 +67,11 @@ for (const slug of ["hvac-plumbing", "auto-repair"]) {
   test(`${slug}: the AI answer, the call-to-action words and the example label stay true`, () => {
     const ai = jsonld.find((j) => j["@type"] === "FAQPage").mainEntity.find((q) => q.name === "Is it a person or AI?");
     assert.match(ai.acceptedAnswer.text, /It is an AI front desk, and it always tells customers it is automated\./);
-    const cal = [...html.matchAll(/<a [^>]*href="https:\/\/calendar\.app\.google\/[^"]*"[^>]*>(.*?)<\/a>/g)].map((m) => m[1]);
-    assert.ok(cal.length >= 2);
-    for (const t of cal) assert.equal(t.replace(/<span class="sr">[^<]*<\/span>/, ""), "Book a walkthrough");
-    for (const [, href] of html.matchAll(/<a [^>]*href="(https?:\/\/[^"]*)"/g)) assert.match(href, /^https:\/\/(calendar\.app\.google\/|plainlineops\.com\/)/, href);
+    const book = [...html.matchAll(/<a class="btn" href="\/#contact">(.*?)<\/a>/g)].map((m) => m[1]);
+    assert.deepStrictEqual(book, ["Book a walkthrough", "Book a walkthrough"], "top and bottom");
+    assert.ok(!html.includes("calendar.app.google"), "the booking page comes after the questions, only for a fit");
+    assert.match(html, /for \(const a of document\.querySelectorAll\('a\[href="\/#contact"\]'\)\) a\.search = location\.search;/, "ad tags ride along");
+    for (const [, href] of html.matchAll(/<a [^>]*href="(https?:\/\/[^"]*)"/g)) assert.match(href, /^https:\/\/plainlineops\.com\//, href);
     assert.match(html, /<figure class="box card">[\s\S]*made-up customer[\s\S]*<figcaption[^>]*>[^<]*values illustrative<\/figcaption>\s*<\/figure>/);
   });
 }

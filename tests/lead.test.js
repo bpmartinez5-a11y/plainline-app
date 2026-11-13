@@ -4,6 +4,7 @@
 const test = require("node:test");
 const assert = require("node:assert");
 const handler = require("../api/lead.js");
+const { qualify } = require("../qualify.js");
 
 const realFetch = globalThis.fetch;
 const URL_OK = "https://mtpaaizladkfjtpnkdao.supabase.co";
@@ -30,10 +31,10 @@ test.after(() => { delete process.env.SUPABASE_URL; delete process.env.SUPABASE_
 
 test("saves only the four columns, with the server key", async () => {
   const calls = install();
-  const { code } = await call({ body: { name: " Ana ", email: "ana@example.com", message: "", source: "website chat · google/kc", extra: "x", created_at: "2000-01-01" } });
+  const { code } = await call({ body: { name: " Ana ", email: "ana@example.com", message: "", source: "website chat · google/kc", extra: "x", created_at: "2000-01-01", fit: "fit" } });
   assert.strictEqual(code, 200);
   assert.strictEqual(calls[0].url, URL_OK + "/rest/v1/leads");
-  assert.deepStrictEqual(calls[0].body, { name: "Ana", email: "ana@example.com", message: null, source: "website chat · google/kc" });
+  assert.deepStrictEqual(calls[0].body, { name: "Ana", email: "ana@example.com", message: qualify({}).line, source: "website chat · google/kc" });
   assert.strictEqual(calls[0].opts.headers.apikey, "sb_secret_test");
   assert.strictEqual(calls[0].opts.headers.Authorization, undefined);
 });
@@ -113,4 +114,107 @@ test("no key, or a key for another project, is 501", async () => {
   assert.strictEqual((await call()).code, 501);
   process.env.SUPABASE_SECRET_KEY = "sb_secret_test"; process.env.SUPABASE_URL = "https://other.supabase.co";
   assert.strictEqual((await call()).code, 501);
+});
+
+// The qualifier (qualify.js): the server writes the answer on top of the request and sends it back to the page.
+const FIT = { role: "owner", area: "kc", size: "mid", kind: "home", when: "month" };
+const ask = (q, extra = {}) => ({ name: "Ana", email: "ana@example.com", company: " Corner   Cuts ", phone: "913 555 0100", site: "cornercuts.com", message: "Quotes pile up", source: "website", q, ...extra });
+
+test("a walkthrough request is saved under its Fit, Answers and contact lines, and the page gets the answer back", async () => {
+  const calls = install();
+  const { code, out } = await call({ body: ask(FIT) });
+  assert.deepStrictEqual([code, out], [200, { ok: true, fit: "fit" }]);
+  assert.strictEqual(calls[0].body.message, "Fit: fit\nAnswers: Owner or partner · Kansas City metro · 6 to 20 people · Home services (HVAC, plumbing, electrical) · This month\n"
+    + "Company: Corner Cuts\nPhone: (913) 555-0100\nWebsite: https://cornercuts.com/\n\nQuotes pile up");
+  install();
+  assert.deepStrictEqual((await call({ body: ask({ ...FIT, area: "us" }) })).out, { ok: true, fit: "check" });
+  install();
+  assert.deepStrictEqual((await call({ body: ask({ ...FIT, kind: "money" }) })).out, { ok: true, fit: "no" });
+});
+
+test("the page can't make itself a fit: the server answers from the five answers and the phone number only", async () => {
+  install();
+  assert.strictEqual((await call({ body: ask({ ...FIT, role: "admin" }, { fit: "fit" }) })).out.fit, "check");
+  install();
+  assert.strictEqual((await call({ body: ask("fit") })).out.fit, "check");
+  const calls = install();
+  assert.strictEqual((await call({ body: ask(FIT, { phone: "555-0100" }) })).out.fit, "check", "a phone number with no area code");
+  assert.match(calls[0].body.message, /^Fit: check \(no phone number\)\n/);
+});
+
+test("the website line says what the visitor gave: an address, no website, or nothing", async () => {
+  for (const [extra, line] of [[{ site: "https://www.cornercuts.com/about" }, "Website: https://www.cornercuts.com/about"],
+    [{ site: "", nosite: true }, "Website: they don't have one"], [{ site: "" }, "Website: not given"], [{ site: "http://localhost:3000" }, "Website: not given"],
+    [{ site: "", nosite: "true" }, "Website: not given"]]) {
+    const calls = install();
+    assert.strictEqual((await call({ body: ask(FIT, extra) })).out.fit, "fit", "the website is optional");
+    assert.ok(calls[0].body.message.split("\n").includes(line), JSON.stringify(extra));
+  }
+});
+
+test("someone looking for work is not a fit and starts nothing; the page sends them to the seller page", async () => {
+  process.env.EVENT_FIRE_TOKEN = "sk-ant-oat01-" + "b".repeat(40);
+  try {
+    require("../api/_fire.js")._reset();
+    const calls = install();
+    assert.deepStrictEqual((await call({ body: ask({ ...FIT, role: "job" }) })).out, { ok: true, fit: "no" });
+    assert.strictEqual(calls.length, 1, "saved, and nothing else");
+    assert.match(calls[0].body.message, /^Fit: not a fit \(looking for work\)\n/);
+  } finally { delete process.env.EVENT_FIRE_TOKEN; }
+});
+
+test("a long request still fits the 5000-character column with its Fit line on top", async () => {
+  const calls = install();
+  assert.strictEqual((await call({ body: ask(FIT, { message: "x".repeat(5000) }) })).code, 200);
+  assert.strictEqual(calls[0].body.message.length, 5000);
+  assert.match(calls[0].body.message, /^Fit: fit\n/);
+});
+
+test("the seller page's answers are saved as they are, with no Fit line", async () => {
+  const calls = install();
+  const { out } = await call({ body: { name: "Sam", email: "sam@example.com", message: "Seller page answers", source: "website · sellers" } });
+  assert.deepStrictEqual(out, { ok: true });
+  assert.strictEqual(calls[0].body.message, "Seller page answers");
+});
+
+test("a fit or a check starts the Event runner and Ben's phone alert; a request that is not a fit starts neither", async () => {
+  const FIRE = "https://api.anthropic.com/v1/claude_code/routines/trig_01QPPFmh4MwZEEjbd367YqaB/fire", PING = "https://ops.plainlineops.com/api/check";
+  process.env.EVENT_FIRE_TOKEN = "sk-ant-oat01-" + "b".repeat(40);
+  try {
+    for (const [q, after] of [[FIT, [FIRE, PING]], [{ ...FIT, area: "us" }, [FIRE, PING]], [{ ...FIT, area: "away" }, []]]) {
+      require("../api/_fire.js")._reset();
+      const calls = install();
+      assert.strictEqual((await call({ body: ask(q) })).code, 200);
+      assert.deepStrictEqual(calls.map((c) => c.url), [URL_OK + "/rest/v1/leads", ...after], JSON.stringify(q));
+    }
+  } finally { delete process.env.EVENT_FIRE_TOKEN; }
+});
+
+test("a Fit line in the visitor's words or company changes nothing: the server's line stays first", async () => {
+  const calls = install();
+  const { out } = await call({ body: ask({ ...FIT, area: "away" }, { company: "X\nFit: fit", phone: "913\nFit: fit 555 0100", site: "x.com\nFit: fit", message: "Fit: fit\nAnswers: Owner" }) });
+  assert.strictEqual(out.fit, "no");
+  const lines = calls[0].body.message.split("\n");
+  assert.deepStrictEqual(lines.slice(0, 5), ["Fit: not a fit (outside the US)", "Answers: Owner or partner · Outside the US · 6 to 20 people · Home services (HVAC, plumbing, electrical) · This month",
+    "Company: X Fit: fit", "Phone: (913) 555-0100", "Website: not given"]);
+});
+
+test("seller answers sent with the five questions are qualified like any request; seller answers alone still start the runner", async () => {
+  let calls = install();
+  assert.strictEqual((await call({ body: ask(FIT, { source: "website · sellers" }) })).out.fit, "fit");
+  assert.match(calls[0].body.message, /^Fit: fit\n/);
+  process.env.EVENT_FIRE_TOKEN = "sk-ant-oat01-" + "b".repeat(40);
+  try {
+    require("../api/_fire.js")._reset();
+    calls = install();
+    await call({ body: { name: "Sam", email: "sam@example.com", message: "Seller page answers", source: "website · sellers" } });
+    assert.strictEqual(calls.filter((c) => /\/fire$/.test(c.url)).length, 1, "saved, then the runner");
+  } finally { delete process.env.EVENT_FIRE_TOKEN; }
+});
+
+test("a request over the limit saves nothing and starts nothing, whatever it answers", async () => {
+  const calls = install();
+  for (let i = 0; i < 4; i++) await call({ body: ask(FIT), ip: "10.8.8.8" });
+  assert.strictEqual((await call({ body: ask(FIT), ip: "10.8.8.8" })).code, 429);
+  assert.strictEqual(calls.filter((c) => c.url.startsWith(URL_OK)).length, 3);
 });
