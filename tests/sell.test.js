@@ -30,6 +30,14 @@ test("the page shows no price, dollar amount or pay rate", () => {
   assert.doesNotMatch(text, /[$€£]\s?\d|\b\d+\s?%|\bper (month|hour|lead|call)\b|\bcommission rate\b/i);
 });
 
+test("the page is public now, so it keeps the seller details for the seller kit: no lead steps, rules, pay terms or booking link", () => {
+  // Ben, Nov 13: "need to take this out of the sell page if it's going to be public" (the home page links here for "Looking for work").
+  const text = html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<!--[\s\S]*?-->/g, " ").replace(/<[^>]+>/g, " ");
+  assert.doesNotMatch(text, /How a lead moves|The rules|How you get paid|90 days|earn a share|pays you|you get paid|intro call/i);
+  assert.ok(!html.includes("calendar.app.google"), "no booking link");
+  assert.match(text, /5 quick questions/);
+});
+
 test("the page is kept out of search and out of the sitemap", () => {
   assert.match(html, /<meta name="robots" content="noindex">/);
   assert.doesNotMatch(fs.readFileSync(path.join(__dirname, "..", "sitemap.xml"), "utf8"), /\/sell/);

@@ -156,8 +156,11 @@ input::placeholder,textarea::placeholder{color:rgba(247,242,234,.68)}
 input:focus,textarea:focus,select:focus{outline:none;border-color:var(--g-accent-hi);box-shadow:0 0 0 4px rgba(76,140,246,.25)}
 textarea{min-height:120px;resize:vertical}
 fieldset.qual{border:0;margin:0;padding:0;min-width:0}
-.qual{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
-@media (max-width:520px){.qual{grid-template-columns:minmax(0,1fr)}}
+.qual,.reach{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+@media (max-width:520px){.qual,.reach{grid-template-columns:minmax(0,1fr)}}
+.reach input{width:100%;min-width:0}
+label.tick{flex-direction:row;align-items:center;gap:10px;font-weight:500}
+label.tick input{min-height:0;width:20px;height:20px;padding:0;margin:0;accent-color:var(--g-accent)}
 .qual select{width:100%;min-width:0;text-overflow:ellipsis}
 .book-now{display:flex;width:max-content;max-width:100%;margin-top:10px}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
@@ -353,13 +356,15 @@ form.chat-book{gap:10px;padding:14px;border-radius:16px;background:rgba(255,255,
       <div class="chat-chips" id="chatChips"></div>
       <form class="chat-book" id="chatBook" hidden novalidate>
         <h3>Book a walkthrough</h3>
-        <p class="fine">Four quick questions. When Plainline is a fit, you pick your walkthrough time right away. We send this chat with your request.</p>
+        <p class="fine">Five quick questions and how to reach you. When Plainline is a fit, you pick your walkthrough time right away. We send this chat with your request.</p>
         <div class="row"><label>Your name<input name="name" required maxlength="200" autocomplete="name"></label><label>Email<input name="email" type="email" required maxlength="320" autocomplete="email"></label></div>
-        <fieldset class="qual"><legend class="sr">Four quick questions</legend></fieldset>
+        <div class="reach"><label>Phone number<input name="phone" type="tel" required maxlength="40" autocomplete="tel"></label><label>Company website<input name="site" inputmode="url" maxlength="200" autocomplete="url" placeholder="e.g. cornercuts.com"></label></div>
+        <label class="tick"><input type="checkbox" name="nosite">We don't have a website</label>
+        <fieldset class="qual"><legend class="sr">Five quick questions</legend></fieldset>
         <label class="hp" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
         <button class="btn" id="bookBtn">Book a walkthrough</button>
         <p id="bookMsg" role="status" aria-live="polite"></p>
-        <p class="fine">By sending, you confirm you're 18 or older and agree to our <a href="/terms">Terms</a>. See our <a href="/privacy">privacy policy</a>.</p>
+        <p class="fine">We call your number only about your request, and we never text you without your OK. By sending, you confirm you're 18 or older and agree to our <a href="/terms">Terms</a>. See our <a href="/privacy">privacy policy</a>.</p>
       </form>
       <form class="chat-in" id="chatIn"><label class="sr" for="chatText">Your message</label><textarea id="chatText" rows="1" maxlength="800" placeholder="e.g. Quote follow-ups and missed calls" enterkeyhint="send"></textarea><button id="chatSend" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></form>
     </div>
@@ -490,19 +495,21 @@ form.chat-book{gap:10px;padding:14px;border-radius:16px;background:rgba(255,255,
   <section id="contact" class="contact">
     <div>
       <h2 style="font-size:28px;margin-bottom:12px">Book a walkthrough</h2>
-      <p style="color:var(--g-ink-2);margin:0">Tell us about your business in four quick questions. When Plainline is a fit, you pick your walkthrough time right away.</p>
+      <p style="color:var(--g-ink-2);margin:0">Tell us about your business in five quick questions. When Plainline is a fit, you pick your walkthrough time right away.</p>
       <p class="billing">After you approve a quote, you pay by invoice through Stripe. <a href="https://stripe.com/@plainline" target="_blank" rel="noopener">Plainline on Stripe ↗</a></p>
     </div>
     <form id="leadForm" novalidate>
       <label>Your name<input name="name" required maxlength="200" autocomplete="name"></label>
       <label>Email<input name="email" type="email" required maxlength="320" autocomplete="email"></label>
       <label>Company name<input name="company" required maxlength="200" autocomplete="organization" placeholder="e.g. Corner Cuts"></label>
-      <fieldset class="qual"><legend class="sr">Four quick questions</legend></fieldset>
+      <div class="reach"><label>Phone number<input name="phone" type="tel" required maxlength="40" autocomplete="tel"></label><label>Company website<input name="site" inputmode="url" maxlength="200" autocomplete="url" placeholder="e.g. cornercuts.com"></label></div>
+      <label class="tick"><input type="checkbox" name="nosite">We don't have a website</label>
+      <fieldset class="qual"><legend class="sr">Five quick questions</legend></fieldset>
       <label>What would you like us to run?<textarea name="message" maxlength="4400"></textarea></label>
       <label class="hp" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
       <button class="btn" id="sendBtn">Book a walkthrough</button>
       <p id="formMsg" role="status" aria-live="polite"></p>
-      <p class="fine">We only use what you send here to reply to you. We never sell it. By sending, you confirm you're 18 or older and agree to our <a href="/terms">Terms</a>. See our <a href="/privacy">privacy policy</a>.</p>
+      <p class="fine">We only use what you send here to reply to you. We never sell it. We call your number only about your request, and we never text you without your OK. By sending, you confirm you're 18 or older and agree to our <a href="/terms">Terms</a>. See our <a href="/privacy">privacy policy</a>.</p>
     </form>
   </section>
 
@@ -526,22 +533,32 @@ const bookLink = big => {
 const say = (text, cls, link) => { msg.textContent = text; msg.className = cls; if (link) msg.append(" ", bookLink(link === "big"), link === "big" ? "" : "."); };
 /* Where the visitor came from, so walkthrough rates can be counted per campaign: "website", or "website · <utm_source>/<utm_campaign>", at most 50 characters (the table's limit). */
 const leadSource = () => { const q = new URLSearchParams(location.search), tag = [q.get("utm_source"), q.get("utm_campaign")].filter(Boolean).join("/").replace(/[^\w.\/-]/g, "").slice(0, 40); return tag ? "website · " + tag : "website"; }; // the leads table caps source at 50 characters
-/* The four quick questions come from qualify.js, so the page and the server use one list and one rule. Without it
+/* The five quick questions come from qualify.js, so the page and the server use one list and one rule. Without it
    (a blocked script) the forms still send, and the server answers "check": a person reads it, nobody gets the calendar. */
 const Q = window.Qualify;
-if (!Q) console.error("qualify.js didn't load: the forms send without the four questions");
+if (!Q) console.error("qualify.js didn't load: the forms send without the five questions");
 document.querySelectorAll(".qual").forEach(box => Q && box.append(...Q.ASK.map(([key, label, opts]) => {
   const l = document.createElement("label"), s = Object.assign(document.createElement("select"), { name: key, required: true });
   s.append(new Option("Choose one", ""), ...Object.entries(opts).map(([v, t]) => new Option(t, v)));
   s.addEventListener("change", () => s.removeAttribute("aria-invalid"));
   l.append(label, s); return l;
 })));
-/* A form's answers, its first unanswered question and qualify()'s answer: fit, check or no */
+/* "We don't have a website" clears the website box, and typing an address clears the tick */
+document.querySelectorAll(".reach").forEach(r => { const f = r.closest("form");
+  f.nosite.addEventListener("change", () => { if (f.nosite.checked) f.site.value = ""; });
+  f.site.addEventListener("input", () => { if (f.site.value) f.nosite.checked = false; });
+});
+/* A form's answers and contact details, its first unanswered question, and qualify()'s answer: fit, check or no */
 const answersOf = f => {
-  const a = {}; let miss = null;
+  const a = {}, c = { company: f.company ? f.company.value : "", phone: f.phone.value, site: f.site.value, nosite: f.nosite.checked }; let miss = null;
   for (const s of f.querySelectorAll(".qual select")) { a[s.name] = s.value; if (!s.value) { s.setAttribute("aria-invalid", "true"); miss = miss || s; } }
-  return { a, miss, ...(Q ? Q.qualify(a) : { fit: "check", note: "" }) };
+  return { a, c, miss, ...(Q ? Q.qualify(a, c) : { fit: "check", note: "", link: "" }) };
 };
+/* The phone and website hints: a phone is required, a website is optional (qualify.js reads both the same way) */
+const reachHint = (f, q) => !(Q ? Q.phone(q.c.phone) : q.c.phone.trim()) ? [f.phone, "Please add a phone number with its area code, so we can call you."]
+  : q.c.site.trim() && Q && !Q.site(q.c.site) ? [f.site, "Please check the website address, or tick \"We don't have a website\"."] : null;
+/* The page a visitor who is not a fit can go to instead (qualify.js NO: "Looking for work" gets the seller page) */
+const pageLink = ([href, text]) => Object.assign(document.createElement("a"), { href, textContent: text });
 const FITS = ["fit", "check", "no"];
 const after = (q, n) => q.fit === "fit" ? `Thanks${n}! Plainline is a fit for your business. Pick your walkthrough time now:`
   : q.fit === "no" ? `Thanks for reaching out${n}. ${q.note}`.trim()
@@ -556,14 +573,15 @@ form.addEventListener("submit", async e => {
   if (!name){ form.name.focus(); return say("Please add your name.", "err"); }
   if (!/^\S+@\S+\.\S+$/.test(email)){ form.email.focus(); return say("Please add a valid email so we can reply.", "err"); }
   if (!company){ form.company.focus(); return say("Please add your company's name.", "err"); }
-  if (q.miss){ q.miss.focus(); return say("Please answer the four quick questions.", "err"); }
+  const hint = reachHint(form, q); if (hint){ hint[0].focus(); return say(hint[1], "err"); }
+  if (q.miss){ q.miss.focus(); return say("Please answer the five quick questions.", "err"); }
   if (f.website){ form.reset(); return say("Thanks! We'll be in touch.", "ok"); } // bot filled the hidden field
   btn.disabled = true; say("Sending…", "");
   try {
     const r = await fetch("/api/lead", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({name, email, company, message: f.message.trim(), q: q.a, source: leadSource()}),
+      body: JSON.stringify({name, email, company, phone: q.c.phone.trim(), site: q.c.site.trim(), nosite: q.c.nosite, message: f.message.trim(), q: q.a, source: leadSource()}),
       signal: AbortSignal.timeout(15000)
     });
     // Our own limit says 429 with no firewall header; the spam check (x-vercel-mitigated) and other errors go to the catch.
@@ -571,6 +589,7 @@ form.addEventListener("submit", async e => {
     if (!r.ok) throw new Error("HTTP " + r.status);
     const d = await r.json().catch(() => ({})), got = FITS.includes(d.fit) ? d.fit : q.fit; // the server's answer wins
     form.reset(); say(after({ ...q, fit: got }, ""), got === "no" ? "" : "ok", got === "fit" && "big");
+    if (got === "no" && q.link) msg.append(" ", pageLink(q.link), ".");
   } catch (err) {
     console.error("lead submit failed", err);
     say(fit ? FAILED.fit : FAILED.other, "err", fit);
@@ -621,6 +640,7 @@ form.addEventListener("submit", async e => {
     if (done) return;
     book.hidden = false; chipsEl.replaceChildren();
     book.scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    if (site && !book.site.value && !book.nosite.checked && Q && Q.site(site)) book.site.value = site; // the address they named in the chat
     if (focus) book.name.focus();
   }
   function lock(on) { text.disabled = sendBtn.disabled = on; input.hidden = on && done; }
@@ -686,11 +706,12 @@ form.addEventListener("submit", async e => {
     const err = (t, link) => { bookMsg.textContent = t; bookMsg.className = "err"; if (link) bookMsg.append(" ", bookLink(), "."); };
     if (!name) { book.name.focus(); return err("Please add your name."); }
     if (!/^\S+@\S+\.\S+$/.test(email)) { book.email.focus(); return err("Please add a valid email so we can reply."); }
-    if (q.miss) { q.miss.focus(); return err("Please answer the four quick questions."); }
+    const hint = reachHint(book, q); if (hint) { hint[0].focus(); return err(hint[1]); }
+    if (q.miss) { q.miss.focus(); return err("Please answer the five quick questions."); }
     const finish = got => {
       done = true; book.hidden = true; lock(true); chips([], false);
       const m = say("in", after({ ...q, fit: got }, ", " + name.split(" ")[0]));
-      if (got === "no") return;
+      if (got === "no") { if (q.link) m.append(" ", pageLink(q.link), "."); return; }
       if (got === "fit") m.append(" ", bookLink(), ".");
       const b = document.createElement("div"); b.className = "booked pop"; b.textContent = "Walkthrough requested"; logEl.append(b); scroll();
     };
@@ -703,7 +724,7 @@ form.addEventListener("submit", async e => {
       const r = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, message, q: q.a, source: leadSource().replace(/^website/, "website chat").slice(0, 50) }),
+        body: JSON.stringify({ name, email, message, phone: q.c.phone.trim(), site: q.c.site.trim(), nosite: q.c.nosite, q: q.a, source: leadSource().replace(/^website/, "website chat").slice(0, 50) }),
         signal: AbortSignal.timeout(15000)
       });
       if (r.status === 429 && !r.headers.get("x-vercel-mitigated")) return err(fit ? LIMIT.fit : LIMIT.other, fit);

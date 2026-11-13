@@ -13,13 +13,15 @@
 <title>Sell with Plainline</title>
 <meta property="og:site_name" content="Plainline">
 <meta property="og:title" content="Sell with Plainline">
-<meta property="og:description" content="Know business owners who miss calls? Bring them to a 20-minute walkthrough. One page to read, five quick questions.">
+<meta property="og:description" content="Know business owners who miss calls? Bring them to a 20-minute walkthrough with Plainline. Five quick questions to start.">
 <meta property="og:image" content="https://plainlineops.com/og.png">
 <script defer src="/_vercel/insights/script.js"></script>
 <script defer src="/consent.js"></script>
 <link rel="stylesheet" href="/fonts/plainline.css">
-<!-- The seller one-pager (Ben, Nov 10), sent from The Engine's Send to box. The text is the seller kit's one page
-     (project files plainline/sellers/onboarding/seller-one-pager.html): change it there first, then here.
+<!-- The seller page (Ben, Nov 10), sent from The Engine's Send to box. Since Nov 13 the home page links here too ("Looking
+     for work", qualify.js), so it is public (Ben: "need to take this out of the sell page if it's going to be public"):
+     no lead steps, rules, pay terms or booking link here. They are in the seller kit's one-pager (project files
+     plainline/sellers/onboarding/seller-one-pager.html), which a seller gets after their answers.
      No prices, rates or amounts on this page: the seller agreement holds them, after an attorney checks it. Not in the sitemap. -->
 <style>
 :root{--ease:cubic-bezier(.2,.8,.2,1);--t-fast:200ms;
@@ -52,15 +54,9 @@ li{margin-bottom:4px}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:24px}
 @media (max-width:700px){.cols{grid-template-columns:1fr}}
 .fine{font-size:14px;color:var(--g-ink-2);margin:0}
-.job{background:var(--surface);border:1px solid var(--g-line);border-radius:16px;padding:14px 16px;margin:0}
-.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-@media (max-width:700px){.steps{grid-template-columns:1fr 1fr}}
-.steps li{counter-increment:s;border-top:3px solid var(--g-success-ink);padding-top:8px;font-size:15px}
-.steps li::before{content:counter(s);display:block;font:700 20px var(--f-body);color:var(--g-success-ink)}
 .btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 24px;border:1px solid rgba(255,255,255,.22);border-radius:999px;
   background:linear-gradient(180deg,var(--g-accent-hi),var(--g-accent));color:#fff;font:600 17px var(--f-body);text-decoration:none;cursor:pointer;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 16px -6px rgba(45,99,216,.7)}
-.btn.ghost{background:rgba(255,255,255,.08);border-color:var(--g-line);box-shadow:none}
 .btn:disabled{opacity:.55;cursor:default}
 .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
 form{display:flex;flex-direction:column;gap:16px}
@@ -91,8 +87,8 @@ footer a{color:var(--g-ink-2)}
 
 <section aria-labelledby="h1">
   <h1 id="h1">Sell with Plainline</h1>
-  <p class="lede">Know business owners who miss calls? Bring them to a 20-minute walkthrough. Plainline does the rest, and you get paid when they become a client.</p>
-  <div class="cta"><a class="btn" href="#questions">Answer 5 quick questions</a><a class="btn ghost" href="https://calendar.app.google/hZbyd1vnBrK6uEwKA" target="_blank" rel="noopener">Book a short intro call</a></div>
+  <p class="lede">Know business owners who miss calls? Bring them to a 20-minute walkthrough with Plainline. Answer 5 quick questions, and we send you how it works.</p>
+  <div class="cta"><a class="btn" href="#questions">Answer 5 quick questions</a></div>
 </section>
 
 <section class="cols">
@@ -118,37 +114,9 @@ footer a{color:var(--g-ink-2)}
   </div>
 </section>
 
-<section>
-  <h2>What you do</h2>
-  <p class="job">Your one job is to book the walkthrough. You do not sell the product, quote or sign. Plainline gives you a short guide, the words to use and a one-page lead form.</p>
-  <h2 style="margin-top:22px">How a lead moves</h2>
-  <ol class="steps">
-    <li>Talk to an owner you know. Ask what happens to the calls they miss.</li>
-    <li>If they name a problem, ask for 20 minutes with Plainline.</li>
-    <li>Send Plainline the lead form the same day. The lead is yours for 90 days.</li>
-    <li>Plainline runs the walkthrough, quotes and tells you the result.</li>
-  </ol>
-</section>
-
-<section class="cols">
-  <div>
-    <h2>The rules</h2>
-    <ul>
-      <li>Never say a price. Plainline quotes after the walkthrough.</li>
-      <li>Tell owners that Plainline pays you.</li>
-      <li>Talk as yourself. No auto-dialers, bought lists or mass texts.</li>
-      <li>Stop when someone says no.</li>
-    </ul>
-  </div>
-  <div>
-    <h2>How you get paid</h2>
-    <p>You earn a share when a client you bring pays Plainline. The terms are in a written seller agreement that you sign before you start.</p>
-  </div>
-</section>
-
 <section id="questions" aria-labelledby="qh">
   <h2 id="qh">Next step: 5 quick questions</h2>
-  <p class="fine" style="margin-bottom:16px">About 2 minutes. We reply by email within 24 hours. Or <a href="https://calendar.app.google/hZbyd1vnBrK6uEwKA" target="_blank" rel="noopener">pick a time</a> for a short intro call, or reply to <a href="mailto:ben@plainlineops.com">ben@plainlineops.com</a> with "I'm in".</p>
+  <p class="fine" style="margin-bottom:16px">About 2 minutes. We reply by email within 24 hours with how it works. Or email <a href="mailto:ben@plainlineops.com">ben@plainlineops.com</a>.</p>
   <form id="f" novalidate>
     <fieldset><legend>1. What interests you? <small>Pick any.</small></legend><div class="pick">
       <label><input type="checkbox" name="want" value="Bringing owners to Plainline">Bringing owners to Plainline</label>

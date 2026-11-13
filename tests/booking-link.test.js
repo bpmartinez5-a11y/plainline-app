@@ -1,6 +1,7 @@
 // Only a fit sees the booking page (Ben, Nov 13: the site qualifies every request before he sees it). The Nov 11
 // booking test said a visitor always has a way to book; now a visitor whose answers make Plainline a fit always has one
-// (after the request, and when a send fails), and nobody else gets the calendar from the home page or the trade pages.
+// (after the request, and when a send fails), and nobody else gets the calendar from the home page, the trade pages or
+// the seller page (public since Nov 13: the home page sends people looking for work there).
 // The page has no build step and CI runs no browser, so these read the page's own script lines; the PR has the browser check.
 const test = require("node:test");
 const assert = require("node:assert");
@@ -11,15 +12,20 @@ const html = read("index.html");
 const BOOK = (html.match(/const BOOK_URL = "([^"]+)"/) || [])[1];
 const lines = (re) => html.split("\n").filter((l) => re.test(l));
 
-test("the home page names one booking page, the same one the seller page uses", () => {
+test("the home page names one booking page", () => {
   assert.match(BOOK || "", /^https:\/\/calendar\.app\.google\/\w+$/);
-  assert.ok(read("sell.html").includes(BOOK), "sell.html: the seller intro call keeps its own link");
   assert.match(html, /const bookLink = [^\n]*\n[^\n]*href: BOOK_URL/);
 });
 
-test("the booking page is never one click from the home page or a trade page", () => {
+test("the booking page is never one click from the home page, a trade page or the seller page", () => {
   assert.equal(html.split("calendar.app.google").length - 1, 1, "only the script's BOOK_URL");
-  for (const f of ["hvac-plumbing.html", "auto-repair.html"]) assert.ok(!read(f).includes("calendar.app.google"), f);
+  for (const f of ["hvac-plumbing.html", "auto-repair.html", "sell.html"]) assert.ok(!read(f).includes("calendar.app.google"), f);
+});
+
+test("a visitor who is not a fit gets the seller page link only from qualify.js, on both forms, never the booking page", () => {
+  assert.equal(lines(/pageLink\(q\.link\)/).length, 2, "the form's and the chat's not-a-fit answers");
+  assert.equal(lines(/got === "no" && q\.link/).length, 1);
+  assert.match(html, /if \(got === "no"\) \{ if \(q\.link\) m\.append\(" ", pageLink\(q\.link\), "\."\); return; \}/);
 });
 
 test("the script shows the booking link in three places, each only for a fit", () => {

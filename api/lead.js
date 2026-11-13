@@ -15,17 +15,17 @@ const EMAIL = /^\S+@\S+\.\S+$/; // the same check as the page
 const str = (v, n) => (typeof v === "string" ? v.trim().slice(0, n) : "");
 
 // The four columns the table takes, checked to the table's own limits, plus `fit` (not saved). Null when the request
-// isn't a real one. A walkthrough request (the form or the chat) is qualified: its message starts with the "Fit:" and
-// "Answers:" lines from qualify.js, then the company and the visitor's words. The seller page's answers are not.
+// isn't a real one. A walkthrough request (the form or the chat) is qualified: its message starts with the "Fit:",
+// "Answers:", "Company:", "Phone:" and "Website:" lines from qualify.js, then the visitor's words. The seller page's
+// answers are not.
 function lead(b) {
   const name = str(b.name, 201), email = str(b.email, 321), message = str(b.message, 5001);
   const source = str(b.source, 50).replace(/[^\w .·\/-]/g, "") || "website";
   if (!name || name.length > 200 || email.length > 320 || !EMAIL.test(email) || message.length > 5000) return null;
   if (!/^website( chat)?( · |$)/.test(source)) return null; // only the site's own sources (lead-source.test.js)
   if (source === "website · sellers" && !b.q) return { name, email, message: message || null, source };
-  const q = qualify(b.q), company = str(b.company, 200).replace(/\s+/g, " ");
-  const head = q.line + (company ? "\nCompany: " + company : "");
-  return { name, email, message: (message ? head + "\n\n" + message : head).slice(0, 5000), source, fit: q.fit };
+  const q = qualify(b.q, { company: b.company, phone: b.phone, site: b.site, nosite: b.nosite });
+  return { name, email, message: (message ? q.line + "\n\n" + message : q.line).slice(0, 5000), source, fit: q.fit };
 }
 
 // Tells The Engine a request came in, so Ben's phone gets an alert in seconds (Ben, Nov 13: "yep let's get them").

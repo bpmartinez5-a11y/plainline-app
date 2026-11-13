@@ -59,7 +59,7 @@ for (const slug of ["hvac-plumbing", "auto-repair"]) {
   test(`${slug}: the first screen says it is automated and offers the walkthrough and the demo`, () => {
     const hero = html.slice(html.indexOf('<section aria-labelledby="h1">'), html.indexOf("</section>"));
     assert.match(hero, /<p class="lede">[^<]*It always says it is automated\.<\/p>/);
-    assert.match(hero, /<a class="btn" href="\/#contact">Book a walkthrough<\/a>/, "the walkthrough starts with the four questions");
+    assert.match(hero, /<a class="btn" href="\/#contact">Book a walkthrough<\/a>/, "the walkthrough starts with the five questions");
     assert.match(hero, /href="\/demo"/);
     assert.match(hero, /Texting on your business number starts once the phone carriers approve it\./);
   });
