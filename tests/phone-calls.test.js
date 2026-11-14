@@ -21,3 +21,14 @@ test("the privacy policy names phone calls, the recording, ElevenLabs and the 90
   assert.match(p, /a short summary of the call for 90 days/);
   assert.match(read("docs/subprocessors.md"), /^\| ElevenLabs \(added Nov 13, 2026\)/m);
 });
+
+test("the privacy policy names the voicemail, who keeps it, the 90 days and who hears of it", () => {
+  const p = read("privacy.html");
+  assert.match(p, /you can leave a voicemail\. Twilio records it and writes a text copy, which we add to your request\. We delete the recording and both text copies, ours and Twilio's, after 90 days\./);
+  assert.match(p, /goes by email or text to the person at Plainline who calls you back, and that person can play your voicemail/);
+  assert.match(p, /<li><b>Twilio<\/b>[^<]*keeps voicemails and their text copies until we delete them after 90 days/);
+  assert.match(p, /<li><b>Resend<\/b> sends our team's work emails/);
+  const subs = read("docs/subprocessors.md");
+  assert.match(subs, /^\| Twilio .*voicemail recordings.*deletes them after 90 days/m);
+  assert.match(subs, /^\| Resend .*front desk notice/m);
+});
